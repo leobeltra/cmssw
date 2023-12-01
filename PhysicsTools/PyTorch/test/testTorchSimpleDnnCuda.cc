@@ -4,6 +4,7 @@
 #include <memory>
 #include <vector>
 
+
 class testSimpleDNNCUDA : public testBasePyTorchCUDA {
   CPPUNIT_TEST_SUITE(testSimpleDNNCUDA);
   CPPUNIT_TEST(test);

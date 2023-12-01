@@ -21,6 +21,8 @@
 #include "FWCore/ServiceRegistry/interface/ServiceToken.h"
 #include "FWCore/Utilities/interface/Exception.h"
 #include "FWCore/Utilities/interface/ResourceInformation.h"
+#include "HeterogeneousCore/CUDAServices/interface/CUDAInterface.h"
+#include "HeterogeneousCore/CUDAUtilities/interface/requireDevices.h"
 
 class testBasePyTorchCUDA : public CppUnit::TestFixture {
 public:

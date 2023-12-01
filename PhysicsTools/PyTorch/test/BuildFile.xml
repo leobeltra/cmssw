@@ -1,5 +1,6 @@
 <use name="python_tools"/>
 
+<<<<<<< HEAD
 <ifarch value="x86_64">
   <bin name="testTorchSimpleDnn" file="testRunner.cc,testTorchSimpleDnn.cc">
     <use name="pytorch"/>
@@ -7,6 +8,13 @@
     <use name="cppunit"/>
   </bin>
 </ifarch>
+=======
+<bin name="testTorchSimpleDnn" file="testRunner.cc,testTorchSimpleDnn.cc">
+  <use name="pytorch"/>
+  <use name="boost_filesystem"/>
+  <use name="cppunit"/>
+</bin>
+>>>>>>> 8fc9e7ddd8b (Added package for PyTorch. Tests for TorchScript inference CPU and CUDA)
 
 <iftool name="cuda">
   <bin name="testTorchSimpleDnnCUDA" file="testRunner.cc,testTorchSimpleDnnCUDA.cc">
