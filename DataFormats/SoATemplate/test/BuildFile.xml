@@ -19,8 +19,22 @@
 <bin file="SoAUnitTests.cc" name="SoAUnitTests">
   <use name="boost"/>
   <use name="catch2"/>
+  <use name="eigen"/>
 </bin>
 
+
+  <bin file="SoATest.cc" name="SoATest">
+    <use name="boost"/>
+    <use name="cuda"/>
+    <use name="catch2"/>
+    <use name="eigen"/>
+    <use name="HeterogeneousCore/ROCmUtilities"/>
+    <use name="DataFormats/Portable"/>
+    <flags ALPAKA_BACKENDS="1"/>
+    <export>
+      <lib name="1"/>
+    </export>  
+  </bin>
 
 <!-- This test triggers a bug in ROOT, so it's kept disabled
 <bin file="SoAStreamer_t.cpp" name="SoAStreamer_t">

@@ -1,5 +1,7 @@
 #include <memory>
 #include <tuple>
+#include <Eigen/Core>
+#include <Eigen/Dense>
 
 #define CATCH_CONFIG_MAIN
 #include <catch.hpp>
@@ -14,7 +16,33 @@ GENERATE_SOA_LAYOUT(SimpleLayoutTemplate,
   SOA_COLUMN(float, t))
 // clang-format on
 
-using SimpleLayout = SimpleLayoutTemplate<>;
+using SimpleLayout = SimpleLayoutTemplate<>;    
+
+
+GENERATE_SOA_LAYOUT(SoA1LayoutTemplate,
+  // predefined static scalars
+  // size_t size;
+  // size_t alignment;
+
+  // columns: one value per element
+  SOA_COLUMN(double, x),
+  SOA_COLUMN(double, y),
+  SOA_COLUMN(double, z),
+  SOA_EIGEN_COLUMN(Eigen::Vector3d, a),
+  SOA_EIGEN_COLUMN(Eigen::Vector3d, b),
+  SOA_EIGEN_COLUMN(Eigen::Vector3d, r),
+  SOA_COLUMN(uint16_t, color),
+  SOA_COLUMN(int32_t, value),
+  SOA_COLUMN(double *, py),
+  SOA_COLUMN(uint32_t, count),
+  SOA_COLUMN(uint32_t, anotherCount),
+
+  // scalars: one value for the whole structure
+  SOA_SCALAR(const char *, description),
+  SOA_SCALAR(uint32_t, someNumber)
+);
+
+using SoA1Layout = SoA1LayoutTemplate<>;
 
 TEST_CASE("SoATemplate") {
   // number of elements
