@@ -555,7 +555,7 @@ namespace cms::soa {
 
   // Helper function to compute aligned size
   constexpr inline byte_size_type alignSize(byte_size_type size, byte_size_type alignment) {
-    return ((size + alignment - 1) / alignment) * alignment;
+    return ((size + alignment - 1) / alignment) * alignment;  //this is an integer division -> it rounds size to the next multiple of alignment
   }
 
 }  // namespace cms::soa
@@ -564,11 +564,12 @@ namespace cms::soa {
 #define SOA_COLUMN(TYPE, NAME) (_VALUE_TYPE_COLUMN, TYPE, NAME)
 #define SOA_EIGEN_COLUMN(TYPE, NAME) (_VALUE_TYPE_EIGEN_COLUMN, TYPE, NAME)
 
-/* Iterate on the macro MACRO and return the result as a comma separated list */
+/* Iterate on the macro MACRO and return the result as a comma separated list, converting
+   the boost sequence into tuples and then into list */
 #define _ITERATE_ON_ALL_COMMA(MACRO, DATA, ...) \
   BOOST_PP_TUPLE_ENUM(BOOST_PP_SEQ_TO_TUPLE(_ITERATE_ON_ALL(MACRO, DATA, __VA_ARGS__)))
 
-/* Iterate MACRO on all elements */
+/* Iterate MACRO on all elements of the boost sequence */
 #define _ITERATE_ON_ALL(MACRO, DATA, ...) BOOST_PP_SEQ_FOR_EACH(MACRO, DATA, BOOST_PP_VARIADIC_TO_SEQ(__VA_ARGS__))
 
 /* Switch on macros depending on scalar / column type */
@@ -598,7 +599,35 @@ namespace cms::soa {
   struct SoAColumnAccessorsImpl<T, SoAColumnType::column, SoAAccessType::mutableAccess, alignment, restrictQualify> {
     SOA_HOST_DEVICE SOA_INLINE SoAColumnAccessorsImpl(const SoAParametersImpl<SoAColumnType::column, T>& params)
         : params_(params) {}
-    SOA_HOST_DEVICE SOA_INLINE T* operator()() { return params_.addr_; }
+    SOA_HOST_DEVICE SOA_INLINE T* operator()() { return params_.addr_; }  
+    /* 
+    
+    int data[3] = {1, 2, 3};
+
+    // Create an object containing data
+    SoAParametersImpl<SoAColumnType::column, int> params = {data};
+
+    // Define a pointer using the access operator ()
+    int* ptr = SoAColumnAccessorsImpl<int, alignof(int), false>(params)();
+
+    // EXample of print
+    std::cout << "Array values using operator()(): ";
+    for (int i = 0; i < 3; ++i) {
+        std::cout << ptr[i] << " ";
+    }
+    std::cout << std::endl;
+
+    // create an object and modify the previous array
+    SoAColumnAccessorsImpl<int, alignof(int), false> accessor(params);
+    accessor(1) = 42;
+    std::cout << "Modified array values: ";
+    for (int i = 0; i < 3; ++i) {
+        std::cout << data[i] << " ";
+    }
+    std::cout << std::endl;
+    
+    */ 
+
     using NoParamReturnType = T*;
     using ParamReturnType = T&;
     SOA_HOST_DEVICE SOA_INLINE T& operator()(size_type index) { return params_.addr_[index]; }
@@ -703,6 +732,13 @@ namespace cms::soa {
       };
     };
   };
+  // It can be used as
+  /*
+          #define SOA_ACCESSOR_TYPE  SoAAccessors<int>::ColumnType<SoAColumnType::column> \
+                                        ::AccessType<SoAAccessType::constAccess> \
+                                        ::Alignment<alignof(int)> \
+                                        ::RestrictQualifier<false>
+  */
 
   /* Enum parameters allowing templated control of layout/view behaviors */
   /* Alignment enforcement verifies every column is aligned, and
