@@ -1,0 +1,5 @@
+<lcgdict>
+  <class name="SoAHostLayout" />
+  <class name="SoAHostCollection"/>
+  <class name="edm::Wrapper<SoAHostCollection>"/>
+</lcgdict>

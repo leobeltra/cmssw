@@ -5,7 +5,7 @@
 #include "FWCore/Framework/interface/MakerMacros.h"
 #include "FWCore/Framework/interface/global/EDProducer.h"
 
-#include "RecoSoA/SoAProducers/plugins/PortableCollectionSoATest.h"
+#include "RecoSoA/SoAProducers/interface/PortableCollectionSoATest.h"
 #include <iostream>
 
 class SoAProducer : public edm::global::EDProducer<> {
