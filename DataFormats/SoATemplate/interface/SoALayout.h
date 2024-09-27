@@ -90,6 +90,7 @@
   )
 // clang-format on
 
+// A bit strange this macro definition
 #define _DECLARE_SOA_STREAM_INFO(R, DATA, TYPE_NAME) BOOST_PP_EXPAND(_DECLARE_SOA_STREAM_INFO_IMPL TYPE_NAME)
 
 /**
