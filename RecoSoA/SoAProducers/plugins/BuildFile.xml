@@ -1,0 +1,9 @@
+<use name="FWCore/Framework"/>
+<use name="FWCore/ParameterSet"/>
+<use name="FWCore/MessageLogger"/>
+<use name="eigen"/>
+<use name="DataFormats/Portable"/>
+<use name="RecoSoA/SoAProducer"/>
+<library file="*.cc" name="RecoSoASoAProducerPlugins">
+    <flags EDM_PLUGIN="1"/>
+</library>    
