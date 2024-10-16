@@ -2,4 +2,5 @@
 #include "DataFormats/Portable/interface/PortableHostObjectReadRules.h"
 #include "RecoSoA/SoAProducers/interface/PortableCollectionSoATest.h"
 
-SET_PORTABLEHOSTCOLLECTION_READ_RULES(SoAHostCollection);
+SET_PORTABLEHOSTCOLLECTION_READ_RULES(SoAHostPositionCollection);
+SET_PORTABLEHOSTCOLLECTION_READ_RULES(SoAHostVelocityCollection);

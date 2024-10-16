@@ -274,7 +274,7 @@
  * Freeing of the ROOT-allocated column or scalar buffer
  */
 // clang-format off
-#define _ROOT_FREE_SOA_COLUMN_OR_SCALAR_IMPL(VALUE_TYPE, CPP_TYPE, NAME)                                                  \
+#define _ROOT_FREE_SOA_COLUMN_OR_SCALAR_IMPL(VALUE_TYPE, CPP_TYPE, NAME)                                               \
   delete[] BOOST_PP_CAT(NAME, _); \
   BOOST_PP_CAT(NAME, _) = nullptr; \
   // clang-format on
@@ -425,6 +425,15 @@
 #define _DO_RANGECHECK false
 #endif
 
+
+#define _COUNT_SOA_COLUMNS(R, DATA, TYPE_NAME)  _soa_column_count++;
+
+
+#define _DECLARE_SOA_COLUMNS_NAMES_IMPL(VALUE_TYPE, CPP_TYPE, NAME)                                                    \
+  _columns_names[i++] = BOOST_PP_STRINGIZE(NAME);                                                                      \
+  
+#define _DECLARE_SOA_COLUMNS_NAMES(R, DATA, NAME) BOOST_PP_EXPAND(_DECLARE_SOA_COLUMNS_NAMES_IMPL  NAME)
+
 /*
  * A macro defining a SoA layout (collection of scalars and columns of equal lengths)
  */
@@ -479,6 +488,19 @@
       byte_size_type _soa_impl_ret = 0;                                                                                \
       _ITERATE_ON_ALL(_ACCUMULATE_SOA_ELEMENT, ~, __VA_ARGS__)                                                         \
       return _soa_impl_ret;                                                                                            \
+    }                                                                                                                  \
+                                                                                                                       \
+    static constexpr size_type computeColumnNumber() {                                                                 \
+      size_type _soa_column_count = 0;                                                                                 \
+      _ITERATE_ON_ALL(_COUNT_SOA_COLUMNS, ~, __VA_ARGS__)                                                              \
+      return _soa_column_count;                                                                                        \
+    }                                                                                                                  \
+                                                                                                                       \
+    static constexpr std::array<const char*, computeColumnNumber()> generateColumnNames() {                            \
+      std::array<const char*, computeColumnNumber()> _columns_names = {};                                              \
+      size_type i = 0;                                                                                                 \
+      _ITERATE_ON_ALL(_DECLARE_SOA_COLUMNS_NAMES, ~, __VA_ARGS__)                                                      \
+      return _columns_names;                                                                                           \
     }                                                                                                                  \
                                                                                                                        \
     /**                                                                                                                \
@@ -618,6 +640,7 @@
     size_type const scalar_ = 1;                                                                                       \
     byte_size_type byteSize_ EDM_REFLEX_TRANSIENT;                                                                     \
     _ITERATE_ON_ALL(_DECLARE_SOA_DATA_MEMBER, ~, __VA_ARGS__)                                                          \
+    static constexpr std::array<const char*, computeColumnNumber()> columnNames_ = generateColumnNames();              \
     /* Making the code conditional is problematic in macros as the commas will interfere with parameter lisings     */ \
     /* So instead we make the code unconditional with paceholder names which are protected by a private protection. */ \
     /* This will be handled later as we handle the integration of the view as a subclass of the layout.             */ \

@@ -4,8 +4,19 @@
 #include "RecoSoA/SoAProducers/interface/SoALayoutTest.h"
 #include "DataFormats/Portable/interface/PortableHostCollection.h"
 
-using SoAHostCollection = PortableHostCollection<SoAHostLayout>;
-using SoAHostCollectionView = PortableHostCollection<SoAHostLayout>::View;
-using SoAHostCollectionConstView = PortableHostCollection<SoAHostLayout>::ConstView;
+using SoAHostPositionCollection = PortableHostCollection<SoAHostPositionLayout>;
+using SoAHostVelocityCollection = PortableHostCollection<SoAHostVelocityLayout>;
+
+using SoAHostCollection2 = PortableHostCollection2<SoAHostPositionLayout, SoAHostVelocityLayout>;
+using SoAHostCollectionView1 = PortableHostCollection2<SoAHostPositionLayout, SoAHostVelocityLayout>::View<0>;
+using SoAHostCollectionView2 = PortableHostCollection2<SoAHostPositionLayout, SoAHostVelocityLayout>::View<1>;
+
+using SoAHostPositionCollectionView = PortableHostCollection<SoAHostPositionLayout>::View;
+using SoAHostCollectionConstView = PortableHostCollection<SoAHostPositionLayout>::ConstView;
+
+using SoAHostVelocityCollectionView = PortableHostCollection<SoAHostVelocityLayout>::View;
+using SoAHostVelocityCollectionConstView = PortableHostCollection<SoAHostVelocityLayout>::ConstView;
+
+// using SoAHostXYCoordinatesView = PortableView<SoAHostPositionCollection, SoAHostVelocityCollection>;
 
 #endif

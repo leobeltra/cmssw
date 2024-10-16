@@ -33,11 +33,41 @@ GENERATE_SOA_LAYOUT(SoAHostDeviceLayoutTemplate,
                     SOA_SCALAR(const char*, description),
                     SOA_SCALAR(uint32_t, someNumber))
 
-using SoAHostDeviceLayout = SoAHostDeviceLayoutTemplate<>;
+using SoAHostDeviceLayout = SoAHostDeviceLayoutTemplate<cms::soa::CacheLineSize::IntelCPU>;
 using SoAHostDeviceView = SoAHostDeviceLayout::View;
 using SoAHostDeviceRangeCheckingView =
     SoAHostDeviceLayout::ViewTemplate<cms::soa::RestrictQualify::enabled, cms::soa::RangeChecking::enabled>;
 using SoAHostDeviceConstView = SoAHostDeviceLayout::ConstView;
+
+GENERATE_SOA_LAYOUT(SoADeviceOnlyLayoutTemplate,
+                    /*SoADeviceOnlyViewTemplate,*/
+                    SOA_COLUMN(uint16_t, color),
+                    SOA_COLUMN(double, value),
+                    SOA_COLUMN(double*, py),
+                    SOA_COLUMN(uint32_t, count),
+                    SOA_COLUMN(uint32_t, anotherCount))
+
+using SoADeviceOnlyLayout = SoADeviceOnlyLayoutTemplate<>;
+using SoADeviceOnlyView = SoADeviceOnlyLayout::View;
+
+// A 1 to 1 view of the store (except for unsupported types).
+GENERATE_SOA_VIEW(SoAFullDeviceConstViewTemplate,
+                  SoAFullDeviceViewTemplate,
+                  SOA_VIEW_LAYOUT_LIST(SOA_VIEW_LAYOUT(SoAHostDeviceLayout, soaHD),
+                                       SOA_VIEW_LAYOUT(SoADeviceOnlyLayout, soaDO)),
+                  SOA_VIEW_VALUE_LIST(SOA_VIEW_VALUE(soaHD, x),
+                                      SOA_VIEW_VALUE(soaHD, y),
+                                      SOA_VIEW_VALUE(soaHD, z),
+                                      SOA_VIEW_VALUE(soaDO, color),
+                                      SOA_VIEW_VALUE(soaDO, value),
+                                      SOA_VIEW_VALUE(soaDO, py),
+                                      SOA_VIEW_VALUE(soaDO, count),
+                                      SOA_VIEW_VALUE(soaDO, anotherCount),
+                                      SOA_VIEW_VALUE(soaHD, description),
+                                      SOA_VIEW_VALUE(soaHD, someNumber)))
+
+using SoAFullDeviceView =
+    SoAFullDeviceViewTemplate<cms::soa::CacheLineSize::NvidiaGPU, cms::soa::AlignmentEnforcement::enforced>;
 
 void printSoAView(SoAHostDeviceView view) {
     std::cout << "SoAHostDeviceView:" << std::endl;
@@ -69,6 +99,12 @@ int main () {
 
     //Memory definition for the host
     std::size_t hostDeviceSize = SoAHostDeviceLayout::computeDataSize(numElements);
+    static constexpr std::size_t number_columns = SoAHostDeviceLayout::computeColumnNumber();
+    std::array<const char*, number_columns> col_names = SoAHostDeviceLayout::generateColumnNames();
+    std::cout << "Names: ";
+    for (const char* i : col_names)
+        std::cout << i << " ";
+    std::cout << std::endl;
     std::unique_ptr<std::byte, decltype(std::free) *> slBuffer{
       reinterpret_cast<std::byte *>(aligned_alloc(SoAHostDeviceLayout::alignment, hostDeviceSize)), std::free};
     //Memory allocation for the host
