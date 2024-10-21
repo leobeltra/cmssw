@@ -21,7 +21,7 @@ namespace {
   using TestSoA1Collection = PortableHostCollection<TestSoA1>;
   using TestSoA2Collection = PortableHostCollection<TestSoA2>;
 
-  // using TestSoAView = PortableView<TestSoA1, TestSoA2>;
+  using TestSoAView = PortableView<TestSoA1Collection, TestSoA2Collection>;
 
   constexpr auto s_tag = "[PortableView]";
 }  // namespace
@@ -34,7 +34,14 @@ TEST_CASE("Use of PortableView<Colls...> on host code", s_tag) {
 
     // // myView owns pointers to the columns corresponding to the input name
     // TestSoAView myView(TestSoA1Collection, {"x", "y"}, TestSoA2Collection, {"v_x"});
+    TestSoAView myView(*SoACollection_0, *SoACollection_1);
 
+        // Test di accesso ai dati tramite getView
+    // Otteniamo la vista su TestSoA1 (primo layout)
+    auto& view1 = myView.getView<0>();  // Otteniamo la prima collezione
+    auto& view2 = myView.getView<1>();  // Otteniamo la seconda collezione
+
+    auto& view_of_view = view1->view();
     // // Adding other columns
     // myView.addColumns(TestSoA1, {"id"}, TestSoA2, {"v_y"});
 }
