@@ -503,6 +503,10 @@
       return _columns_names;                                                                                           \
     }                                                                                                                  \
                                                                                                                        \
+    static constexpr size_type retrive_offset(const char* string) {                                                    \
+      return 0;                                                                                                        \
+    }                                                                                                                  \
+                                                                                                                       \
     /**                                                                                                                \
      * Helper/friend class allowing SoA introspection.                                                                 \
      */                                                                                                                \

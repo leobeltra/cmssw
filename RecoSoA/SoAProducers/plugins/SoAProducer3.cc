@@ -42,7 +42,17 @@
 
 //     // Creating a PortableCollection for the output (memory not allocated here)
 //     std::size_t elems = PortableCollection_0->view().metadata().size();
-//     // auto myView = std::make_unique<SoAHostXYCoordinatesView>(PortableCollection_0, {"x", "y"}, PortableCollection_1, {"v_x"}, elems);
+
+
+
+
+
+//     auto myView = std::make_unique<SoAHostXYCoordinatesView>
+//                     (PortableCollection_0, {"y"}, PortableCollection_1, {"v_y"}, elems);
+
+
+
+
 //     //auto myView = std::make_unique<SoAHostXYCoordinatesView>(PortableCollection_0, PortableCollection_1);
 //     // Dynamically allocate columns
 //     // myView.addColumns(PortableCollection_1, "v_y");

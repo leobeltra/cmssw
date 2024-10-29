@@ -1,34 +1,56 @@
 #ifndef DataFormats_Portable_interface_PortableView_h
 #define DataFormats_Portable_interface_PortableView_h
 
+// #include <utility> 
+// // #include <string>
+// // #include <vector>
 #include "DataFormats/Portable/interface/PortableCollection.h"
 #include "DataFormats/SoATemplate/interface/SoAView.h"
 
-template <typename... Colls> 
+using Buffer = cms::alpakatools::host_buffer<std::byte[]>;
+
+// Definizione della struct Argument
+template <typename Collection>
+    struct Argument {
+        using Layout = typename Collection::Layout;
+
+        std::unique_ptr<Collection> collection;
+        std::vector<std::string> columnNames;
+
+        Argument(std::unique_ptr<Collection> coll, std::vector<std::string> names)
+            : collection(std::move(coll)), columnNames(std::move(names)) {}
+
+        Argument(const Argument&) = delete;
+        Argument& operator=(const Argument&) = delete;
+
+        Argument(Argument&&) = default;
+        Argument& operator=(Argument&&) = default;    
+    };
+
+template <typename... Collections>
 class PortableView {
 public:
 
     PortableView() = default;
 
-    PortableView(Colls&... colls) : colls_(colls...) {}
+    PortableView(Argument<Collections>&&... args) 
+        : arguments_(std::make_tuple(std::forward<Argument<Collections>>(args)...)) {}
 
-    // default destructor
     ~PortableView() = default;
 
-    // Access to different views
-    template <std::size_t N>
-    auto& getView() {
-        return std::get<N>(colls_);
+    template <std::size_t I>
+    auto& get() {
+        return std::get<I>(arguments_);
     }
 
-    // template <std::size_t N, typename Column_Name>
-    // auto getColumn() {
-    //     auto& view = getView<N>();
-    //     return view.getCol(Column_Name);
-    // }
+    static constexpr std::size_t size() {
+        return sizeof...(Collections);
+    }
 
 private:
-    std::tuple<Colls&...> colls_;
+    std::tuple<Argument<Collections>...> arguments_;
+    int32_t elements_;
+
 };
 
 #endif // DataFormats_Portable_interface_PortableView_h

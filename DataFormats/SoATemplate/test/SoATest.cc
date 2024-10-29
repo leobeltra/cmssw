@@ -87,12 +87,10 @@ void printSoAView(SoAHostDeviceView view) {
 /*  
     TODO:
     - write my alpaka kernel and test in parallel
-    - use some producers and test the functioning
-    - write my total and cpu time (maybe other metrics) to evaluate efficiency
 */
 
 int main () {
-    std::size_t numElements = 16;
+    std::size_t numElements = 15;
 
     // Enables parallel execution
     // PortableCollection<SoAHostDeviceLayout, alpaka::DevCpu> coll(numElements, cms::alpakatools::host());
