@@ -1,12 +1,11 @@
 <lcgdict>
   <class name="SoAHostPositionLayout" />
   <class name="SoAHostVelocityLayout" />
+  <class name="SoAHostYCoordinateLayout"/>
   <class name="SoAHostPositionCollection"/>
   <class name="SoAHostVelocityCollection"/>
-  <!-- <class name="portablecollection::CollectionImpl<0, SoAHostPositionLayoutTemplate<128,false>, SoAHostVelocityLayoutTemplate<128,false> >" />
-  <class name="portablecollection::CollectionImpl<1, SoAHostVelocityLayoutTemplate<128,false> >" />
-  <class name="portablecollection::CollectionLeaf<0, SoAHostPositionLayoutTemplate<128,false> >" />
-  <class name="portablecollection::CollectionLeaf<1, SoAHostVelocityLayoutTemplate<128,false> >" /> -->
+  <class name="SoAHostYCoordinateCollection"/>
   <class name="edm::Wrapper<SoAHostPositionCollection>"/>
   <class name="edm::Wrapper<SoAHostVelocityCollection>"/>
+  <class name="edm::Wrapper<SoAHostYCoordinateCollection>"/>
 </lcgdict>

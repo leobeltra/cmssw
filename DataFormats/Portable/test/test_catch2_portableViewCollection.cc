@@ -19,8 +19,12 @@ namespace {
   using TestSoA1View = TestSoA1::View;
   using TestSoA2View = TestSoA2::View;
 
+//   using TestSoA = SoA<>;
+//   using TestSoAView = TestSoA::View;
+
   using TestSoA1Collection = PortableHostCollection<TestSoA1>;
   using TestSoA2Collection = PortableHostCollection<TestSoA2>;
+  //using TestSoACollection = PortableHostCollection<TestSoA>;
 
   using TestSoAView = PortableView<TestSoA1Collection, TestSoA2Collection>;
 
@@ -41,8 +45,10 @@ TEST_CASE("Use of PortableView<Colls...> on host code", s_tag) {
     std::size_t elems = 16;
     auto SoACollection_0 = std::make_unique<TestSoA1Collection>(elems, cms::alpakatools::host());
     auto SoACollection_1 = std::make_unique<TestSoA2Collection>(elems, cms::alpakatools::host());
+    // auto SoACOllection = std::make_unique<TestSoACollection>(elems, cms::alpakatools::host());
 
     auto& view_0 = SoACollection_0 -> view();
+   //  auto& view = SoACollection -> view();
 
     for (int i = 0; i < view_0.metadata().size(); i++) {
       view_0.x()[i] = static_cast<double>(i);

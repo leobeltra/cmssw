@@ -168,6 +168,41 @@
 // clang-format on
 #define _DEFINE_METADATA_MEMBERS(R, DATA, TYPE_NAME) _DEFINE_METADATA_MEMBERS_IMPL TYPE_NAME
 
+#define _DEFINE_SET_COLUMN_FUNCTIONS_IMPL(VALUE_TYPE, CPP_TYPE, NAME)                                                  \
+  _SWITCH_ON_TYPE(VALUE_TYPE,                                                                                          \
+      /* Scalar */                                                                                                     \
+      void BOOST_PP_CAT(setColumn_, NAME)(CPP_TYPE* newAddr, size_type elements) {                                     \
+          BOOST_PP_CAT(NAME, _) = reinterpret_cast<CPP_TYPE*>(newAddr);                                                \
+      }                                                                                                                \
+      ,                                                                                                                \
+      /* Column */                                                                                                     \
+      void BOOST_PP_CAT(setColumn_, NAME)(CPP_TYPE* newAddr, size_type elements) {                                     \
+          elements_ = elements;                                                                                        \
+          BOOST_PP_CAT(NAME, _) = reinterpret_cast<CPP_TYPE*>(newAddr);                                                \
+      }                                                                                                                \
+      void BOOST_PP_CAT(setColumn_, NAME)(const CPP_TYPE* newAddr, size_type elements) {                               \
+          BOOST_PP_CAT(NAME, _) = const_cast<CPP_TYPE*>(newAddr);                                                      \
+      }                                                                                                                \
+      ,                                                                                                                \
+      /* Eigen */                                                                                                      \
+      void BOOST_PP_CAT(setColumn_, NAME)(CPP_TYPE::Scalar* newAddr, size_type elements) {                             \
+          elements_ = elements;                                                                                        \
+          BOOST_PP_CAT(NAME, Stride_) = cms::soa::alignSize(elements_ * sizeof(CPP_TYPE::Scalar), alignment)           \
+            / sizeof(CPP_TYPE::Scalar);                                                                                \
+          BOOST_PP_CAT(NAME, ElementsWithPadding_) = BOOST_PP_CAT(NAME, Stride_)                                       \
+            *  CPP_TYPE::RowsAtCompileTime * CPP_TYPE::ColsAtCompileTime;                                              \
+          BOOST_PP_CAT(NAME, _) = reinterpret_cast<CPP_TYPE::Scalar*>(newAddr);                                        \
+      }                                                                                                                \
+  )   
+    
+
+#define _DEFINE_SET_COLUMN_FUNCTIONS(R, DATA, TYPE_NAME) _DEFINE_SET_COLUMN_FUNCTIONS_IMPL TYPE_NAME
+
+#define _DEFINE_POINTERS_SET_IMPL(VALUE_TYPE, CPP_TYPE, NAME)                                                          \
+      BOOST_PP_CAT(setColumn_, NAME)(first, elements);                                                                 \
+
+#define _DEFINE_POINTERS_SET(R, DATA, TYPE_NAME) _DEFINE_POINTERS_SET_IMPL TYPE_NAME
+
 // clang-format off
 #define _DECLARE_MEMBER_TRIVIAL_CONSTRUCTION_IMPL(VALUE_TYPE, CPP_TYPE, NAME)                                          \
   _SWITCH_ON_TYPE(VALUE_TYPE,                                                                                          \
@@ -434,6 +469,12 @@
   
 #define _DECLARE_SOA_COLUMNS_NAMES(R, DATA, NAME) BOOST_PP_EXPAND(_DECLARE_SOA_COLUMNS_NAMES_IMPL  NAME)
 
+#define _DECLARE_MEMBER(r, _, elem) \
+    decltype(elem) elem_;
+
+#define _GENERATE_PARAMETERS_LIST(...) \
+    BOOST_PP_SEQ_FOR_EACH(_DECLARE_MEMBER, _, BOOST_PP_VARIADIC_TO_SEQ(__VA_ARGS__))   \
+
 /*
  * A macro defining a SoA layout (collection of scalars and columns of equal lengths)
  */
@@ -503,10 +544,27 @@
       return _columns_names;                                                                                           \
     }                                                                                                                  \
                                                                                                                        \
-    static constexpr size_type retrive_offset(const char* string) {                                                    \
-      return 0;                                                                                                        \
+  /*                                                                                                                    \
+    template <typename... TArgs, std::size_t... Ids>                                                                   \
+    void assign_data(std::tuple<TArgs...>& tuple, std::index_sequence<Ids...>) {                                       \
+        *this = Layout(std::get<Ids>(tuple)...);                                                                       \
     }                                                                                                                  \
                                                                                                                        \
+    template <typename... TArgs>                                                                                       \
+    void make_from_tuple(std::tuple<TArgs...> args) {                                                                  \
+        return assign_data(args, std::make_index_sequence<sizeof...(TArgs)>{});                                        \
+    }                                                                                                                  \
+    */                                                                                                                   \
+    _ITERATE_ON_ALL(_DEFINE_SET_COLUMN_FUNCTIONS, ~, __VA_ARGS__)                                                      \
+                                                                                                                       \
+    template<typename First, typename... Rest>                                                                         \
+    void set_Columns(size_type elements, size_type index, First first, Rest... rests) {                                                 \
+        /* _DEFINE_POINTERS_SET(BOOST_PP_OVERLOAD(BOOST_PP_VARIADIC_ELEM(1, __VA_ARGS__)), __VA_ARGS__) */             \
+        decltype(first) BOOST_PP_CAT(element_, index) = first; \
+        index++; \
+        if constexpr (sizeof...(Rest) > 0)  \
+          set_Columns(elements, rests...);   \
+    }                                                                                                                  \
     /**                                                                                                                \
      * Helper/friend class allowing SoA introspection.                                                                 \
      */                                                                                                                \
@@ -523,6 +581,7 @@
       }                                                                                                                \
                                                                                                                        \
       _ITERATE_ON_ALL(_DEFINE_METADATA_MEMBERS, ~, __VA_ARGS__)                                                        \
+                                                                                                                       \
                                                                                                                        \
       struct value_element {                                                                                           \
         SOA_HOST_DEVICE SOA_INLINE value_element                                                                       \
@@ -608,11 +667,19 @@
         return *this;                                                                                                  \
     }                                                                                                                  \
                                                                                                                        \
+    /* Constructor relying on user provided already allocated memory areas */                                          \
+    template <typename... Ptrs>                                                                                        \
+    SOA_HOST_ONLY CLASS(size_type elements, Ptrs... address) {                                                         \
+        set_Columns(elements, idx, address..);                                                                                \
+    }                                                                                                                  \
+                                                                                                                       \
     /* ROOT read streamer */                                                                                           \
     template <typename T>                                                                                              \
     void ROOTReadStreamer(T & onfile) {                                                                                \
       _ITERATE_ON_ALL(_STREAMER_READ_SOA_DATA_MEMBER, ~, __VA_ARGS__)                                                  \
     }                                                                                                                  \
+                                                                                                                       \
+    inline void setData(std::byte* newMem) {mem_ = newMem;}                                                            \
                                                                                                                        \
     /* ROOT allocation cleanup */                                                                                      \
     void ROOTStreamerCleaner() {                                                                                       \

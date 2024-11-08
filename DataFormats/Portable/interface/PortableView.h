@@ -13,18 +13,25 @@ using Buffer = cms::alpakatools::host_buffer<std::byte[]>;
 template <typename Collection>
     struct Argument {
         using Layout = typename Collection::Layout;
+        using View = typename Layout::View;
 
         std::unique_ptr<Collection> collection;
         std::vector<std::string> columnNames;
+        std::vector<View> pointers;
 
         Argument(std::unique_ptr<Collection> coll, std::vector<std::string> names)
-            : collection(std::move(coll)), columnNames(std::move(names)) {}
+            : collection(std::move(coll)), columnNames(std::move(names)) {
+                // Layout lay = collection -> layout();
+                // View view{lay};
+                //initializePointers();
+            }
 
         Argument(const Argument&) = delete;
         Argument& operator=(const Argument&) = delete;
 
         Argument(Argument&&) = default;
         Argument& operator=(Argument&&) = default;    
+
     };
 
 template <typename... Collections>

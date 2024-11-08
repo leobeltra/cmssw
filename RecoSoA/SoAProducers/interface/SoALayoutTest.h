@@ -26,7 +26,14 @@ GENERATE_SOA_LAYOUT(SoAHostVelocityLayoutTemplate,
                     SOA_SCALAR(uint32_t, someNumber2))
                     
 using SoAHostVelocityLayout = SoAHostVelocityLayoutTemplate<>;    
-using SoAHostVelocityView = SoAHostVelocityLayout::View;                
+using SoAHostVelocityView = SoAHostVelocityLayout::View;       
+
+GENERATE_SOA_LAYOUT(SoAHostYCoordinateLayoutTemplate,
+                    SOA_COLUMN(double, p_y),
+                    SOA_COLUMN(double, p_vy))
+
+using SoAHostYCoordinateLayout = SoAHostYCoordinateLayoutTemplate<>;
+using SoAHostYCoordinateView = SoAHostYCoordinateLayout::View;
 
 
 inline void printSoAView(SoAHostPositionView view){
