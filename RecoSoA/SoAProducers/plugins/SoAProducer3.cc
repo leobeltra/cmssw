@@ -43,7 +43,7 @@ void SoAProducer3::produce(edm::StreamID iID, edm::Event& event, const edm::Even
 
     auto y_Coll = std::make_unique<SoAHostYCoordinateCollection>(elems, cms::alpakatools::host());
 
-    y_Coll -> layout().setColumn_p_y(PortableCollection_0 -> layout().metadata().addressOf_y(), elems);
+    // y_Coll -> layout().setColumn_p_y(PortableCollection_0 -> layout().metadata().addressOf_y(), elems);
 
     //auto myView = std::make_unique<SoAHostXYCoordinatesView>(PortableCollection_0, PortableCollection_1);
     // Dynamically allocate columns

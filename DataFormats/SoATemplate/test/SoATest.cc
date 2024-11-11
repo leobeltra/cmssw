@@ -42,6 +42,8 @@ HAS_METHOD(p_x)
 HAS_METHOD(p_y)
 HAS_METHOD(p_z)
 HAS_METHOD(p_a)
+HAS_METHOD(p_b)
+HAS_METHOD(num)
 
 GENERATE_SOA_LAYOUT(SoAHostDeviceLayoutTemplate,
                     SOA_COLUMN(double, x),
@@ -77,7 +79,10 @@ GENERATE_SOA_LAYOUT(CustomSoATemplate,
                     /*CustomSoAViewTemplate,*/
                     SOA_COLUMN(double, p_x),
                     SOA_COLUMN(double, p_y),
-                    SOA_COLUMN(double, p_z))
+                    SOA_COLUMN(double, p_z),
+                    SOA_EIGEN_COLUMN(Eigen::Vector3d, p_a),
+                    SOA_SCALAR(uint32_t, num),
+                    SOA_EIGEN_COLUMN(Eigen::Vector3d, p_b))
 
 using CustomSoA = CustomSoATemplate<>;
 using CustomSoAView = CustomSoA::View;
@@ -93,6 +98,10 @@ void printSoAView(View view) {
 
     if constexpr (has_someNumber<View>::value) {
         std::cout << "someNumber: " << view.someNumber() << std::endl;
+    }
+
+    if constexpr (has_num<View>::value) {
+        std::cout << "num: " << view.num() << std::endl;
     }
 
     if constexpr (has_metadata<View>::value) {
@@ -128,6 +137,11 @@ void printSoAView(View view) {
                 std::cout << "p_a = " << view[i].p_a().transpose() << ", ";
             }
 
+            if constexpr (has_p_a<View>::value) {
+                std::cout << "p_b = " << view[i].p_b().transpose() << ", ";
+            }
+
+
             if constexpr (has_a<View>::value) {
                 std::cout << "a = " << view[i].a().transpose() << ", ";
             }
@@ -149,31 +163,34 @@ void printSoAView(View view) {
 */
 
 int main () {
-    std::size_t numElements = 15;
-
-    // Enables parallel execution
-    // PortableCollection<SoAHostDeviceLayout, alpaka::DevCpu> coll(numElements, cms::alpakatools::host());
-
     //Memory definition for the host
+    std::size_t numElements = 15;
     std::size_t hostDeviceSize = SoAHostDeviceLayout::computeDataSize(numElements);
+
+    //Total number of columns
     static constexpr std::size_t number_columns = SoAHostDeviceLayout::computeColumnNumber();
+
+    //Array of names
     std::array<const char*, number_columns> col_names = SoAHostDeviceLayout::generateColumnNames();
     std::cout << "Names: ";
     for (const char* i : col_names)
         std::cout << i << " ";
     std::cout << std::endl;
+
+    //Memory allocation
     std::unique_ptr<std::byte, decltype(std::free) *> slBuffer{
       reinterpret_cast<std::byte *>(aligned_alloc(SoAHostDeviceLayout::alignment, hostDeviceSize)), std::free};
-
-        std::unique_ptr<std::byte, decltype(std::free) *> slBuffer2{
+    std::unique_ptr<std::byte, decltype(std::free) *> slBuffer2{
       reinterpret_cast<std::byte *>(aligned_alloc(SoAHostLayout::alignment, hostDeviceSize)), std::free};  
-    //Memory allocation for the host
+
     SoAHostDeviceLayout h_soa(slBuffer.get(), numElements);
+    SoAHostLayout v_soa(slBuffer2.get(), numElements);
 
     //SoAView object to manipulate columns for the host
     SoAHostDeviceLayout::View h_soav{h_soa};
-    SoAHostDeviceLayout::ConstView soacv{h_soa};
+    SoAHostLayoutView v_soav{v_soa};
 
+    //Filling the SoAs (different ways)
     h_soav.x()[0] = h_soav.y()[0] = h_soav.z()[0] = 0.;
 
     Eigen::Vector3d vec_a;
@@ -194,14 +211,6 @@ int main () {
     h_soav.description() = "Example SoA";
     h_soav.someNumber() = 1; 
 
-    std::cout << std::endl << "Memory information: " << std::endl << std::endl;
-
-    h_soa.soaToStreamInternal(std::cout);
-
-    SoAHostLayout v_soa(slBuffer2.get(), numElements);
-
-    SoAHostLayoutView v_soav{v_soa};
-
         for (size_t i = 0; i < numElements; i++) {
           v_soav.v_x()[i] = h_soav.x()[i] / TIME;
           v_soav.v_y()[i] = h_soav.y()[i] / TIME;
@@ -213,15 +222,16 @@ int main () {
           }
     }
 
-    // std::unique_ptr<std::byte, decltype(std::free) *> sl{
-    //   reinterpret_cast<std::byte *>(aligned_alloc(CustomSoA::alignment, hostDeviceSize)), std::free};
-    //Memory allocation for the host
+    //Constructor by column pointers (for scalar values the reference is needed)
     CustomSoA d_soa(h_soa.metadata().size(), 
                               h_soav.x(), 
                               v_soav.v_x(),
-                              v_soav.v_y()); 
-                            //   h_soav.a());
+                              v_soav.v_y(), 
+                              h_soav.a(),
+                              &(h_soav.someNumber()),
+                              v_soav.v_b());
 
+    // // Another way to use this feature: default constructor and function adding column by column
     // CustomSoA d_soa;
 
     // // d_soa.setData(h_soa.metadata().data());
@@ -236,16 +246,12 @@ int main () {
 
     CustomSoA::View d_soav{d_soa};
 
+    // This action modifies x()[3] too
     d_soav.p_x()[3] = 1000;
-
-    std::cout << "Number of elements of second Layout: " << d_soav.metadata().size() << std::endl; 
 
     printSoAView<CustomSoAView>(d_soav);
 
     printSoAView<SoAHostDeviceView>(h_soav);
-
-    // Push to device
-    //cudaCheck(cudaMemcpyAsync(d_buf, h_buf, hostDeviceSize, cudaMemcpyDefault, stream));
 
     std::cout << "Indirizzo della memoria di d_soa: " << static_cast<void*>(d_soa.metadata().data()) << std::endl;
     std::cout << "Indirizzo della memoria di h_soa: " << static_cast<void*>(h_soa.metadata().data()) << std::endl;
@@ -256,8 +262,3 @@ int main () {
     return 0;
 
 }
-
-
-/*
-    Aggiungere a SoAView metodo per tornare il TUPLEORPOINTER corrispondente alla colonna x, SoAParameterImpl anche
-*/
