@@ -174,8 +174,8 @@
 #define _DEFINE_SET_COLUMN_FUNCTIONS_IMPL(VALUE_TYPE, CPP_TYPE, NAME)                                                  \
   _SWITCH_ON_TYPE(VALUE_TYPE,                                                                                          \
       /* Scalar */                                                                                                     \
-      void BOOST_PP_CAT(setColumn_, NAME)(CPP_TYPE* newAddr) {                                                         \
-          BOOST_PP_CAT(NAME, _) = reinterpret_cast<CPP_TYPE*>(newAddr);                                                \
+      void BOOST_PP_CAT(setColumn_, NAME)(CPP_TYPE& newAddr) {                                                         \
+          BOOST_PP_CAT(NAME, _) = reinterpret_cast<CPP_TYPE*>(&newAddr);                                               \
       }                                                                                                                \
       ,                                                                                                                \
       /* Column */                                                                                                     \
@@ -469,7 +469,7 @@
 #define _DECLARE_CONSTRUCTOR_ARGUMENT_IMPL(VALUE_TYPE, CPP_TYPE, NAME)                                                 \
     _SWITCH_ON_TYPE(VALUE_TYPE,                                                                                        \
         /* Scalar */                                                                                                   \
-        (CPP_TYPE* NAME),                                                                                              \
+        (CPP_TYPE& NAME),                                                                                              \
         /* Column */                                                                                                   \
         (CPP_TYPE* NAME),                                                                                              \
         /* Eigen column */                                                                                             \
@@ -669,6 +669,11 @@
     {                                                                                                                  \
       _ITERATE_ON_ALL(_CALL_SET_COLUMN_FUNCTIONS_FROM_ARGS, ~, __VA_ARGS__)                                            \
     }                                                                                                                  \
+                                                                                                                       \
+    /* Construnctor having only the number of elements */                                                              \
+    SOA_HOST_ONLY CLASS(size_type elements)                                                                            \
+      : elements_(elements)                                                                                            \
+    {}                                                                                                                 \
                                                                                                                        \
     SOA_HOST_ONLY CLASS& operator=(CLASS const& _soa_impl_other) {                                                     \
         mem_ = _soa_impl_other.mem_;                                                                                   \

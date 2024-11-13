@@ -62,7 +62,6 @@ using SoAHostDeviceRangeCheckingView =
 using SoAHostDeviceConstView = SoAHostDeviceLayout::ConstView;
 
 GENERATE_SOA_LAYOUT(SoAHostLayoutTemplate,
-                    /*CustomSoAViewTemplate,*/
                     SOA_COLUMN(double, v_x),
                     SOA_COLUMN(double, v_y),
                     SOA_COLUMN(double, v_z),
@@ -76,7 +75,6 @@ using SoAHostLayout = SoAHostLayoutTemplate<>;
 using SoAHostLayoutView = SoAHostLayout::View;
 
 GENERATE_SOA_LAYOUT(CustomSoATemplate,
-                    /*CustomSoAViewTemplate,*/
                     SOA_COLUMN(double, p_x),
                     SOA_COLUMN(double, p_y),
                     SOA_COLUMN(double, p_z),
@@ -222,13 +220,13 @@ int main () {
           }
     }
 
-    //Constructor by column pointers (for scalar values the reference is needed)
-    CustomSoA d_soa(h_soa.metadata().size(), 
+    //Constructor by column pointers
+    CustomSoA d_soa(h_soa.metadata().size(),
                               h_soav.x(), 
                               v_soav.v_x(),
                               v_soav.v_y(), 
                               h_soav.a(),
-                              &(h_soav.someNumber()),
+                              h_soav.someNumber(),
                               v_soav.v_b());
 
     // // Another way to use this feature: default constructor and function adding column by column
@@ -258,6 +256,8 @@ int main () {
 
     std::cout << "Indirizzo della memoria di x: " << h_soa.metadata().addressOf_x() << std::endl;
     std::cout << "Indirizzo della memoria di p_x: " << d_soa.metadata().addressOf_p_x() << std::endl;
+
+    // std::cout << "Parameters x: " << h_soa.metadata().parametersOf_x() << std::endl;
 
     return 0;
 
