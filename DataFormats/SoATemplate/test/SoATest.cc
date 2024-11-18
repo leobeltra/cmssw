@@ -85,6 +85,11 @@ GENERATE_SOA_LAYOUT(CustomSoATemplate,
 using CustomSoA = CustomSoATemplate<>;
 using CustomSoAView = CustomSoA::View;
 
+// auto hp = h_soa.fills();
+
+// CustomSoa(size,
+//           {.p_x = hp.x(), ...})
+
 
 template <typename View>
 void printSoAView(View view) {
@@ -162,7 +167,7 @@ void printSoAView(View view) {
 
 int main () {
     //Memory definition for the host
-    std::size_t numElements = 15;
+    std::size_t numElements = 14;
     std::size_t hostDeviceSize = SoAHostDeviceLayout::computeDataSize(numElements);
 
     //Total number of columns
@@ -220,14 +225,16 @@ int main () {
           }
     }
 
+    std::size_t size = 15;
+
     //Constructor by column pointers
-    CustomSoA d_soa(h_soa.metadata().size(),
-                              h_soav.x(), 
-                              v_soav.v_x(),
-                              v_soav.v_y(), 
-                              h_soav.a(),
-                              h_soav.someNumber(),
-                              v_soav.v_b());
+    CustomSoA d_soa(size,
+                    h_soa.metadata().parametersOf_x(), 
+                    v_soa.metadata().parametersOf_v_x(),
+                    v_soa.metadata().parametersOf_v_y(), 
+                    h_soa.metadata().parametersOf_a(),
+                    h_soa.metadata().parametersOf_someNumber(),
+                    v_soa.metadata().parametersOf_v_b());
 
     // // Another way to use this feature: default constructor and function adding column by column
     // CustomSoA d_soa;

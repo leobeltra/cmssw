@@ -112,7 +112,7 @@
         cms::soa::SoAParameters_ColumnType<cms::soa::SoAColumnType::scalar>::DataType<CPP_TYPE>;                       \
       SOA_HOST_DEVICE SOA_INLINE                                                                                       \
       BOOST_PP_CAT(ParametersTypeOf_, NAME) BOOST_PP_CAT(parametersOf_, NAME)() const {                                \
-        return  BOOST_PP_CAT(ParametersTypeOf_, NAME) (parent_.BOOST_PP_CAT(NAME, _));                                 \
+        return  BOOST_PP_CAT(ParametersTypeOf_, NAME) (parent_.BOOST_PP_CAT(NAME, _), parent_.metadata().size());      \
       }                                                                                                                \
       SOA_HOST_DEVICE SOA_INLINE                                                                                       \
       CPP_TYPE* BOOST_PP_CAT(addressOf_, NAME)() {                                                                     \
@@ -123,7 +123,7 @@
          cms::soa::SoAParameters_ColumnType<cms::soa::SoAColumnType::column>::DataType<CPP_TYPE>;                      \
       SOA_HOST_DEVICE SOA_INLINE                                                                                       \
       BOOST_PP_CAT(ParametersTypeOf_, NAME) BOOST_PP_CAT(parametersOf_, NAME)() const {                                \
-        return  BOOST_PP_CAT(ParametersTypeOf_, NAME) (parent_.BOOST_PP_CAT(NAME, _));                                 \
+        return  BOOST_PP_CAT(ParametersTypeOf_, NAME) (parent_.BOOST_PP_CAT(NAME, _), parent_.metadata().size());                                 \
       }                                                                                                                \
       SOA_HOST_DEVICE SOA_INLINE                                                                                       \
       CPP_TYPE const* BOOST_PP_CAT(addressOf_, NAME)() const {                                                         \
@@ -146,7 +146,8 @@
       BOOST_PP_CAT(ParametersTypeOf_, NAME) BOOST_PP_CAT(parametersOf_, NAME)() const {                                \
         return BOOST_PP_CAT(ParametersTypeOf_, NAME) (                                                                 \
           parent_.BOOST_PP_CAT(NAME, _),                                                                               \
-          parent_.BOOST_PP_CAT(NAME, Stride_));                                                                        \
+          parent_.BOOST_PP_CAT(NAME, Stride_),                                                                         \
+          parent_.metadata().size());                                                                                  \
       }                                                                                                                \
       SOA_HOST_DEVICE SOA_INLINE                                                                                       \
       byte_size_type BOOST_PP_CAT(NAME, Pitch()) const {                                                               \
@@ -484,7 +485,46 @@
         setColumn_##NAME(NAME); 
 // clang-format on
 
-#define _CALL_SET_COLUMN_FUNCTIONS_FROM_ARGS(R, DATA, TYPE_NAME) BOOST_PP_EXPAND(_CALL_SET_COLUMN_FUNCTIONS_FROM_ARGS_IMPL TYPE_NAME)    
+#define _CALL_SET_COLUMN_FUNCTIONS_FROM_ARGS(R, DATA, TYPE_NAME) BOOST_PP_EXPAND(_CALL_SET_COLUMN_FUNCTIONS_FROM_ARGS_IMPL TYPE_NAME)
+
+#define _DECLARE_CONSTRUCTOR_PARAMETERS_IMPL(VALUE_TYPE, CPP_TYPE, NAME)                                               \
+    (typename Metadata::BOOST_PP_CAT(ParametersTypeOf_, NAME) NAME)
+
+#define _DECLARE_CONSTRUCTOR_PARAMETERS(R, DATA, TYPE_NAME) BOOST_PP_EXPAND(_DECLARE_CONSTRUCTOR_PARAMETERS_IMPL TYPE_NAME)
+
+// clang-format off
+#define _INITIALIZE_PARAMETERS_FROM_ARGS_IMPL(VALUE_TYPE, CPP_TYPE, NAME)   \
+    _SWITCH_ON_TYPE(VALUE_TYPE, \
+        /* Scalar */ \
+        (BOOST_PP_CAT(NAME, _)([&]() -> auto { \
+          if (elements_ != NAME.size_) \
+            throw std::runtime_error( \
+              "In constructor by column pointers: number of elements not equal for every column: " \
+              BOOST_PP_STRINGIZE(NAME)); \
+          return NAME.tupleOrPointer();     \
+            }())) \
+            , \
+        /* Column */ \
+        (BOOST_PP_CAT(NAME, _)([&]() -> auto { \
+          if (elements_ != NAME.size_) \
+            throw std::runtime_error( \
+              "In constructor by column pointers: number of elements not equal for every column: " \
+              BOOST_PP_STRINGIZE(NAME)); \
+          return NAME.tupleOrPointer();     \
+            }())) \
+        , \
+        /* Eigen column */  \
+        (BOOST_PP_CAT(NAME, _)([&]() -> auto { \
+          if (elements_ != NAME.size_) \
+            throw std::runtime_error( \
+              "In constructor by column pointers: number of elements not equal for every column: " \
+              BOOST_PP_STRINGIZE(NAME)); \
+          return std::get<0>(NAME.tupleOrPointer());     \
+            }())) \
+        ) 
+// clang-format on
+
+#define _INITIALIZE_PARAMETERS_FROM_ARGS(R, DATA, TYPE_NAME) BOOST_PP_EXPAND(_INITIALIZE_PARAMETERS_FROM_ARGS_IMPL TYPE_NAME)
 
 #ifdef DEBUG
 #define _DO_RANGECHECK true
@@ -664,6 +704,11 @@
           _ITERATE_ON_ALL_COMMA(_DECLARE_MEMBER_COPY_CONSTRUCTION, ~, __VA_ARGS__) {}                                  \
                                                                                                                        \
     /* Constructor relying on user-provided column pointers */                                                         \
+    SOA_HOST_ONLY CLASS(size_type elements, _ITERATE_ON_ALL_COMMA(_DECLARE_CONSTRUCTOR_PARAMETERS, ~, __VA_ARGS__))      \
+      : elements_(elements), _ITERATE_ON_ALL_COMMA(_INITIALIZE_PARAMETERS_FROM_ARGS, ~, __VA_ARGS__)                                                                                         \
+    {}                                                                                                                  \
+                                                                                                                       \
+    /* Constructor relying on user-provided column pointers */                                                     \
     SOA_HOST_ONLY CLASS(size_type elements, _ITERATE_ON_ALL_COMMA(_DECLARE_CONSTRUCTOR_ARGUMENT, ~, __VA_ARGS__))      \
       : elements_(elements)                                                                                            \
     {                                                                                                                  \
