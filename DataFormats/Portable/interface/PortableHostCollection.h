@@ -69,6 +69,10 @@ public:
   ConstBuffer buffer() const { return *buffer_; }
   ConstBuffer const_buffer() const { return *buffer_; }
 
+  Layout& layout() { return layout_; }
+
+  const Layout& layout() const { return layout_; }
+
   // erases the data in the Buffer by writing zeros (bytes containing '\0') to it
   void zeroInitialise() {
     std::memset(std::data(*buffer_), 0x00, alpaka::getExtentProduct(*buffer_) * sizeof(std::byte));
