@@ -129,7 +129,7 @@ namespace cms::soa {
     SOA_HOST_DEVICE SOA_INLINE constexpr SoAConstParametersImpl(ValueType const* addr, size_type size)
         : addr_(addr), size_{size} {}
 
-    // constructor from a non-const parameter set
+    // constructor from a non-const parameter setsize
     SOA_HOST_DEVICE SOA_INLINE constexpr SoAConstParametersImpl(SoAParametersImpl<columnType, ValueType> const& o)
         : addr_{o.addr_}, size_{o.size_} {}
 
@@ -566,7 +566,8 @@ namespace cms::soa {
   // Helper function to compute aligned size
   //this is an integer division -> it rounds size to the next multiple of alignment
   constexpr inline byte_size_type alignSize(byte_size_type size, byte_size_type alignment) {
-    return ((size + alignment - 1) / alignment) * alignment;
+    return ((size + alignment - 1) / alignment) *
+           alignment;  //this is an integer division -> it rounds size to the next multiple of alignment
   }
 
 }  // namespace cms::soa
