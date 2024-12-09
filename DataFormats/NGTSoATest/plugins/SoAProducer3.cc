@@ -23,7 +23,7 @@ private:
 SoAProducer3::SoAProducer3(const edm::ParameterSet& iConfig) : inputToken_0_(consumes<PhysicsObjCollection>(iConfig.getParameter<edm::InputTag>("soaInput_0"))), 
                                                                inputToken_1_(consumes<PhysicsObjExtraCollection>(iConfig.getParameter<edm::InputTag>("soaInput_1")))
 {
-    // produces<CombinedPhysicsObjectCollection>("SoAProduct3");
+    produces<CombinedPhysicsObjectCollection>("SoAProduct3");
 }
 
 // Destructor
@@ -43,29 +43,32 @@ void SoAProducer3::produce(edm::StreamID iID, edm::Event& event, const edm::Even
 
     // auto CombinedPhysicsObjSoAColl = std::make_unique<CombinedPhysicsObjectCollection>(elems, cms::alpakatools::host());
 
-    auto physicsObj = PortableCollection_0->layout();
+    auto physicsObj = PortableCollection_0 -> layout();
     auto physicsObjExtra = PortableCollection_1 -> layout();
 
     const auto phObj = physicsObj.records();
     const auto phObjExtra = physicsObjExtra.records();
 
-    CombinedPhysicsObject combinedPhysicsObjSoA(elems,
-                                                 phObj.x(),
+    auto CombinedPhysicsObjSoAColl = std::make_unique<CombinedPhysicsObjectCollection>(elems, cms::alpakatools::host());
+
+    CombinedPhysicsObject combinedPhysicsObjSoA( phObj.x(),
                                                  phObj.y(),
                                                  phObj.z(),
                                                  phObjExtra.candidateDirection());
+
+    CombinedPhysicsObjSoAColl -> aggregate(combinedPhysicsObjSoA);                                             
 
     // auto combinedView = std::make_unique<CombinedPhysicsObjectCollection>(elems, cms::alpakatools::host());
 
     // finalView -> layout().setColumn_p_y(PortableCollection_0 -> layout().metadata().addressOf_y(), elems);
 
-    CombinedPhysicsObject::View finalView{combinedPhysicsObjSoA};
+    // CombinedPhysicsObject::View finalView{combinedPhysicsObjSoA};
     // Dynamically allocate columns
     // myView.addColumns(PortableCollection_1, "v_y");
 
     std::cout << "Hey, I modified SoA for second time!" << std::endl;
+    printSoAView(CombinedPhysicsObjSoAColl -> view());
 
-    // event.put(std::move(CombinedPhysicsObjSoAColl), "SoAProduct3");
-    printSoAView(finalView);
+    event.put(std::move(CombinedPhysicsObjSoAColl), "SoAProduct3");
     //printSoAView(modifiedView);
 }
