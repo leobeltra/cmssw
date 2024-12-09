@@ -98,6 +98,13 @@ public:
     layout.ROOTStreamerCleaner();
   }
 
+  void aggregate(Layout& customLayout) {
+    customLayout.aggregateInPlace();
+    layout_ = customLayout;
+    View customView{customLayout};
+    view_ = customView;
+  }
+
 private:
   std::optional<Buffer> buffer_;  //!
   Layout layout_;                 //

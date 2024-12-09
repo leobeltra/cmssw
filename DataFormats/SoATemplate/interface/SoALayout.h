@@ -306,11 +306,11 @@
 #define _STRUCT_ELEMENT_INITIALIZERS_IMPL(VALUE_TYPE, CPP_TYPE, NAME)                                                  \
   _SWITCH_ON_TYPE(VALUE_TYPE,                                                                                          \
       /* Scalar (empty) */                                                                                             \
-      (BOOST_PP_CAT(NAME, _){parent_.metadata().BOOST_PP_CAT(parametersOf_, NAME)()}),                                                  \
+      (BOOST_PP_CAT(NAME, _){parent_.metadata().BOOST_PP_CAT(parametersOf_, NAME)()}),                                 \
       /* Column */                                                                                                     \
-      (BOOST_PP_CAT(NAME, _){parent_.metadata().BOOST_PP_CAT(parametersOf_, NAME)()}),                                                                                                    \
+      (BOOST_PP_CAT(NAME, _){parent_.metadata().BOOST_PP_CAT(parametersOf_, NAME)()}),                                 \
       /* Eigen column */                                                                                               \
-      (BOOST_PP_CAT(NAME, _){parent_.metadata().BOOST_PP_CAT(parametersOf_, NAME)()})                                                   \
+      (BOOST_PP_CAT(NAME, _){parent_.metadata().BOOST_PP_CAT(parametersOf_, NAME)()})                                  \
   )
 // clang-format on
 
@@ -359,21 +359,21 @@
 #define _ASSIGN_SOA_COLUMN_OR_SCALAR(R, DATA, TYPE_NAME) _ASSIGN_SOA_COLUMN_OR_SCALAR_IMPL TYPE_NAME
 
 // clang-format off
-#define _AGGREGATE_SOA_COLUMNS_IMPL(VALUE_TYPE, CPP_TYPE, NAME)                                                  \
+#define _AGGREGATE_SOA_COLUMNS_IMPL(VALUE_TYPE, CPP_TYPE, NAME)                                                        \
   _SWITCH_ON_TYPE(VALUE_TYPE,                                                                                          \
       /* Scalar */                                                                                                     \
-      memcpy(_soa_impl_curMem, BOOST_PP_CAT(NAME, _), cms::soa::alignSize(sizeof(CPP_TYPE), alignment));                \
+      memcpy(_soa_impl_curMem, BOOST_PP_CAT(NAME, _), sizeof(CPP_TYPE));                                               \
       BOOST_PP_CAT(NAME, _) = reinterpret_cast<CPP_TYPE*>(_soa_impl_curMem);                                           \
       _soa_impl_curMem += cms::soa::alignSize(sizeof(CPP_TYPE), alignment);                                            \
       ,                                                                                                                \
       /* Column */                                                                                                     \
-      memcpy(_soa_impl_curMem, BOOST_PP_CAT(NAME, _), cms::soa::alignSize(elements_ * sizeof(CPP_TYPE), alignment));    \
+      memcpy(_soa_impl_curMem, BOOST_PP_CAT(NAME, _), elements_ * sizeof(CPP_TYPE));                                   \
       BOOST_PP_CAT(NAME, _) = reinterpret_cast<CPP_TYPE*>(_soa_impl_curMem);                                           \
       _soa_impl_curMem += cms::soa::alignSize(elements_ * sizeof(CPP_TYPE), alignment);                                \
       ,                                                                                                                \
       /* Eigen column */                                                                                               \
-      memcpy(_soa_impl_curMem, BOOST_PP_CAT(NAME, _), cms::soa::alignSize(elements_ * sizeof(CPP_TYPE::Scalar), alignment) \
-                                                        * CPP_TYPE::RowsAtCompileTime * CPP_TYPE::ColsAtCompileTime); \
+      memcpy(_soa_impl_curMem, BOOST_PP_CAT(NAME, _), cms::soa::alignSize(elements_ * sizeof(CPP_TYPE::Scalar), alignment)                             \
+                                                        * CPP_TYPE::RowsAtCompileTime * CPP_TYPE::ColsAtCompileTime);  \
       BOOST_PP_CAT(NAME, _) = reinterpret_cast<CPP_TYPE::Scalar*>(_soa_impl_curMem);                                   \
       _soa_impl_curMem += cms::soa::alignSize(elements_ * sizeof(CPP_TYPE::Scalar), alignment)                         \
         * CPP_TYPE::RowsAtCompileTime * CPP_TYPE::ColsAtCompileTime;                                                   \
@@ -494,7 +494,7 @@
 #define _DECLARE_SOA_DATA_MEMBER(R, DATA, TYPE_NAME) BOOST_PP_EXPAND(_DECLARE_SOA_DATA_MEMBER_IMPL TYPE_NAME)
 
 // clang-format off
-#define _ACCESSORS_STRUCT_MEMBERS_IMPL(VALUE_TYPE, CPP_TYPE, NAME)                                                      \
+#define _ACCESSORS_STRUCT_MEMBERS_IMPL(VALUE_TYPE, CPP_TYPE, NAME)                                                     \
     const typename Metadata::BOOST_PP_CAT(ParametersTypeOf_, NAME)& NAME() const { return BOOST_PP_CAT(NAME, _); }
 // clang-format on
 
@@ -508,7 +508,7 @@
 #define _DECLARE_STRUCT_DATA_MEMBER(R, DATA, TYPE_NAME) BOOST_PP_EXPAND(_DECLARE_STRUCT_DATA_MEMBER_IMPL TYPE_NAME)
 
 // clang-format off
-#define _DECLARE_STRUCT_MEMBERS_IMPL(VALUE_TYPE, CPP_TYPE, NAME)                                                   \
+#define _DECLARE_STRUCT_MEMBERS_IMPL(VALUE_TYPE, CPP_TYPE, NAME)                                                       \
     typename Metadata::BOOST_PP_CAT(ParametersTypeOf_, NAME) NAME;
 // clang-format on
 
@@ -648,9 +648,91 @@
               BOOST_PP_STRINGIZE(NAME));                                                                               \
           return std::get<0>(helper.NAME.tupleOrPointer());                                                            \
             }()))                                                                                                      \
-        )
+    )
+// clang-format on
 
 #define _INITIALIZE_PARAMETERS_FROM_STRUCT(R, DATA, TYPE_NAME) BOOST_PP_EXPAND(_INITIALIZE_PARAMETERS_FROM_STRUCT_IMPL TYPE_NAME)
+
+// clang-format off
+#define _INITIALIZE_PARAMETERS_AND_SIZE_IMPL(VALUE_TYPE, CPP_TYPE, NAME)                                               \
+    _SWITCH_ON_TYPE(VALUE_TYPE,                                                                                        \
+        /* Scalar */                                                                                                   \
+        if (not readyToSet) {                                                                                          \
+          elements_ = NAME.size_;                                                                                      \
+          readyToSet = true;                                                                                           \
+        }                                                                                                              \
+        auto BOOST_PP_CAT(NAME, _tmp) = [&]() -> auto {                                                                \
+          if (elements_ != NAME.size_)                                                                                 \
+            throw std::runtime_error(                                                                                  \
+              "In constructor by column pointers: number of elements not equal for every column: "                     \
+              BOOST_PP_STRINGIZE(NAME));                                                                               \
+          return NAME.tupleOrPointer();                                                                                \
+            }();                                                                                                       \
+        BOOST_PP_CAT(NAME, _) = BOOST_PP_CAT(NAME, _tmp);                                                              \
+        ,                                                                                                              \
+        /* Column */                                                                                                   \
+        if (not readyToSet) {                                                                                          \
+          elements_ = NAME.size_;                                                                                      \
+          readyToSet = true;                                                                                           \
+        }                                                                                                              \
+        auto BOOST_PP_CAT(NAME, _tmp) = [&]() -> auto {                                                                \
+          if (elements_ != NAME.size_)                                                                                 \
+            throw std::runtime_error(                                                                                  \
+              "In constructor by column pointers: number of elements not equal for every column: "                     \
+              BOOST_PP_STRINGIZE(NAME));                                                                               \
+          return NAME.tupleOrPointer();                                                                                \
+            }();                                                                                                       \
+        BOOST_PP_CAT(NAME, _) = BOOST_PP_CAT(NAME, _tmp);                                                              \
+        ,                                                                                                              \
+        /* Eigen column */                                                                                             \
+        if (not readyToSet) {                                                                                          \
+          elements_ = NAME.size_;                                                                                      \
+          readyToSet = true;                                                                                           \
+        }                                                                                                              \
+        auto BOOST_PP_CAT(NAME, Stride_tmp)([&]() -> auto {                                                            \
+          if (elements_ != NAME.size_)                                                                                 \
+            throw std::runtime_error(                                                                                  \
+              "In constructor by column pointers: number of elements not equal for every column: "                     \
+              BOOST_PP_STRINGIZE(NAME));                                                                               \
+          return std::get<1>(NAME.tupleOrPointer());                                                                   \
+            }());                                                                                                      \
+        auto BOOST_PP_CAT(NAME, ElementsWithPadding_tmp)([&]() -> auto {                                               \
+          if (elements_ != NAME.size_)                                                                                 \
+            throw std::runtime_error(                                                                                  \
+              "In constructor by column pointers: number of elements not equal for every column: "                     \
+              BOOST_PP_STRINGIZE(NAME));                                                                               \
+          return BOOST_PP_CAT(NAME, Stride_)                                                                           \
+                 *  CPP_TYPE::RowsAtCompileTime * CPP_TYPE::ColsAtCompileTime;                                         \
+            }());                                                                                                      \
+        auto BOOST_PP_CAT(NAME, _tmp) = [&]() -> auto {                                                                \
+          if (elements_ != NAME.size_)                                                                                 \
+            throw std::runtime_error(                                                                                  \
+              "In constructor by column pointers: number of elements not equal for every column: "                     \
+              BOOST_PP_STRINGIZE(NAME));                                                                               \
+          return std::get<0>(NAME.tupleOrPointer());                                                                   \
+            }();                                                                                                       \
+        BOOST_PP_CAT(NAME, Stride_) = BOOST_PP_CAT(NAME, Stride_tmp);                                                  \
+        BOOST_PP_CAT(NAME, ElementsWithPadding_) = BOOST_PP_CAT(NAME, ElementsWithPadding_tmp);                        \
+        BOOST_PP_CAT(NAME, _) = BOOST_PP_CAT(NAME, _tmp);                                                              \
+      ) 
+// clang-format on
+
+#define _INITIALIZE_PARAMETERS_AND_SIZE(R, DATA, TYPE_NAME) BOOST_PP_EXPAND(_INITIALIZE_PARAMETERS_AND_SIZE_IMPL TYPE_NAME)
+
+#define _COPY_COLUMN_BY_COLUMN_IMPL(VALUE_TYPE, CPP_TYPE, NAME)                                                        \
+  _SWITCH_ON_TYPE(VALUE_TYPE,                                                                                          \
+      /* Scalar */                                                                                                     \
+      memcpy(BOOST_PP_CAT(soa.metadata().addressOf_, NAME)(), BOOST_PP_CAT(NAME, _), cms::soa::alignSize(sizeof(CPP_TYPE), alignment));                                                      \
+      ,                                                                                                                \
+      /* Column */                                                                                                     \
+      memcpy(BOOST_PP_CAT(soa.metadata().addressOf_, NAME)(), BOOST_PP_CAT(NAME, _), cms::soa::alignSize(elements_ * sizeof(CPP_TYPE), alignment));                                          \
+      ,                                                                                                                \
+      /* Eigen column */                                                                                               \
+      memcpy(BOOST_PP_CAT(soa.metadata().addressOf_, NAME)(), BOOST_PP_CAT(NAME, _), cms::soa::alignSize(elements_ * sizeof(CPP_TYPE::Scalar), alignment)                                    \
+                                                        * CPP_TYPE::RowsAtCompileTime * CPP_TYPE::ColsAtCompileTime);  \
+  )                                                                                                                    \
+
+#define _COPY_COLUMN_BY_COLUMN(R, DATA, TYPE_NAME) BOOST_PP_EXPAND(_COPY_COLUMN_BY_COLUMN_IMPL TYPE_NAME)
 
 #ifdef DEBUG
 #define _DO_RANGECHECK true
@@ -730,12 +812,14 @@
     }                                                                                                                  \
                                                                                                                        \
     SOA_HOST_ONLY                                                                                                      \
-    void aggregate(std::byte* mem) {                                                                                   \
-    mem_ = mem;                                                                                                        \
+    void aggregateInPlace() {                                                                                          \
+      std::byte* buffer {                                                                                              \
+        reinterpret_cast<std::byte *>(aligned_alloc(alignment, byteSize_))};                                           \
+      mem_ = buffer;                                                                                                   \
       if constexpr (alignmentEnforcement == cms::soa::AlignmentEnforcement::enforced)                                  \
-        if (reinterpret_cast<intptr_t>(mem) % alignment)                                                               \
+        if (reinterpret_cast<intptr_t>(mem_) % alignment)                                                              \
           throw std::runtime_error("In " #CLASS "::" #CLASS ": misaligned buffer");                                    \
-      auto _soa_impl_curMem = mem;                                                                                     \
+      auto _soa_impl_curMem = mem_;                                                                                    \
       _ITERATE_ON_ALL(_AGGREGATE_SOA_COLUMNS, ~, __VA_ARGS__)                                                          \
       /* Sanity check: we should have reached the computed size, only on host code */                                  \
       byteSize_ = computeDataSize(elements_);                                                                          \
@@ -743,6 +827,14 @@
         throw std::runtime_error("In " #CLASS "::" #CLASS ": unexpected end pointer.");                                \
     }                                                                                                                  \
                                                                                                                        \
+    SOA_HOST_ONLY                                                                                                      \
+    CLASS aggregate() {                                                                                                \
+      std::byte* buffer {                                                                                              \
+        reinterpret_cast<std::byte *>(aligned_alloc(alignment, byteSize_))};                                           \
+      CLASS soa(buffer, elements_);                                                                                    \
+      _ITERATE_ON_ALL(_COPY_COLUMN_BY_COLUMN, ~, __VA_ARGS__)                                                          \
+      return soa;                                                                                                      \
+    }                                                                                                                  \
     /* Helper function to set the starting memory byte */                                                              \
     inline void setData(std::byte* newMem) {mem_ = newMem;}                                                            \
                                                                                                                        \
@@ -864,16 +956,20 @@
           _ITERATE_ON_ALL_COMMA(_DECLARE_MEMBER_COPY_CONSTRUCTION, ~, __VA_ARGS__) {}                                  \
                                                                                                                        \
     /* Constructor relying on user-provided column pointers */                                                         \
-    SOA_HOST_ONLY CLASS(size_type elements, _ITERATE_ON_ALL_COMMA(_DECLARE_CONSTRUCTOR_PARAMETERS, ~, __VA_ARGS__))    \
-      : mem_(nullptr), elements_(elements), _ITERATE_ON_ALL_COMMA(_INITIALIZE_PARAMETERS_FROM_ARGS, ~, __VA_ARGS__)    \
-    {}                                                                                                                 \
+    SOA_HOST_ONLY CLASS(_ITERATE_ON_ALL_COMMA(_DECLARE_CONSTRUCTOR_PARAMETERS, ~, __VA_ARGS__))                        \
+      : mem_(nullptr)                                                                                                  \
+    {                                                                                                                  \
+      bool readyToSet = false;                                                                                         \
+      _ITERATE_ON_ALL(_INITIALIZE_PARAMETERS_AND_SIZE, ~, __VA_ARGS__)                                                 \
+      byteSize_ = computeDataSize(elements_);                                                                          \
+    }                                                                                                                  \
                                                                                                                        \
     /* Constructor relying on user-provided column pointers */                                                         \
-    SOA_HOST_ONLY CLASS(size_type elements, _ITERATE_ON_ALL_COMMA(_DECLARE_CONSTRUCTOR_ARGUMENT, ~, __VA_ARGS__))      \
-      : elements_(elements), mem_(nullptr)                                                                             \
-    {                                                                                                                  \
-      _ITERATE_ON_ALL(_CALL_SET_COLUMN_FUNCTIONS_FROM_ARGS, ~, __VA_ARGS__)                                            \
-    }                                                                                                                  \
+    /* SOA_HOST_ONLY CLASS(size_type elements, _ITERATE_ON_ALL_COMMA(_DECLARE_CONSTRUCTOR_ARGUMENT, ~, __VA_ARGS__)) */\
+    /*  : elements_(elements), mem_(nullptr)                    */                                                     \
+    /* {                                                */                                                             \
+    /*  _ITERATE_ON_ALL(_CALL_SET_COLUMN_FUNCTIONS_FROM_ARGS, ~, __VA_ARGS__)       */                                 \
+    /* }                                                 */                                                            \
                                                                                                                        \
     /* Construnctor having only the number of elements */                                                              \
     SOA_HOST_ONLY CLASS(size_type elements)                                                                            \
