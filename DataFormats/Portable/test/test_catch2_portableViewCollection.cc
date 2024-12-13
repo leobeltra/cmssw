@@ -31,14 +31,14 @@ namespace {
   constexpr auto s_tag = "[PortableView]";
 }  // namespace
 
-void printSoAView(TestSoA1View view) {
-    std::cout << "TestSoA1View:" << std::endl;
-    for (auto i = 0; i < view.metadata().size(); ++i) {
-        std::cout << "Element " << i << ": ";
-        std::cout << "x = " << view.x()[i] << ", ";
-        std::cout << "y = " << view.y()[i] << ", ";
-    }
-}
+// void printSoAView(TestSoA1View view) {
+//     std::cout << "TestSoA1View:" << std::endl;
+//     for (auto i = 0; i < view.metadata().size(); ++i) {
+//         std::cout << "Element " << i << ": ";
+//         std::cout << "x = " << view.x()[i] << ", ";
+//         std::cout << "y = " << view.y()[i] << ", ";
+//     }
+// }
 
 // This test is currently mostly about the code compiling
 TEST_CASE("Use of PortableView<Colls...> on host code", s_tag) {

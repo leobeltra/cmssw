@@ -2,7 +2,10 @@
 #define Portable_Collection_SoA_Test_h
 
 #include "DataFormats/NGTSoATest/interface/SoALayoutTest.h"
+#include "DataFormats/Portable/interface/PortableCollection.h"
 #include "DataFormats/Portable/interface/PortableHostCollection.h"
+#include "DataFormats/Portable/interface/PortableDeviceCollection.h"
+#include <alpaka/alpaka.hpp>
 
 using PhysicsObjCollection = PortableHostCollection<PhysicsObj>;
 using PhysicsObjExtraCollection = PortableHostCollection<PhysicsObjExtra>;

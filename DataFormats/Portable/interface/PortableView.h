@@ -16,8 +16,6 @@ public:
 
     PortableView() = default;
 
-    PortableView(Argument<Collections>&&... args) {}
-
     ~PortableView() = default;
 
 private:

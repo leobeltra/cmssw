@@ -748,6 +748,8 @@
   template <CMS_SOA_BYTE_SIZE_TYPE ALIGNMENT = cms::soa::CacheLineSize::defaultSize,                                   \
             bool ALIGNMENT_ENFORCEMENT = cms::soa::AlignmentEnforcement::relaxed>                                      \
   struct CLASS {                                                                                                       \
+    struct Borrowing;                                                                                                  \
+    friend Borrowing;                                                                                                  \
     /* these could be moved to an external type trait to free up the symbol names */                                   \
     using self_type = CLASS;                                                                                           \
     using AlignmentEnforcement = cms::soa::AlignmentEnforcement;                                                       \
@@ -811,30 +813,6 @@
       return _columns_names;                                                                                           \
     }                                                                                                                  \
                                                                                                                        \
-    SOA_HOST_ONLY                                                                                                      \
-    void aggregateInPlace() {                                                                                          \
-      std::byte* buffer {                                                                                              \
-        reinterpret_cast<std::byte *>(aligned_alloc(alignment, byteSize_))};                                           \
-      mem_ = buffer;                                                                                                   \
-      if constexpr (alignmentEnforcement == cms::soa::AlignmentEnforcement::enforced)                                  \
-        if (reinterpret_cast<intptr_t>(mem_) % alignment)                                                              \
-          throw std::runtime_error("In " #CLASS "::" #CLASS ": misaligned buffer");                                    \
-      auto _soa_impl_curMem = mem_;                                                                                    \
-      _ITERATE_ON_ALL(_AGGREGATE_SOA_COLUMNS, ~, __VA_ARGS__)                                                          \
-      /* Sanity check: we should have reached the computed size, only on host code */                                  \
-      byteSize_ = computeDataSize(elements_);                                                                          \
-      if (mem_ + byteSize_ != _soa_impl_curMem)                                                                        \
-        throw std::runtime_error("In " #CLASS "::" #CLASS ": unexpected end pointer.");                                \
-    }                                                                                                                  \
-                                                                                                                       \
-    SOA_HOST_ONLY                                                                                                      \
-    CLASS aggregate() {                                                                                                \
-      std::byte* buffer {                                                                                              \
-        reinterpret_cast<std::byte *>(aligned_alloc(alignment, byteSize_))};                                           \
-      CLASS soa(buffer, elements_);                                                                                    \
-      _ITERATE_ON_ALL(_COPY_COLUMN_BY_COLUMN, ~, __VA_ARGS__)                                                          \
-      return soa;                                                                                                      \
-    }                                                                                                                  \
     /* Helper function to set the starting memory byte */                                                              \
     inline void setData(std::byte* newMem) {mem_ = newMem;}                                                            \
                                                                                                                        \
@@ -887,14 +865,6 @@
     };                                                                                                                 \
                                                                                                                        \
     friend Metadata;                                                                                                   \
-                                                                                                                       \
-      /**                                                                                                              \
-     * Helper class allowing for SoA costruction with names.                                                           \
-     */                                                                                                                \
-    struct Records {                                                                                                   \
-      size_type size;                                                                                                  \
-      _ITERATE_ON_ALL(_DECLARE_STRUCT_MEMBERS, ~, __VA_ARGS__)                                                         \
-    };                                                                                                                 \
                                                                                                                        \
     struct Metarecords {                                                                                               \
       friend CLASS;                                                                                                    \
@@ -955,29 +925,9 @@
           byteSize_(_soa_impl_other.byteSize_),                                                                        \
           _ITERATE_ON_ALL_COMMA(_DECLARE_MEMBER_COPY_CONSTRUCTION, ~, __VA_ARGS__) {}                                  \
                                                                                                                        \
-    /* Constructor relying on user-provided column pointers */                                                         \
-    SOA_HOST_ONLY CLASS(_ITERATE_ON_ALL_COMMA(_DECLARE_CONSTRUCTOR_PARAMETERS, ~, __VA_ARGS__))                        \
-      : mem_(nullptr)                                                                                                  \
-    {                                                                                                                  \
-      bool readyToSet = false;                                                                                         \
-      _ITERATE_ON_ALL(_INITIALIZE_PARAMETERS_AND_SIZE, ~, __VA_ARGS__)                                                 \
-      byteSize_ = computeDataSize(elements_);                                                                          \
-    }                                                                                                                  \
-                                                                                                                       \
-    /* Constructor relying on user-provided column pointers */                                                         \
-    /* SOA_HOST_ONLY CLASS(size_type elements, _ITERATE_ON_ALL_COMMA(_DECLARE_CONSTRUCTOR_ARGUMENT, ~, __VA_ARGS__)) */\
-    /*  : elements_(elements), mem_(nullptr)                    */                                                     \
-    /* {                                                */                                                             \
-    /*  _ITERATE_ON_ALL(_CALL_SET_COLUMN_FUNCTIONS_FROM_ARGS, ~, __VA_ARGS__)       */                                 \
-    /* }                                                 */                                                            \
-                                                                                                                       \
     /* Construnctor having only the number of elements */                                                              \
     SOA_HOST_ONLY CLASS(size_type elements)                                                                            \
       : elements_(elements)                                                                                            \
-    {}                                                                                                                 \
-                                                                                                                       \
-    SOA_HOST_ONLY CLASS(Records helper)                                                                                \
-      : mem_(nullptr), elements_(helper.size), _ITERATE_ON_ALL_COMMA(_INITIALIZE_PARAMETERS_FROM_STRUCT, ~, __VA_ARGS__) \
     {}                                                                                                                 \
                                                                                                                        \
     SOA_HOST_ONLY CLASS& operator=(CLASS const& _soa_impl_other) {                                                     \
@@ -1029,7 +979,55 @@
     /* So instead we make the code unconditional with paceholder names which are protected by a private protection. */ \
     /* This will be handled later as we handle the integration of the view as a subclass of the layout.             */ \
                                                                                                                        \
-  };
+  };                                                                                                                   \
+                                                                                                                       \
+  template<>                                                                                                           \
+  struct CLASS<>::Borrowing : CLASS<> {                                                                                \
+    /* Constructor relying on user-provided column pointers */                                                         \
+    SOA_HOST_ONLY Borrowing(_ITERATE_ON_ALL_COMMA(_DECLARE_CONSTRUCTOR_PARAMETERS, ~, __VA_ARGS__))                        \
+    {                                                                                                                  \
+      mem_ = nullptr; \
+      bool readyToSet = false;                                                                                         \
+      _ITERATE_ON_ALL(_INITIALIZE_PARAMETERS_AND_SIZE, ~, __VA_ARGS__)                                                 \
+      byteSize_ = computeDataSize(elements_);                                                                          \
+    }                                                                                                                  \
+                                                                                                                       \
+      /**                                                                                                              \
+     * Helper class allowing for SoA costruction with names.                                                           \
+     */                                                                                                                \
+    /* struct Records { */                                                                                                  \
+    /* size_type size; */                                                                                                 \
+    /*  _ITERATE_ON_ALL(_DECLARE_STRUCT_MEMBERS, ~, __VA_ARGS__)  */                                                       \
+    /*}; */                                                                                                                \
+                                                                                                                       \
+    /* SOA_HOST_ONLY CLASS(Records helper) */                                                                               \
+    /*  : mem_(nullptr), elements_(helper.size), _ITERATE_ON_ALL_COMMA(_INITIALIZE_PARAMETERS_FROM_STRUCT, ~, __VA_ARGS__) */ \
+    /* {} */                                                                                                                 \
+    SOA_HOST_ONLY                                                                                                      \
+    void aggregateInPlace() {                                                                                          \
+      std::byte* buffer {                                                                                              \
+        reinterpret_cast<std::byte *>(aligned_alloc(alignment, byteSize_))};                                           \
+      mem_ = buffer;                                                                                                   \
+      if constexpr (alignmentEnforcement == cms::soa::AlignmentEnforcement::enforced)                                  \
+        if (reinterpret_cast<intptr_t>(mem_) % alignment)                                                              \
+          throw std::runtime_error("In " #CLASS "::" #CLASS ": misaligned buffer");                                    \
+      auto _soa_impl_curMem = mem_;                                                                                    \
+      _ITERATE_ON_ALL(_AGGREGATE_SOA_COLUMNS, ~, __VA_ARGS__)                                                          \
+      /* Sanity check: we should have reached the computed size, only on host code */                                  \
+      byteSize_ = computeDataSize(elements_);                                                                          \
+      if (mem_ + byteSize_ != _soa_impl_curMem)                                                                        \
+        throw std::runtime_error("In " #CLASS "::" #CLASS ": unexpected end pointer.");                                \
+    }                                                                                                                  \
+                                                                                                                       \
+    SOA_HOST_ONLY                                                                                                      \
+    CLASS aggregate() {                                                                                                \
+      std::byte* buffer {                                                                                              \
+        reinterpret_cast<std::byte *>(aligned_alloc(alignment, byteSize_))};                                           \
+      CLASS soa(buffer, elements_);                                                                                    \
+      _ITERATE_ON_ALL(_COPY_COLUMN_BY_COLUMN, ~, __VA_ARGS__)                                                          \
+      return soa;                                                                                                      \
+    }                                                                                                                  \
+  };                                                                                                                    \
 // clang-format on
 
 #endif  // DataFormats_SoATemplate_interface_SoALayout_h

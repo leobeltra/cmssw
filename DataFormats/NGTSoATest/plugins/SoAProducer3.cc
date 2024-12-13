@@ -51,10 +51,10 @@ void SoAProducer3::produce(edm::StreamID iID, edm::Event& event, const edm::Even
 
     auto CombinedPhysicsObjSoAColl = std::make_unique<CombinedPhysicsObjectCollection>(elems, cms::alpakatools::host());
 
-    CombinedPhysicsObject combinedPhysicsObjSoA( phObj.x(),
-                                                 phObj.y(),
-                                                 phObj.z(),
-                                                 phObjExtra.candidateDirection());
+    CombinedPhysicsObject::Borrowing combinedPhysicsObjSoA( phObj.x(),
+                                                            phObj.y(),
+                                                            phObj.z(),
+                                                            phObjExtra.candidateDirection());
 
     CombinedPhysicsObjSoAColl -> aggregate(combinedPhysicsObjSoA);                                             
 
@@ -63,8 +63,6 @@ void SoAProducer3::produce(edm::StreamID iID, edm::Event& event, const edm::Even
     // finalView -> layout().setColumn_p_y(PortableCollection_0 -> layout().metadata().addressOf_y(), elems);
 
     // CombinedPhysicsObject::View finalView{combinedPhysicsObjSoA};
-    // Dynamically allocate columns
-    // myView.addColumns(PortableCollection_1, "v_y");
 
     std::cout << "Hey, I modified SoA for second time!" << std::endl;
     printSoAView(CombinedPhysicsObjSoAColl -> view());

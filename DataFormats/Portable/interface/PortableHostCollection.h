@@ -16,6 +16,7 @@ template <typename T>
 class PortableHostCollection {
 public:
   using Layout = T;
+  using Borrow = typename Layout::Borrowing;
   using View = typename Layout::View;
   using ConstView = typename Layout::ConstView;
   using Buffer = cms::alpakatools::host_buffer<std::byte[]>;
@@ -95,10 +96,10 @@ public:
     layout.ROOTStreamerCleaner();
   }
 
-  void aggregate(Layout& customLayout) {
-    customLayout.aggregateInPlace();
-    layout_ = customLayout;
-    View customView{customLayout};
+  void aggregate(Borrow& customLayout) {
+    Layout aggregated_layout = customLayout.aggregate();
+    layout_ = aggregated_layout;
+    View customView{aggregated_layout};
     view_ = customView;
   }
 

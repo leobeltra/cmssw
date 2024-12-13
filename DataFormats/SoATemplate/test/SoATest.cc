@@ -267,8 +267,8 @@ int main () {
 
     // std::unique_ptr<std::byte, decltype(std::free) *> slBuffer3{
     //     reinterpret_cast<std::byte *>(aligned_alloc(CustomSoA::alignment, customLayoutSize)), std::free};  
-    d_soa.aggregateInPlace();
-    // CustomSoA aggregated_soa = d_soa.aggregate();
+    // d_soa.aggregateInPlace();
+    CustomSoA aggregated_soa = d_soa.aggregate();
     
     // // d_soa.setData(h_soa.metadata().data());
 
@@ -278,14 +278,14 @@ int main () {
 
     // d_soa.setColumn_p_a(h_soav.a(), h_soa.metadata().size());
 
-    // h_soa.soaToStreamInternal(std::cout);
-    // v_soa.soaToStreamInternal(std::cout);
-    // d_soa.soaToStreamInternal(std::cout);
+    h_soa.soaToStreamInternal(std::cout);
+    v_soa.soaToStreamInternal(std::cout);
+    d_soa.soaToStreamInternal(std::cout);
 
-    // aggregated_soa.soaToStreamInternal(std::cout);
+    aggregated_soa.soaToStreamInternal(std::cout);
 
     CustomSoA::View d_soav{d_soa};
-    // CustomSoA::View aggregated_soav{aggregated_soa};
+    CustomSoA::View aggregated_soav{aggregated_soa};
 
     // This action modifies x()[3] too
     d_soav.p_x()[3] = 1000;
@@ -296,7 +296,7 @@ int main () {
 
     printSoAView<SoAHostLayoutView>(v_soav);
 
-    // printSoAView<CustomSoAView>(aggregated_soav);
+    printSoAView<CustomSoAView>(aggregated_soav);
 
     std::cout << "Indirizzo della memoria di d_soa: " << static_cast<void*>(d_soa.metadata().data()) << std::endl;
     std::cout << "Indirizzo della memoria di h_soa: " << static_cast<void*>(h_soa.metadata().data()) << std::endl;
