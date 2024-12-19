@@ -1,4 +1,3 @@
-// Necessary includes
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/ParameterSet/interface/ConfigurationDescriptions.h"
@@ -15,6 +14,7 @@
 #include "HeterogeneousCore/AlpakaCore/interface/alpaka/EDGetToken.h"
 #include "HeterogeneousCore/AlpakaCore/interface/alpaka/stream/SynchronizingEDProducer.h"
 #include "HeterogeneousCore/AlpakaInterface/interface/config.h"
+#include "HeterogeneousCore/AlpakaCore/interface/alpaka/MakerMacros.h"
 #include <iostream>
 
 namespace ALPAKA_ACCELERATOR_NAMESPACE {
@@ -48,5 +48,4 @@ private:
 };
 }
 
-#include "HeterogeneousCore/AlpakaCore/interface/alpaka/MakerMacros.h"
 DEFINE_FWK_ALPAKA_MODULE(SoAProducer4);
