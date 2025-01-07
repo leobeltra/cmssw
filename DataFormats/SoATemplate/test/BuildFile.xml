@@ -30,7 +30,7 @@
     <flags ALPAKA_BACKENDS="1"/>
     <export>
       <lib name="1"/>
-          </export>
+    </export>
   </bin>
 </iftool>
 

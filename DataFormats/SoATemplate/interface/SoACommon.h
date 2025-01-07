@@ -7,6 +7,7 @@
 
 #include <cstdint>
 #include <cassert>
+#include <cstring>
 #include <memory> 
 #include <ostream>
 #include <tuple>

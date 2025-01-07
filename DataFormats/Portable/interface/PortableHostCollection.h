@@ -98,11 +98,11 @@ public:
     layout.ROOTStreamerCleaner();
   }
 
-  void aggregate(Layout& customLayout) {
-    customLayout.aggregateInPlace();
-    layout_ = customLayout;
-    View customView{customLayout};
-    view_ = customView;
+  void aggregate() {
+    Layout custom = layout_.aggregate(const_view());
+    layout_ = custom;
+    // View customView{layout_};
+    // view_ = customView;
   }
 
 private:
