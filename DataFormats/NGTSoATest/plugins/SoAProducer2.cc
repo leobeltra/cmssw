@@ -43,12 +43,12 @@ void SoAProducer2::produce(edm::StreamID iID, edm::Event& event, const edm::Even
     auto modifiedSoA = std::make_unique<PhysicsObjExtraCollection>(elems, cms::alpakatools::host());
     auto& modifiedView = modifiedSoA->view();
 
-        for (int i = 0; i < modifiedView.metadata().size(); i++) {
+    for (int i = 0; i < modifiedView.metadata().size(); i++) {
           modifiedView.eigenvector_1()[i] = view.x()[i] / TIME;
           modifiedView.eigenvector_2()[i] = view.y()[i] / TIME;
           modifiedView.eigenvector_3()[i] = view.z()[i] / TIME;
           modifiedView.eigenvalues()[i] = view.x()[i] * TIME;
-          for (int j = 0; j < 3; j++)
+        for (int j = 0; j < 3; j++)
           modifiedView[i].candidateDirection()(j) = view.y()[i] / (TIME * (j+1));
     }
 

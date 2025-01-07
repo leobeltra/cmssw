@@ -734,6 +734,21 @@
 
 #define _COPY_COLUMN_BY_COLUMN(R, DATA, TYPE_NAME) BOOST_PP_EXPAND(_COPY_COLUMN_BY_COLUMN_IMPL TYPE_NAME)
 
+#define _COPY_VIEW_COLUMNS_IMPL(VALUE_TYPE, CPP_TYPE, NAME)                                                        \
+  _SWITCH_ON_TYPE(VALUE_TYPE,                                                                                          \
+      /* Scalar */                                                                                                     \
+      memcpy(BOOST_PP_CAT(soa.metadata().addressOf_, NAME)(), BOOST_PP_CAT(view.metadata().addressOf_, NAME)(), cms::soa::alignSize(sizeof(CPP_TYPE), alignment));                                                      \
+      ,                                                                                                                \
+      /* Column */                                                                                                     \
+      memcpy(BOOST_PP_CAT(soa.metadata().addressOf_, NAME)(), BOOST_PP_CAT(view.metadata().addressOf_, NAME)(), cms::soa::alignSize(soa.elements_ * sizeof(CPP_TYPE), alignment));                                          \
+      ,                                                                                                                \
+      /* Eigen column */                                                                                               \
+      memcpy(BOOST_PP_CAT(soa.metadata().addressOf_, NAME)(), BOOST_PP_CAT(view.metadata().addressOf_, NAME)(), cms::soa::alignSize(soa.elements_ * sizeof(CPP_TYPE::Scalar), alignment)                                    \
+                                                        * CPP_TYPE::RowsAtCompileTime * CPP_TYPE::ColsAtCompileTime);  \
+  )                                                                                                                    \
+
+#define _COPY_VIEW_COLUMNS(R, DATA, TYPE_NAME) BOOST_PP_EXPAND(_COPY_VIEW_COLUMNS_IMPL TYPE_NAME)
+
 #ifdef DEBUG
 #define _DO_RANGECHECK true
 #else
@@ -835,6 +850,7 @@
       _ITERATE_ON_ALL(_COPY_COLUMN_BY_COLUMN, ~, __VA_ARGS__)                                                          \
       return soa;                                                                                                      \
     }                                                                                                                  \
+                                                                                                                       \
     /* Helper function to set the starting memory byte */                                                              \
     inline void setData(std::byte* newMem) {mem_ = newMem;}                                                            \
                                                                                                                        \
@@ -857,7 +873,6 @@
       }                                                                                                                \
                                                                                                                        \
       _ITERATE_ON_ALL(_DEFINE_METADATA_MEMBERS, ~, __VA_ARGS__)                                                        \
-                                                                                                                       \
                                                                                                                        \
       struct value_element {                                                                                           \
         SOA_HOST_DEVICE SOA_INLINE value_element                                                                       \
@@ -892,7 +907,7 @@
      * Helper class allowing for SoA costruction with names.                                                           \
      */                                                                                                                \
     struct Records {                                                                                                   \
-      size_type size;                                                                                                  \
+      size_type capacity;                                                                                              \
       _ITERATE_ON_ALL(_DECLARE_STRUCT_MEMBERS, ~, __VA_ARGS__)                                                         \
     };                                                                                                                 \
                                                                                                                        \
@@ -977,7 +992,7 @@
     {}                                                                                                                 \
                                                                                                                        \
     SOA_HOST_ONLY CLASS(Records helper)                                                                                \
-      : mem_(nullptr), elements_(helper.size), _ITERATE_ON_ALL_COMMA(_INITIALIZE_PARAMETERS_FROM_STRUCT, ~, __VA_ARGS__) \
+      : mem_(nullptr), elements_(helper.capacity), _ITERATE_ON_ALL_COMMA(_INITIALIZE_PARAMETERS_FROM_STRUCT, ~, __VA_ARGS__) \
     {}                                                                                                                 \
                                                                                                                        \
     SOA_HOST_ONLY CLASS& operator=(CLASS const& _soa_impl_other) {                                                     \
@@ -986,6 +1001,15 @@
         byteSize_ = _soa_impl_other.byteSize_;                                                                         \
         _ITERATE_ON_ALL(_DECLARE_MEMBER_ASSIGNMENT, ~, __VA_ARGS__)                                                    \
         return *this;                                                                                                  \
+    }                                                                                                                  \
+                                                                                                                       \
+    SOA_HOST_ONLY                                                                                                      \
+    static const CLASS aggregate(ConstView const& view) {                                                                    \
+    std::byte* buffer {                                                                                                \
+        reinterpret_cast<std::byte *>(aligned_alloc(alignment, computeDataSize(view.metadata().size())))};             \
+      CLASS soa(buffer, view.metadata().size());                                                                       \
+      _ITERATE_ON_ALL(_COPY_VIEW_COLUMNS, ~, __VA_ARGS__)                                                              \
+      return soa;                                                                                                      \
     }                                                                                                                  \
                                                                                                                        \
     /* ROOT read streamer */                                                                                           \
@@ -1024,7 +1048,7 @@
     size_type const scalar_ = 1;                                                                                       \
     byte_size_type byteSize_ EDM_REFLEX_TRANSIENT;                                                                     \
     _ITERATE_ON_ALL(_DECLARE_SOA_DATA_MEMBER, ~, __VA_ARGS__)                                                          \
-    static constexpr std::array<const char*, computeColumnNumber()> columnNames_ = generateColumnNames();              \
+    /* static constexpr std::array<const char*, computeColumnNumber()> columnNames_ = generateColumnNames(); */        \
     /* Making the code conditional is problematic in macros as the commas will interfere with parameter lisings     */ \
     /* So instead we make the code unconditional with paceholder names which are protected by a private protection. */ \
     /* This will be handled later as we handle the integration of the view as a subclass of the layout.             */ \
