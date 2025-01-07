@@ -168,38 +168,6 @@
 // clang-format on
 #define _DEFINE_METADATA_MEMBERS(R, DATA, TYPE_NAME) _DEFINE_METADATA_MEMBERS_IMPL TYPE_NAME
 
-/**
- * Functions for retreving pointers to layout columns
- */
-// clang-format off
-#define _DEFINE_SET_COLUMN_FUNCTIONS_IMPL(VALUE_TYPE, CPP_TYPE, NAME)                                                  \
-  _SWITCH_ON_TYPE(VALUE_TYPE,                                                                                          \
-      /* Scalar */                                                                                                     \
-      void BOOST_PP_CAT(setColumn_, NAME)(CPP_TYPE& newAddr) {                                                         \
-          BOOST_PP_CAT(NAME, _) = reinterpret_cast<CPP_TYPE*>(&newAddr);                                               \
-      }                                                                                                                \
-      ,                                                                                                                \
-      /* Column */                                                                                                     \
-      void BOOST_PP_CAT(setColumn_, NAME)(CPP_TYPE* newAddr) {                                                         \
-          BOOST_PP_CAT(NAME, _) = reinterpret_cast<CPP_TYPE*>(newAddr);                                                \
-      }                                                                                                                \
-      void BOOST_PP_CAT(setColumn_, NAME)(const CPP_TYPE* newAddr) {                                                   \
-          BOOST_PP_CAT(NAME, _) = const_cast<CPP_TYPE*>(newAddr);                                                      \
-      }                                                                                                                \
-      ,                                                                                                                \
-      /* Eigen */                                                                                                      \
-      void BOOST_PP_CAT(setColumn_, NAME)(CPP_TYPE::Scalar* newAddr) {                                                 \
-          BOOST_PP_CAT(NAME, Stride_) = cms::soa::alignSize(elements_ * sizeof(CPP_TYPE::Scalar), alignment)           \
-            / sizeof(CPP_TYPE::Scalar);                                                                                \
-          BOOST_PP_CAT(NAME, ElementsWithPadding_) = BOOST_PP_CAT(NAME, Stride_)                                       \
-            *  CPP_TYPE::RowsAtCompileTime * CPP_TYPE::ColsAtCompileTime;                                              \
-          BOOST_PP_CAT(NAME, _) = reinterpret_cast<CPP_TYPE::Scalar*>(newAddr);                                        \
-      }                                                                                                                \
-  )   
-// clang-format on    
-
-#define _DEFINE_SET_COLUMN_FUNCTIONS(R, DATA, TYPE_NAME) _DEFINE_SET_COLUMN_FUNCTIONS_IMPL TYPE_NAME
-
 // clang-format off
 #define _DECLARE_MEMBER_TRIVIAL_CONSTRUCTION_IMPL(VALUE_TYPE, CPP_TYPE, NAME)                                          \
   _SWITCH_ON_TYPE(VALUE_TYPE,                                                                                          \
@@ -514,18 +482,6 @@
 
 #define _DECLARE_STRUCT_MEMBERS(R, DATA, TYPE_NAME) BOOST_PP_EXPAND(_DECLARE_STRUCT_MEMBERS_IMPL TYPE_NAME)
 
-#define _COUNT_SOA_COLUMNS(R, DATA, TYPE_NAME)  _soa_column_count++;
-
-/**
- * Array of string column names
- */
-// clang-format off
-#define _DECLARE_SOA_COLUMNS_NAMES_IMPL(VALUE_TYPE, CPP_TYPE, NAME)                                                    \
-  _columns_names[i++] = BOOST_PP_STRINGIZE(NAME);                                                                      \
-// clang-format on 
-
-#define _DECLARE_SOA_COLUMNS_NAMES(R, DATA, NAME) BOOST_PP_EXPAND(_DECLARE_SOA_COLUMNS_NAMES_IMPL  NAME)
-
 /**
  * List of data members in the layout-by-columns constructor arguments
  */
@@ -542,13 +498,6 @@
 // clang-format on
 
 #define _DECLARE_CONSTRUCTOR_ARGUMENT(R, DATA, TYPE_NAME) BOOST_PP_EXPAND(_DECLARE_CONSTRUCTOR_ARGUMENT_IMPL TYPE_NAME)
-
-// clang-format off
-#define _CALL_SET_COLUMN_FUNCTIONS_FROM_ARGS_IMPL(VALUE_TYPE, CPP_TYPE, NAME)                                          \
-        setColumn_##NAME(NAME); 
-// clang-format on
-
-#define _CALL_SET_COLUMN_FUNCTIONS_FROM_ARGS(R, DATA, TYPE_NAME) BOOST_PP_EXPAND(_CALL_SET_COLUMN_FUNCTIONS_FROM_ARGS_IMPL TYPE_NAME)
 
 #define _DECLARE_CONSTRUCTOR_PARAMETERS_IMPL(VALUE_TYPE, CPP_TYPE, NAME)                                               \
     (typename Metadata::BOOST_PP_CAT(ParametersTypeOf_, NAME) NAME)
@@ -811,21 +760,6 @@
       return _soa_impl_ret;                                                                                            \
     }                                                                                                                  \
                                                                                                                        \
-    /* Helper function to compute the total number of columns */                                                       \
-    static constexpr size_type computeColumnNumber() {                                                                 \
-      size_type _soa_column_count = 0;                                                                                 \
-      _ITERATE_ON_ALL(_COUNT_SOA_COLUMNS, ~, __VA_ARGS__)                                                              \
-      return _soa_column_count;                                                                                        \
-    }                                                                                                                  \
-                                                                                                                       \
-    /* Helper function used by caller to generate an array of strings containing column names */                       \
-    static constexpr std::array<const char*, computeColumnNumber()> generateColumnNames() {                            \
-      std::array<const char*, computeColumnNumber()> _columns_names = {};                                              \
-      size_type i = 0;                                                                                                 \
-      _ITERATE_ON_ALL(_DECLARE_SOA_COLUMNS_NAMES, ~, __VA_ARGS__)                                                      \
-      return _columns_names;                                                                                           \
-    }                                                                                                                  \
-                                                                                                                       \
     SOA_HOST_ONLY                                                                                                      \
     void aggregateInPlace() {                                                                                          \
       std::byte* buffer {                                                                                              \
@@ -850,12 +784,6 @@
       _ITERATE_ON_ALL(_COPY_COLUMN_BY_COLUMN, ~, __VA_ARGS__)                                                          \
       return soa;                                                                                                      \
     }                                                                                                                  \
-                                                                                                                       \
-    /* Helper function to set the starting memory byte */                                                              \
-    inline void setData(std::byte* newMem) {mem_ = newMem;}                                                            \
-                                                                                                                       \
-                                                                                                                       \
-    _ITERATE_ON_ALL(_DEFINE_SET_COLUMN_FUNCTIONS, ~, __VA_ARGS__)                                                      \
                                                                                                                        \
     /**                                                                                                                \
      * Helper/friend class allowing SoA introspection.                                                                 \
@@ -902,14 +830,6 @@
     };                                                                                                                 \
                                                                                                                        \
     friend Metadata;                                                                                                   \
-                                                                                                                       \
-      /**                                                                                                              \
-     * Helper class allowing for SoA costruction with names.                                                           \
-     */                                                                                                                \
-    struct Records {                                                                                                   \
-      size_type capacity;                                                                                              \
-      _ITERATE_ON_ALL(_DECLARE_STRUCT_MEMBERS, ~, __VA_ARGS__)                                                         \
-    };                                                                                                                 \
                                                                                                                        \
     struct Metarecords {                                                                                               \
       friend CLASS;                                                                                                    \
@@ -971,13 +891,13 @@
           _ITERATE_ON_ALL_COMMA(_DECLARE_MEMBER_COPY_CONSTRUCTION, ~, __VA_ARGS__) {}                                  \
                                                                                                                        \
     /* Constructor relying on user-provided column pointers */                                                         \
-    SOA_HOST_ONLY CLASS(_ITERATE_ON_ALL_COMMA(_DECLARE_CONSTRUCTOR_PARAMETERS, ~, __VA_ARGS__))                        \
-      : mem_(nullptr)                                                                                                  \
-    {                                                                                                                  \
-      bool readyToSet = false;                                                                                         \
-      _ITERATE_ON_ALL(_INITIALIZE_PARAMETERS_AND_SIZE, ~, __VA_ARGS__)                                                 \
-      byteSize_ = computeDataSize(elements_);                                                                          \
-    }                                                                                                                  \
+    /* SOA_HOST_ONLY CLASS(_ITERATE_ON_ALL_COMMA(_DECLARE_CONSTRUCTOR_PARAMETERS, ~, __VA_ARGS__)) */                        \
+    /*  : mem_(nullptr)                                                                                */                  \
+    /* {                                                                                                 */                 \
+    /*  bool readyToSet = false;                                                                          */               \
+    /*  _ITERATE_ON_ALL(_INITIALIZE_PARAMETERS_AND_SIZE, ~, __VA_ARGS__)                                    */             \
+    /*  byteSize_ = computeDataSize(elements_);                                                              */            \
+    /* }                                                                                                        */          \
                                                                                                                        \
     /* Constructor relying on user-provided column pointers */                                                         \
     /* SOA_HOST_ONLY CLASS(size_type elements, _ITERATE_ON_ALL_COMMA(_DECLARE_CONSTRUCTOR_ARGUMENT, ~, __VA_ARGS__)) */\
@@ -991,10 +911,6 @@
       : elements_(elements)                                                                                            \
     {}                                                                                                                 \
                                                                                                                        \
-    SOA_HOST_ONLY CLASS(Records helper)                                                                                \
-      : mem_(nullptr), elements_(helper.capacity), _ITERATE_ON_ALL_COMMA(_INITIALIZE_PARAMETERS_FROM_STRUCT, ~, __VA_ARGS__) \
-    {}                                                                                                                 \
-                                                                                                                       \
     SOA_HOST_ONLY CLASS& operator=(CLASS const& _soa_impl_other) {                                                     \
         mem_ = _soa_impl_other.mem_;                                                                                   \
         elements_ = _soa_impl_other.elements_;                                                                         \
@@ -1004,7 +920,7 @@
     }                                                                                                                  \
                                                                                                                        \
     SOA_HOST_ONLY                                                                                                      \
-    static const CLASS aggregate(ConstView const& view) {                                                                    \
+    static const CLASS aggregate(ConstView const& view) {                                                              \
     std::byte* buffer {                                                                                                \
         reinterpret_cast<std::byte *>(aligned_alloc(alignment, computeDataSize(view.metadata().size())))};             \
       CLASS soa(buffer, view.metadata().size());                                                                       \

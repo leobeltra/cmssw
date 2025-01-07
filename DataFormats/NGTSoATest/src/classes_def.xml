@@ -1,11 +1,11 @@
 <lcgdict>
   <class name="PhysicsObj" />
   <class name="PhysicsObjExtra" />
-  <class name="CombinedPhysicsObject"/>
+  <!-- <class name="CombinedPhysicsObject"/> -->
   <class name="PhysicsObjCollection"/>
   <class name="PhysicsObjExtraCollection"/>
-  <class name="CombinedPhysicsObjectCollection"/>
+  <!-- <class name="CombinedPhysicsObjectCollection"/> -->
   <class name="edm::Wrapper<PhysicsObjCollection>"/>
   <class name="edm::Wrapper<PhysicsObjExtraCollection>"/>
-  <class name="edm::Wrapper<CombinedPhysicsObjectCollection>"/>
+  <!-- <class name="edm::Wrapper<CombinedPhysicsObjectCollection>"/> -->
 </lcgdict>
