@@ -49,28 +49,17 @@ void SoAProducer3::produce(edm::StreamID iID, edm::Event& event, const edm::Even
     const auto phObj = physicsObj.records();
     const auto phObjExtra = physicsObjExtra.records();
 
-    // CombinedPhysicsObject combinedPhysicsObjSoA(phObj.x(),
-    //                                             phObj.y(),
-    //                                             phObj.z(),
-    //                                             phObjExtra.candidateDirection());
+    CombinedPhysicsObject combinedPhysicsObjSoA(phObj.x(),
+                                                phObj.y(),
+                                                phObj.z(),
+                                                phObjExtra.candidateDirection());
 
     // IL PROBLEMA DI QUESTO APPROCCIO È CHE COSTRUENDO LA PORTABLE COLLECTION IN MANIERA STANDARD POI OCCORRE RICOSTRUIRE IL LAYOUT IN MANIERA DIFFERENTE E ANCHE
-    // LA VIEW DEVE ESSERE INIZIALIZZATA PRIMA IN QUANTO VIENE USATA DAL METODO AGGREGATE. A QUESTO PUNTO UN NUOVO COSTRUTTORE PER LA COLLECTION?
+    // LA VIEW DEVE ESSERE INIZIALIZZATA PRIMA IN QUANTO VIENE USATA DAL METODO AGGREGATE. A QUESTO PUNTO UN NUOVO COSTRUTTORE PER LA COLLECTION? SÌ!
 
-    auto CombinedPhysicsObjSoAColl = std::make_unique<CombinedPhysicsObjectCollection>(elems, cms::alpakatools::host());
+    auto combinedPhysicsObjSoAView{combinedPhysicsObjSoA};
 
-    auto& combinedPhysicsObjSoA = CombinedPhysicsObjSoAColl -> layout();
-
-    combinedPhysicsObjSoA = CombinedPhysicsObject(phObj.x(),
-                                                  phObj.y(),
-                                                  phObj.z(),
-                                                  phObjExtra.candidateDirection());
-
-    auto combinedPhysicsObjSoAView{combinedPhysicsObjSoA};                                            
-
-    CombinedPhysicsObjSoAColl -> view() = combinedPhysicsObjSoAView;
-
-    CombinedPhysicsObjSoAColl -> aggregate();
+    auto CombinedPhysicsObjSoAColl = std::make_unique<CombinedPhysicsObjectCollection>(combinedPhysicsObjSoAView);
 
     std::cout << "Hey, I modified SoA for second time!" << std::endl;
     printSoAView(CombinedPhysicsObjSoAColl -> view());
