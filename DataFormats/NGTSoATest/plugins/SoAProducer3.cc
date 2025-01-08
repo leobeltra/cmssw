@@ -39,7 +39,7 @@ void SoAProducer3::produce(edm::StreamID iID, edm::Event& event, const edm::Even
     auto const& PortableCollection_1 = event.getHandle(inputToken_1_); // Velocity Collection
 
     // Creating a PortableCollection for the output (memory not allocated here)
-    int elems = PortableCollection_0->view().metadata().size();
+    // int elems = PortableCollection_0->view().metadata().size();
 
     // auto CombinedPhysicsObjSoAColl = std::make_unique<CombinedPhysicsObjectCollection>(elems, cms::alpakatools::host());
 
