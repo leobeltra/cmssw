@@ -985,6 +985,11 @@
     /* {                                                */                                                             \
     /*  _ITERATE_ON_ALL(_CALL_SET_COLUMN_FUNCTIONS_FROM_ARGS, ~, __VA_ARGS__)       */                                 \
     /* }                                                 */                                                            \
+    SOA_HOST_ONLY CLASS(View const& custom_view, std::byte* mem) : mem_(mem), elements_(custom_view.metadata().size()), byteSize_(0) {     \
+      auto _soa_impl_curMem = mem_;                                                                                    \
+      _ITERATE_ON_ALL(_ASSIGN_SOA_COLUMN_OR_SCALAR_FROM_VIEW, ~, __VA_ARGS__)                                          \
+      byteSize_ = computeDataSize(elements_);                                                                          \
+    }                                                                                                                  \
                                                                                                                        \
     /* Construnctor having only the number of elements */                                                              \
     SOA_HOST_ONLY CLASS(size_type elements)                                                                            \
