@@ -358,6 +358,40 @@
  
 #define _ASSIGN_SOA_COLUMN_OR_SCALAR(R, DATA, TYPE_NAME) _ASSIGN_SOA_COLUMN_OR_SCALAR_IMPL TYPE_NAME
 
+#define _INITIALIZE_MEM_ADDRESS_IMPL(VALUE_TYPE, CPP_TYPE, NAME)                                                       \
+  if(mem_start) {                                                                                                      \
+    mem_ = BOOST_PP_CAT(custom_view.metadata().addressOf_, NAME)();                                                    \
+    mem_start = false;                                                                                                 \
+  }                                                                                                                    \
+
+#define _INITIALIZE_MEM_ADDRESS(R, DATA, TYPE_NAME) _INITIALIZE_MEM_ADDRESS_IMPL TYPE_NAME
+
+#define  _ASSIGN_SOA_COLUMN_OR_SCALAR_FROM_VIEW_IMPL(VALUE_TYPE, CPP_TYPE, NAME)                                     \
+  _SWITCH_ON_TYPE(VALUE_TYPE,                                                                                          \
+    /* Scalar */                                                                                                       \
+      BOOST_PP_CAT(NAME, _) = reinterpret_cast<CPP_TYPE*>(_soa_impl_curMem);                                           \
+      _soa_impl_curMem += cms::soa::alignSize(sizeof(CPP_TYPE), alignment);                                            \
+    memcpy(BOOST_PP_CAT(NAME, _), BOOST_PP_CAT(custom_view.metadata().addressOf_, NAME)(), cms::soa::alignSize(sizeof(CPP_TYPE), alignment));                                                      \
+    ,                                                                                                                \
+    /* Column */                                                                                                     \
+      BOOST_PP_CAT(NAME, _) = reinterpret_cast<CPP_TYPE*>(_soa_impl_curMem);                                           \
+      _soa_impl_curMem += cms::soa::alignSize(sizeof(CPP_TYPE), alignment);                                            \
+    memcpy(BOOST_PP_CAT(NAME, _), BOOST_PP_CAT(custom_view.metadata().addressOf_, NAME)(), cms::soa::alignSize(elements_ * sizeof(CPP_TYPE), alignment));                                          \
+    ,                                                                                                                \
+    /* Eigen column */                                                                                               \
+      BOOST_PP_CAT(NAME, _) = reinterpret_cast<CPP_TYPE::Scalar*>(_soa_impl_curMem);                                   \
+      _soa_impl_curMem += cms::soa::alignSize(elements_ * sizeof(CPP_TYPE::Scalar), alignment)                         \
+        * CPP_TYPE::RowsAtCompileTime * CPP_TYPE::ColsAtCompileTime;                                                   \
+    BOOST_PP_CAT(NAME, Stride_) = cms::soa::alignSize(elements_ * sizeof(CPP_TYPE::Scalar), alignment)               \
+      / sizeof(CPP_TYPE::Scalar);                                                                                    \
+    BOOST_PP_CAT(NAME, ElementsWithPadding_) = BOOST_PP_CAT(NAME, Stride_)                                           \
+      *  CPP_TYPE::RowsAtCompileTime * CPP_TYPE::ColsAtCompileTime;                                                  \
+    memcpy(BOOST_PP_CAT(NAME, _), BOOST_PP_CAT(custom_view.metadata().addressOf_, NAME)(), cms::soa::alignSize(elements_ * sizeof(CPP_TYPE::Scalar), alignment)                                    \
+                                                      * CPP_TYPE::RowsAtCompileTime * CPP_TYPE::ColsAtCompileTime);  \
+  )                                                                                                                    \
+
+#define _ASSIGN_SOA_COLUMN_OR_SCALAR_FROM_VIEW(R, DATA, TYPE_NAME) _ASSIGN_SOA_COLUMN_OR_SCALAR_FROM_VIEW_IMPL TYPE_NAME
+
 // clang-format off
 #define _AGGREGATE_SOA_COLUMNS_IMPL(VALUE_TYPE, CPP_TYPE, NAME)                                                        \
   _SWITCH_ON_TYPE(VALUE_TYPE,                                                                                          \
