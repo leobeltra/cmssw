@@ -1,0 +1,7 @@
+#include "DataFormats/Portable/interface/PortableHostCollectionReadRules.h"
+#include "DataFormats/Portable/interface/PortableHostObjectReadRules.h"
+#include "DataFormats/NGTSoATest/interface/PortableCollectionSoATest.h"
+
+SET_PORTABLEHOSTCOLLECTION_READ_RULES(PhysicsObjCollection);
+SET_PORTABLEHOSTCOLLECTION_READ_RULES(PhysicsObjExtraCollection);
+SET_PORTABLEHOSTCOLLECTION_READ_RULES(CombinedPhysicsObjectCollection);
