@@ -1,4 +1,5 @@
 import FWCore.ParameterSet.Config as cms
+from DataFormats.NGTSoATest.soAProducer4_cfi import soAProducer4
 
 process = cms.Process("SoAProducer")
 
@@ -15,7 +16,8 @@ process.source = cms.Source("EmptySource")
 process.soaproducer = cms.EDProducer("SoAProducer", soaParameter = cms.int32(42))
 process.soaproducer2 = cms.EDProducer("SoAProducer2", soaInput = cms.InputTag("soaproducer", "SoAProduct"))
 process.soaproducer3 = cms.EDProducer("SoAProducer3", soaInput_0 = cms.InputTag("soaproducer", "SoAProduct"), soaInput_1 = cms.InputTag("soaproducer2", "SoAProduct2"))
+process.soaproducer4 = soAProducer4.clone(soaInput_2 = cms.InputTag("soaproducer3", "SoAProduct3"))
 
 # Add to process path
-process.p = cms.Path(process.soaproducer * process.soaproducer2 * process.soaproducer3
+process.p = cms.Path(process.soaproducer + process.soaproducer2 + process.soaproducer3 + process.soaproducer4
                      )

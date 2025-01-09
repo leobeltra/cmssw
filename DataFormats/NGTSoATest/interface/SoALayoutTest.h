@@ -36,14 +36,14 @@ GENERATE_SOA_LAYOUT(CombinedPhysicsObjectTemplate,
 using CombinedPhysicsObject = CombinedPhysicsObjectTemplate<>;
 using CombinedPhysicsObjectView = CombinedPhysicsObject::View;
 
-GENERATE_SOA_LAYOUT(DeviceLayoutTemplate,
+GENERATE_SOA_LAYOUT(NGTSoATemplate,
                     SOA_COLUMN(double, a),
                     SOA_COLUMN(double, b),
                     SOA_COLUMN(double, c),
                     SOA_SCALAR(int, d))
 
-using DeviceLayout = DeviceLayoutTemplate<>;
-using DeviceLayoutView = DeviceLayout::View;
+using NGTSoA = NGTSoATemplate<>;
+using NGTSoAView = NGTSoA::View;
 
 // Helper per verificare la presenza di un metodo
 #define HAS_METHOD(method) \
