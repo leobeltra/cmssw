@@ -21,6 +21,7 @@
     <use name="FWCore/ServiceRegistry"/>
     <use name="FWCore/Utilities"/>
     <use name="HeterogeneousCore/CUDAServices"/>
+    <use name="HeterogeneousCore/CUDAUtilities"/>
   </bin>
 </iftool>
 
@@ -67,7 +68,7 @@
     <use name="HeterogeneousCore/CUDAUtilities"/>
   </bin>
 </iftool>
---><!--
+<!--
 <iftool name="cuda">
   <bin name="testTorchFromBufferModelEvalMTMS" file="testRunner.cc,testTorchFromBufferModelEvalMTMS.cu">
     <use name="boost_filesystem"/>
