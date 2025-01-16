@@ -103,11 +103,8 @@ PortableHostCollection(View view)
     layout.ROOTStreamerCleaner();
   }
 
-  void aggregate() {
-    Layout custom = layout_.aggregate(const_view());
-    layout_ = custom;
-    // View customView{layout_};
-    // view_ = customView;
+  void aggregate(View view) {
+    layout_.aggregate(view);
   }
 
 private:

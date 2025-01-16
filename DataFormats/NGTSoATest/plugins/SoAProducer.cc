@@ -52,5 +52,6 @@ void SoAProducer::produce(edm::StreamID iID, edm::Event& event, const edm::Event
     // Put the product in the event
     event.put(std::move(SoAProduct), "SoAProduct");
     std::cout << "Hey I work with SoA" << std::endl;
+    std::cout << "Memory address of the first collection: " << view.metadata().addressOf_x() << std::endl;
     printSoAView(view);
 } 

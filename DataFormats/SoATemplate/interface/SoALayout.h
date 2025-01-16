@@ -771,13 +771,13 @@
 #define _COPY_VIEW_COLUMNS_IMPL(VALUE_TYPE, CPP_TYPE, NAME)                                                        \
   _SWITCH_ON_TYPE(VALUE_TYPE,                                                                                          \
       /* Scalar */                                                                                                     \
-      memcpy(BOOST_PP_CAT(soa.metadata().addressOf_, NAME)(), BOOST_PP_CAT(view.metadata().addressOf_, NAME)(), cms::soa::alignSize(sizeof(CPP_TYPE), alignment));                                                      \
+      memcpy(BOOST_PP_CAT(this -> metadata().addressOf_, NAME)(), BOOST_PP_CAT(view.metadata().addressOf_, NAME)(), cms::soa::alignSize(sizeof(CPP_TYPE), alignment));                                                      \
       ,                                                                                                                \
       /* Column */                                                                                                     \
-      memcpy(BOOST_PP_CAT(soa.metadata().addressOf_, NAME)(), BOOST_PP_CAT(view.metadata().addressOf_, NAME)(), cms::soa::alignSize(soa.elements_ * sizeof(CPP_TYPE), alignment));                                          \
+      memcpy(BOOST_PP_CAT(this -> metadata().addressOf_, NAME)(), BOOST_PP_CAT(view.metadata().addressOf_, NAME)(), cms::soa::alignSize(this -> elements_ * sizeof(CPP_TYPE), alignment));                                          \
       ,                                                                                                                \
       /* Eigen column */                                                                                               \
-      memcpy(BOOST_PP_CAT(soa.metadata().addressOf_, NAME)(), BOOST_PP_CAT(view.metadata().addressOf_, NAME)(), cms::soa::alignSize(soa.elements_ * sizeof(CPP_TYPE::Scalar), alignment)                                    \
+      memcpy(BOOST_PP_CAT(this -> metadata().addressOf_, NAME)(), BOOST_PP_CAT(view.metadata().addressOf_, NAME)(), cms::soa::alignSize(this -> elements_ * sizeof(CPP_TYPE::Scalar), alignment)                                    \
                                                         * CPP_TYPE::RowsAtCompileTime * CPP_TYPE::ColsAtCompileTime);  \
   )                                                                                                                    \
 
@@ -874,15 +874,6 @@
       byteSize_ = computeDataSize(elements_);                                                                          \
       if (mem_ + byteSize_ != _soa_impl_curMem)                                                                        \
         throw std::runtime_error("In " #CLASS "::" #CLASS ": unexpected end pointer.");                                \
-    }                                                                                                                  \
-                                                                                                                       \
-    SOA_HOST_ONLY                                                                                                      \
-    CLASS aggregate() {                                                                                                \
-      std::byte* buffer {                                                                                              \
-        reinterpret_cast<std::byte *>(aligned_alloc(alignment, byteSize_))};                                           \
-      CLASS soa(buffer, elements_);                                                                                    \
-      _ITERATE_ON_ALL(_COPY_COLUMN_BY_COLUMN, ~, __VA_ARGS__)                                                          \
-      return soa;                                                                                                      \
     }                                                                                                                  \
                                                                                                                        \
     /* Helper function to set the starting memory byte */                                                              \
@@ -1042,13 +1033,21 @@
         return *this;                                                                                                  \
     }                                                                                                                  \
                                                                                                                        \
+    /* SOA_HOST_ONLY        */                                                                                              \
+    /* static const CLASS aggregate(ConstView const& view) { */                                                                   \
+    /* std::byte* buffer {                                      */                                                           \
+    /*    reinterpret_cast<std::byte *>(aligned_alloc(alignment, computeDataSize(view.metadata().size())))}; */            \
+    /*  CLASS soa(buffer, view.metadata().size());             */                                                          \
+    /*  _ITERATE_ON_ALL(_COPY_VIEW_COLUMNS, ~, __VA_ARGS__) */                                                             \
+    /*  return soa;          */                                                                                            \
+    /* }  */                                                                                                                \
+                                                                                                                       \
     SOA_HOST_ONLY                                                                                                      \
-    static const CLASS aggregate(ConstView const& view) {                                                                    \
-    std::byte* buffer {                                                                                                \
-        reinterpret_cast<std::byte *>(aligned_alloc(alignment, computeDataSize(view.metadata().size())))};             \
-      CLASS soa(buffer, view.metadata().size());                                                                       \
-      _ITERATE_ON_ALL(_COPY_VIEW_COLUMNS, ~, __VA_ARGS__)                                                              \
-      return soa;                                                                                                      \
+    void aggregate(View view) {                                                                                        \
+      if (elements_ < view.metadata().size())                                                                \
+        throw std::runtime_error(                                                                                  \
+            "In aggregate method: number of elements mismatch ");                                                      \
+      _ITERATE_ON_ALL(_COPY_VIEW_COLUMNS, ~, __VA_ARGS__)                                                          \
     }                                                                                                                  \
                                                                                                                        \
     /* ROOT read streamer */                                                                                           \

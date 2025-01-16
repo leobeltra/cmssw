@@ -49,21 +49,21 @@ void SoAProducer3::produce(edm::StreamID iID, edm::Event& event, const edm::Even
     const auto phObj = physicsObj.records();
     const auto phObjExtra = physicsObjExtra.records();
 
-    CombinedPhysicsObject combinedPhysicsObjSoA(phObj.x(),
-                                                phObj.y(),
-                                                phObj.z(),
-                                                phObjExtra.candidateDirection());
+    CombinedPhysicsObjectView combinedPhysicsObjSoAView(phObj.x(),
+                                                        phObj.y(),
+                                                        phObj.z(),
+                                                        phObjExtra.candidateDirection());
 
-    // IL PROBLEMA DI QUESTO APPROCCIO È CHE COSTRUENDO LA PORTABLE COLLECTION IN MANIERA STANDARD POI OCCORRE RICOSTRUIRE IL LAYOUT IN MANIERA DIFFERENTE E ANCHE
-    // LA VIEW DEVE ESSERE INIZIALIZZATA PRIMA IN QUANTO VIENE USATA DAL METODO AGGREGATE. A QUESTO PUNTO UN NUOVO COSTRUTTORE PER LA COLLECTION? SÌ!
+    auto combinedPhysicsObjSoAColl = std::make_unique<CombinedPhysicsObjectCollection>(
+                     combinedPhysicsObjSoAView.metadata().size(), cms::alpakatools::host());
 
-    auto combinedPhysicsObjSoAView{combinedPhysicsObjSoA};
-
-    auto CombinedPhysicsObjSoAColl = std::make_unique<CombinedPhysicsObjectCollection>(combinedPhysicsObjSoAView);
+    combinedPhysicsObjSoAColl -> aggregate(combinedPhysicsObjSoAView);
 
     std::cout << "Hey, I modified SoA for second time!" << std::endl;
-    printSoAView(CombinedPhysicsObjSoAColl -> view());
+    // std::cout << "Memory address of the aggregate collection: " << combinedPhysicsObjSoAColl -> view().metadata().addressOf_x() << std::endl;
+    std::cout << (PortableCollection_0 -> view().metadata().addressOf_x() == combinedPhysicsObjSoAColl -> view().metadata().addressOf_x() ? "the addresses are the same" : "the addresses are not the same") << std::endl;
+    printSoAView(combinedPhysicsObjSoAColl -> view());
 
-    event.put(std::move(CombinedPhysicsObjSoAColl), "SoAProduct3");
+    event.put(std::move(combinedPhysicsObjSoAColl), "SoAProduct3");
     //printSoAView(modifiedView);
 }

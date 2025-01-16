@@ -35,7 +35,7 @@ GENERATE_SOA_LAYOUT(CombinedPhysicsObjectTemplate,
 
 using CombinedPhysicsObject = CombinedPhysicsObjectTemplate<>;
 using CombinedPhysicsObjectView = CombinedPhysicsObject::View;
-
+using CombinedPhysicsObjectConstView = CombinedPhysicsObject::ConstView;
 
 // Helper per verificare la presenza di un metodo
 #define HAS_METHOD(method) \
