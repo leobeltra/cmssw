@@ -244,12 +244,12 @@ int main () {
     const auto hf = h_soa.records();
     const auto vf = v_soa.records();
 
-    CustomSoA d_soa(hf.x(),
-                    hf.y(),
-                    vf.v_y(),
-                    vf.v_r(),
-                    hf.description(),
-                    hf.r());
+    CustomSoAConstView d_soa(hf.x(),
+                        hf.y(),
+                        vf.v_y(),
+                        vf.v_r(),
+                        hf.description(),
+                        hf.r());
 
     // CustomSoA d_soa({.size = size, 
     //                  .p_x = hf.x(),
@@ -261,32 +261,34 @@ int main () {
 
     // aggregated_soa.soaToStreamInternal(std::cout);
 
-    CustomSoA::View d_soav{d_soa};
+    // CustomSoA::View d_soav{d_soa};
     //CustomSoA::View aggregated_soav{aggregated_soa};
-    CustomSoA::ConstView aggregated_const_soav{d_soa};
+    // CustomSoA::ConstView aggregated_const_soav{d_soa};
 
-    CustomSoA aggregated_soa{d_soa.aggregate(aggregated_const_soav)}; 
+    // CustomSoA aggregated_soa{d_soa.aggregate(aggregated_const_soav)}; 
 
-    CustomSoA::View aggregated_soa_view{aggregated_soa};
+    // CustomSoA::View aggregated_soa_view{aggregated_soa};
     // This action modifies x()[3] too
-    d_soav.p_x()[3] = 1000;
+    // d_soa.p_x()[3] = 1000;
 
     printSoAView<SoAHostDeviceView>(h_soav);
 
     printSoAView<SoAHostLayoutView>(v_soav);
 
-    printSoAView<CustomSoAConstView>(aggregated_const_soav);
+    printSoAView<CustomSoAConstView>(d_soa);
 
-    printSoAView<CustomSoAView>(aggregated_soa_view);
+    // printSoAView<CustomSoAConstView>(aggregated_const_soav);
 
-    d_soa.soaToStreamInternal(std::cout);
+    // printSoAView<CustomSoAView>(aggregated_soa_view);
 
-    std::cout << "Indirizzo della memoria di d_soa: " << static_cast<void*>(d_soa.metadata().data()) << std::endl;
+    // d_soa.soaToStreamInternal(std::cout);
+    std::cout << std::endl; 
+    // std::cout << "Indirizzo della memoria di d_soa: " << static_cast<void*>(d_soa.metadata().data()) << std::endl;
     std::cout << "Indirizzo della memoria di h_soa: " << static_cast<void*>(h_soa.metadata().data()) << std::endl;
-    std::cout << "Indirizzo della memoria di aggregated_soa: " << static_cast<void*>(aggregated_soa.metadata().data()) << std::endl;
+    // std::cout << "Indirizzo della memoria di aggregated_soa: " << static_cast<void*>(aggregated_soa.metadata().data()) << std::endl;
 
     std::cout << "Indirizzo della memoria di x: " << h_soa.metadata().addressOf_x() << std::endl;
-    std::cout << "Indirizzo della memoria di p_x: " << d_soa.metadata().addressOf_p_b() << std::endl;
+    std::cout << "Indirizzo della memoria di p_x: " << d_soa.metadata().addressOf_p_x() << std::endl;
 
     return 0;
 

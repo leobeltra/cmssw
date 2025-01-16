@@ -487,6 +487,55 @@ namespace cms::soa {
 
 #define _TRIVIAL_VIEW_ASSIGN_VALUE_ELEMENT(R, DATA, TYPE_NAME) _TRIVIAL_VIEW_ASSIGN_VALUE_ELEMENT_IMPL TYPE_NAME
 
+#define _DECLARE_VIEW_CONSTRUCTOR_COLUMNS_IMPL(LAYOUT_NAME, LAYOUT_MEMBER, LOCAL_NAME)                              \
+    (typename Metadata::BOOST_PP_CAT(ParametersTypeOf_, LOCAL_NAME) LOCAL_NAME)
+
+#define _DECLARE_VIEW_CONSTRUCTOR_COLUMNS(R, DATA, LAYOUT_MEMBER_NAME) BOOST_PP_EXPAND(_DECLARE_VIEW_CONSTRUCTOR_COLUMNS_IMPL LAYOUT_MEMBER_NAME)
+
+// clang-format off
+#define _INITIALIZE_VIEW_PARAMETERS_AND_SIZE_IMPL(LAYOUT_NAME, LAYOUT_MEMBER, LOCAL_NAME)                                               \
+        /* Scalar */                                                                                                   \
+        if (not readyToSet) {                                                                                          \
+          base_type::elements_ = LOCAL_NAME.size_;                                                                                      \
+          readyToSet = true;                                                                                           \
+        }                                                                                                              \
+        auto BOOST_PP_CAT(LOCAL_NAME, _tmp) = [&]() -> auto {                                                                \
+          if (base_type::elements_ != LOCAL_NAME.size_)                                                                                 \
+            throw std::runtime_error(                                                                                  \
+              "In constructor by column pointers: number of elements not equal for every column: "                     \
+              BOOST_PP_STRINGIZE(LOCAL_NAME));                                                                               \
+          if constexpr (alignmentEnforcement == AlignmentEnforcement::enforced)                                            \
+            if (Metadata:: BOOST_PP_CAT(ParametersTypeOf_, LOCAL_NAME)::checkAlignment(LOCAL_NAME, alignment))                         \
+              throw std::runtime_error("In constructor by column: misaligned column: " #LOCAL_NAME);                         \
+          return LOCAL_NAME;                                                                                \
+            }();                                                                                                       \
+        base_type::BOOST_PP_CAT(LOCAL_NAME, Parameters_) = BOOST_PP_CAT(LOCAL_NAME, _tmp);                           \
+// clang-format on
+
+#define _INITIALIZE_VIEW_PARAMETERS_AND_SIZE(R, DATA, TYPE_NAME) BOOST_PP_EXPAND(_INITIALIZE_VIEW_PARAMETERS_AND_SIZE_IMPL TYPE_NAME)
+
+// clang-format off
+#define _INITIALIZE_CONST_VIEW_PARAMETERS_AND_SIZE_IMPL(LAYOUT_NAME, LAYOUT_MEMBER, LOCAL_NAME)                                               \
+        /* Scalar */                                                                                                   \
+        if (not readyToSet) {                                                                                          \
+          elements_ = LOCAL_NAME.size_;                                                                                      \
+          readyToSet = true;                                                                                           \
+        }                                                                                                              \
+        auto BOOST_PP_CAT(LOCAL_NAME, _tmp) = [&]() -> auto {                                                                \
+          if (elements_ != LOCAL_NAME.size_)                                                                                 \
+            throw std::runtime_error(                                                                                  \
+              "In constructor by column pointers: number of elements not equal for every column: "                     \
+              BOOST_PP_STRINGIZE(LOCAL_NAME));                                                                               \
+          if constexpr (alignmentEnforcement == AlignmentEnforcement::enforced)                                            \
+            if (Metadata:: BOOST_PP_CAT(ParametersTypeOf_, LOCAL_NAME)::checkAlignment(LOCAL_NAME, alignment))                         \
+              throw std::runtime_error("In constructor by column: misaligned column: " #LOCAL_NAME);                         \
+          return LOCAL_NAME;                                                                                \
+            }();                                                                                                       \
+        BOOST_PP_CAT(LOCAL_NAME, Parameters_) = BOOST_PP_CAT(LOCAL_NAME, _tmp);                           \
+// clang-format on
+
+#define _INITIALIZE_CONST_VIEW_PARAMETERS_AND_SIZE(R, DATA, TYPE_NAME) BOOST_PP_EXPAND(_INITIALIZE_CONST_VIEW_PARAMETERS_AND_SIZE_IMPL TYPE_NAME)
+
 /* ---- MUTABLE VIEW ------------------------------------------------------------------------------------------------ */
 // clang-format off
 #define _GENERATE_SOA_VIEW_PART_0(CONST_VIEW, VIEW, LAYOUTS_LIST, VALUE_LIST)                                          \
@@ -589,6 +638,11 @@ namespace cms::soa {
         : base_type{_soa_impl_elements,                                                                                \
                     _ITERATE_ON_ALL_COMMA(_DECLARE_VIEW_MEMBER_LIST, BOOST_PP_EMPTY(), VALUE_LIST)                     \
           } {}                                                                                                         \
+                                                                                                                       \
+    SOA_HOST_ONLY VIEW(_ITERATE_ON_ALL_COMMA(_DECLARE_VIEW_CONSTRUCTOR_COLUMNS, BOOST_PP_EMPTY(), VALUE_LIST)) {    \
+      bool readyToSet = false;                                                                                         \
+      _ITERATE_ON_ALL(_INITIALIZE_VIEW_PARAMETERS_AND_SIZE, BOOST_PP_EMPTY(), VALUE_LIST)                                             \
+    }                  \
                                                                                                                        \
     /* Copiable */                                                                                                     \
     VIEW(VIEW const&) = default;                                                                                       \
@@ -766,6 +820,11 @@ namespace cms::soa {
                         _ITERATE_ON_ALL_COMMA(_DECLARE_VIEW_CONSTRUCTION_BYCOLUMN_PARAMETERS, const, VALUE_LIST))      \
         : elements_(_soa_impl_elements),                                                                               \
           _ITERATE_ON_ALL_COMMA(_DECLARE_VIEW_MEMBER_INITIALIZERS_BYCOLUMN, ~, VALUE_LIST) {}                          \
+                                                                                                                       \
+    SOA_HOST_ONLY CONST_VIEW(_ITERATE_ON_ALL_COMMA(_DECLARE_VIEW_CONSTRUCTOR_COLUMNS, BOOST_PP_EMPTY(), VALUE_LIST)) {    \
+      bool readyToSet = false;                                                                                         \
+      _ITERATE_ON_ALL(_INITIALIZE_CONST_VIEW_PARAMETERS_AND_SIZE, BOOST_PP_EMPTY(), VALUE_LIST)                                             \
+    }                  \
                                                                                                                        \
     /* Copiable */                                                                                                     \
     CONST_VIEW(CONST_VIEW const&) = default;                                                                           \
