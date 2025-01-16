@@ -1,3 +1,5 @@
+#include <alpaka/alpaka.hpp>
+
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/ParameterSet/interface/ConfigurationDescriptions.h"
@@ -40,11 +42,11 @@ static void fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
     edm::ParameterSetDescription desc;
     desc.add<edm::InputTag>("soaInput_2", edm::InputTag{"CombinedObjCollection"});
     descriptions.addWithDefaultLabel(desc);
-    }
+}
 
 private:
-    edm::EDGetTokenT<CombinedPhysicsObjectCollection> inputToken_;
-    device::EDPutToken<NGTSoACollection> outputToken_;
+    const edm::EDGetTokenT<CombinedPhysicsObjectCollection> inputToken_;
+    const edm::EDPutTokenT<NGTSoACollection> outputToken_;
 };
 }
 
