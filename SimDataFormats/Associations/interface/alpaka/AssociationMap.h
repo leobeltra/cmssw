@@ -27,7 +27,7 @@
 
 namespace ALPAKA_ACCELERATOR_NAMESPACE {
 
-    using cms::alpakatools;
+  using namespace cms::alpakatools;
 
   // Define wrapper types to differentiate between fraction and shared energy
   struct FractionType {
@@ -133,7 +133,7 @@ namespace ALPAKA_ACCELERATOR_NAMESPACE {
     CollectionRefProdType collectionRefProds;
 
     using value_type = V;
-    using has_score = typename AssociationElements<V, Score>::has_score;
+    static constexpr bool has_score = AssociationElements<V, Score>::has_score;
 
     // TODO
     //using Traits = MapTraits<MapType>;
@@ -169,7 +169,7 @@ namespace ALPAKA_ACCELERATOR_NAMESPACE {
           m_offsets{make_device_buffer<int[]>(dev, nbins)},
           m_size{nbins},
           collectionRefProds(std::make_pair(id1, id2)) {
-      resize(event);
+      //resize(event);
     }
 
     template <typename C1 = Collection1,
@@ -187,7 +187,7 @@ namespace ALPAKA_ACCELERATOR_NAMESPACE {
           m_offsets{make_device_buffer<int[]>(queue, nbins)},
           m_size{nbins},
           collectionRefProds(std::make_pair(id1, id2)) {
-      resize(event);
+      //resize(event);
     }
 
     // Constructor for CMSSW-specific use
@@ -206,7 +206,7 @@ namespace ALPAKA_ACCELERATOR_NAMESPACE {
           m_offsets{make_device_buffer<int[]>(queue, nbins)},
           m_size{nbins},
           collectionRefProds(std::make_pair(edm::RefProd<C1>(handle1), edm::RefProd<C2>(handle2))) {
-      resize(event);
+      //resize(event);
     }
 
     auto size() const { return m_size; }
@@ -276,6 +276,7 @@ namespace ALPAKA_ACCELERATOR_NAMESPACE {
     }
   };
 
+// TODO manage the score case also in CreateAssociationMap
   template <typename TDev, typename V, typename Score, typename Collection1 = void, typename Collection2 = void>
   struct KernelFillAssociationMap {
     template <typename TAcc>
@@ -288,14 +289,14 @@ namespace ALPAKA_ACCELERATOR_NAMESPACE {
       for (auto i : uniform_elements(acc, size)) {
         const auto binId = bin_buffer[i];
         const auto position = alpaka::atomicAdd(acc, &temp_offsets[binId], 1u);
-        map->template insert<V, void>(content[position], i, values[i], scores[i]);
+        map->template insert<V, void>(position, i, values[i], 0.0);
       }
     }
   };
 
   // Note: could also provide a different overload for the case where the associations have already
   // been calculated. In that case, I only need to compute the offsets and fill the map
-  template <typename V, typename TFunc, typename TDev, typename = std::enable_if_t<alpaka::isDevice<TDev>>>
+  template <typename V, typename TFunc,  typename TDev, typename Score, typename = std::enable_if_t<alpaka::isDevice<TDev>>>
   ALPAKA_FN_HOST AssociationMap<TDev, V> CreateAssociationMap(
       const int* indexes, const V* values, size_t size, const TFunc* func, const TDev& dev) {
     auto nbins_buffer = make_device_buffer<int>(dev);
@@ -304,6 +305,9 @@ namespace ALPAKA_ACCELERATOR_NAMESPACE {
     const auto blocksize = 512;
     const auto gridsize = divide_up_by<Acc1D>(size, blocksize);
     const auto workdiv = make_workdiv<Acc1D>(gridsize, blocksize);
+
+    Queue queue{dev};
+
     alpaka::exec<Acc1D>(
         queue, workdiv, KernelComputeAssociations<TFunc>{}, indexes, size, bin_buffer.data(), nbins_buffer.data(), func);
 
@@ -335,16 +339,16 @@ namespace ALPAKA_ACCELERATOR_NAMESPACE {
     auto temp_offsets = make_device_buffer<int[]>(queue, size);
     alpaka::memcpy(queue, temp_offsets, assoc_map.offsets());
     alpaka::exec<Acc1D>(
-        queue, workdiv, KernelFillAssociator<V>{}, &assoc_map, bin_buffer.data(), values, temp_offsets.data(), size);
+        queue, workdiv, KernelFillAssociationMap<TDev, V, Score>{}, &assoc_map, bin_buffer.data(), values, temp_offsets.data(), size);
 
-    return AssociationMap;
+    return assoc_map;
   }
 
-  template <typename V, typename TQueue, typename = std::enable_if_t<alpaka::isQueue<TQueue>>>
-  ALPAKA_FN_HOST AssociationMap<TDev, V> CreateAssociationMap(const int* indexes,
-                                                              const V* values,
-                                                              size_t size,
-                                                              const TQueue& queue) {
-  }
+  // template <typename V, typename TQueue, typename = std::enable_if_t<alpaka::isQueue<TQueue>>>
+  // ALPAKA_FN_HOST AssociationMap<TDev, V> CreateAssociationMap(const int* indexes,
+  //                                                             const V* values,
+  //                                                             size_t size,
+  //                                                             const TQueue& queue) {
+  // }
 
 }  // namespace ALPAKA_ACCELERATOR_NAMESPACE
