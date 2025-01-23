@@ -575,6 +575,8 @@ namespace cms::soa {
 #define SOA_COLUMN(TYPE, NAME) (_VALUE_TYPE_COLUMN, TYPE, NAME)
 #define SOA_EIGEN_COLUMN(TYPE, NAME) (_VALUE_TYPE_EIGEN_COLUMN, TYPE, NAME)
 
+#define SOA_METHOD(TYPE, NAME, ...) public: TYPE NAME { __VA_ARGS__} };
+
 /* Iterate on the macro MACRO and return the result as a comma separated list, converting
    the boost sequence into tuples and then into list */
 #define _ITERATE_ON_ALL_COMMA(MACRO, DATA, ...) \
