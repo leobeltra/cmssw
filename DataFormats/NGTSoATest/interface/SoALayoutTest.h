@@ -4,28 +4,11 @@
 #include <Eigen/Core>
 #include <Eigen/Dense>
 
+#include "DataFormats/NGTSoATest/interface/PositionSoA.h"
+
 #include "DataFormats/SoATemplate/interface/SoALayout.h"
 #include "DataFormats/SoATemplate/interface/SoAView.h"
 #include <iostream>
-
-GENERATE_SOA_LAYOUT(PhysicsObjTemplate,
-                    SOA_COLUMN(double, x),
-                    SOA_COLUMN(double, y),
-                    SOA_COLUMN(double, z),
-                    SOA_SCALAR(int, detectorType))
-
-using PhysicsObj = PhysicsObjTemplate<>;
-using PhysicsObjView = PhysicsObj::View;
-
-GENERATE_SOA_LAYOUT(PhysicsObjExtraTemplate,
-                    SOA_COLUMN(double, eigenvalues),
-                    SOA_COLUMN(double, eigenvector_1),
-                    SOA_COLUMN(double, eigenvector_2),
-                    SOA_COLUMN(double, eigenvector_3),
-                    SOA_EIGEN_COLUMN(Eigen::Vector3d, candidateDirection))
-
-using PhysicsObjExtra = PhysicsObjExtraTemplate<>;
-using PhysicsObjExtraView = PhysicsObjExtra::View;
 
 GENERATE_SOA_LAYOUT(CombinedPhysicsObjectTemplate,
                     SOA_COLUMN(double, x),
@@ -37,7 +20,7 @@ using CombinedPhysicsObject = CombinedPhysicsObjectTemplate<>;
 using CombinedPhysicsObjectView = CombinedPhysicsObject::View;
 
 GENERATE_SOA_LAYOUT(
-    NGTSoATemplate, SOA_COLUMN(double, a), SOA_COLUMN(double, b), SOA_COLUMN(double, c), SOA_SCALAR(int, d))
+    NGTSoATemplate, SOA_COLUMN(double, a), SOA_COLUMN(double, b), SOA_COLUMN(double, c), SOA_EIGEN_COLUMN(Eigen::Vector3d, d))
 
 using NGTSoA = NGTSoATemplate<>;
 using NGTSoAView = NGTSoA::View;
@@ -66,6 +49,10 @@ HAS_METHOD(eigenvector_1)
 HAS_METHOD(eigenvector_2)
 HAS_METHOD(eigenvector_3)
 HAS_METHOD(detectorType)
+HAS_METHOD(a)
+HAS_METHOD(b)
+HAS_METHOD(c)
+HAS_METHOD(d)
 
 template <typename View>
 inline void printSoAView(View view) {
@@ -91,6 +78,18 @@ inline void printSoAView(View view) {
         std::cout << "z = " << view.z()[i] << std::endl;
       }
 
+      if constexpr (has_a<View>::value) {
+        std::cout << "a = " << view.a()[i] << ", ";
+      }
+
+      if constexpr (has_b<View>::value) {
+        std::cout << "b = " << view.b()[i] << ", ";
+      }
+
+      if constexpr (has_c<View>::value) {
+        std::cout << "c = " << view.c()[i] << ", ";
+      }            
+
       if constexpr (has_eigenvalues<View>::value) {
         std::cout << "eigenvalues = " << view.eigenvalues()[i] << ", ";
       }
@@ -109,6 +108,10 @@ inline void printSoAView(View view) {
 
       if constexpr (has_candidateDirection<View>::value) {
         std::cout << "candidateDirection = " << view[i].candidateDirection().transpose() << std::endl;
+      }
+
+      if constexpr (has_d<View>::value) {
+        std::cout << "d = " << view[i].d().transpose() << std::endl;
       }
     }
   }

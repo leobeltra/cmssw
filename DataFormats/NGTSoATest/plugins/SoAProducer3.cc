@@ -4,6 +4,8 @@
 #include "FWCore/Framework/interface/MakerMacros.h"
 #include "FWCore/Framework/interface/global/EDProducer.h"
 #include "DataFormats/NGTSoATest/interface/PortableCollectionSoATest.h"
+#include "DataFormats/NGTSoATest/interface/AlgebraSoACollection.h"
+#include "DataFormats/NGTSoATest/interface/PositionSoACollection.h"
 #include <iostream>
 
 class SoAProducer3 : public edm::global::EDProducer<> {
@@ -14,14 +16,14 @@ public:
   void produce(edm::StreamID, edm::Event&, const edm::EventSetup&) const override;
 
 private:
-  edm::EDGetTokenT<PhysicsObjCollection> inputToken_0_;
-  edm::EDGetTokenT<PhysicsObjExtraCollection> inputToken_1_;
+  edm::EDGetTokenT<PositionSoACollection> inputToken_0_;
+  edm::EDGetTokenT<AlgebraSoACollection> inputToken_1_;
 };
 
 // Constructor
 SoAProducer3::SoAProducer3(const edm::ParameterSet& iConfig)
-    : inputToken_0_(consumes<PhysicsObjCollection>(iConfig.getParameter<edm::InputTag>("soaInput_0"))),
-      inputToken_1_(consumes<PhysicsObjExtraCollection>(iConfig.getParameter<edm::InputTag>("soaInput_1"))) {
+    : inputToken_0_(consumes<PositionSoACollection>(iConfig.getParameter<edm::InputTag>("soaInput_0"))),
+      inputToken_1_(consumes<AlgebraSoACollection>(iConfig.getParameter<edm::InputTag>("soaInput_1"))) {
   produces<CombinedPhysicsObjectCollection>("SoAProduct3");
 }
 
@@ -43,26 +45,26 @@ void SoAProducer3::produce(edm::StreamID iID, edm::Event& event, const edm::Even
   // auto CombinedPhysicsObjSoAColl = std::make_unique<CombinedPhysicsObjectCollection>(elems, cms::alpakatools::host());
 
   auto physicsObj = PortableCollection_0->layout();
-  auto physicsObjExtra = PortableCollection_1->layout();
+  auto AlgebraSoA = PortableCollection_1->layout();
 
   const auto phObj = physicsObj.records();
-  const auto phObjExtra = physicsObjExtra.records();
+  const auto phObjExtra = AlgebraSoA.records();
 
-    CombinedPhysicsObjectView combinedPhysicsObjSoAView(phObj.x(),
-                                                        phObj.y(),
-                                                        phObj.z(),
-                                                        phObjExtra.candidateDirection());
+  CombinedPhysicsObjectView combinedPhysicsObjSoAView(phObj.x(),
+                                                      phObj.y(),
+                                                      phObj.z(),
+                                                      phObjExtra.candidateDirection());
 
-    auto combinedPhysicsObjSoAColl = std::make_unique<CombinedPhysicsObjectCollection>(
-                     combinedPhysicsObjSoAView.metadata().size(), cms::alpakatools::host());
+  auto combinedPhysicsObjSoAColl = std::make_unique<CombinedPhysicsObjectCollection>(
+                        combinedPhysicsObjSoAView.metadata().size(), cms::alpakatools::host());
 
-    combinedPhysicsObjSoAColl -> aggregate(combinedPhysicsObjSoAView);
+  combinedPhysicsObjSoAColl -> aggregate(combinedPhysicsObjSoAView);
 
-    std::cout << "Hey, I modified SoA for second time!" << std::endl;
-    // std::cout << "Memory address of the aggregate collection: " << combinedPhysicsObjSoAColl -> view().metadata().addressOf_x() << std::endl;
-    std::cout << (PortableCollection_0 -> view().metadata().addressOf_x() == combinedPhysicsObjSoAColl -> view().metadata().addressOf_x() ? "the addresses are the same" : "the addresses are not the same") << std::endl;
-    printSoAView(combinedPhysicsObjSoAColl -> view());
+  std::cout << "Hey, I modified SoA for second time!" << std::endl;
+  // std::cout << "Memory address of the aggregate collection: " << combinedPhysicsObjSoAColl -> view().metadata().addressOf_x() << std::endl;
+  std::cout << (PortableCollection_0 -> view().metadata().addressOf_x() == combinedPhysicsObjSoAColl -> view().metadata().addressOf_x() ? "the addresses are the same" : "the addresses are not the same") << std::endl;
+  printSoAView(combinedPhysicsObjSoAColl -> view());
 
-    event.put(std::move(combinedPhysicsObjSoAColl), "SoAProduct3");
-    //printSoAView(modifiedView);
+  event.put(std::move(combinedPhysicsObjSoAColl), "SoAProduct3");
+  //printSoAView(modifiedView);
 }

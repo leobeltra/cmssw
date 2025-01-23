@@ -3,7 +3,8 @@
 
 #include "DataFormats/Common/interface/Wrapper.h"
 #include "DataFormats/Common/interface/DeviceProduct.h"
-#include "DataFormats/Portable/interface/alpaka/PortableCollection.h"
+// #include "DataFormats/Portable/interface/alpaka/PortableCollection.h"
+// #include "DataFormats/Portable/interface/PortableDeviceCollection.h"
 #include "DataFormats/NGTSoATest/interface/SoALayoutTest.h"
 #include "DataFormats/NGTSoATest/interface/alpaka/NGTSoACollection.h"
 

@@ -87,6 +87,8 @@
          << std::endl;                                                                                                 \
       _soa_impl_offset += cms::soa::alignSize(elements_ * sizeof(CPP_TYPE::Scalar), alignment)                         \
                 * CPP_TYPE::RowsAtCompileTime * CPP_TYPE::ColsAtCompileTime;                                           \
+      ,                                                                                                                \
+      /* Dump method */                                                                                                \
   )
 // clang-format on
 
@@ -164,6 +166,8 @@
       CPP_TYPE::Scalar* BOOST_PP_CAT(addressOf_, NAME)() {                                                             \
         return parent_.metadata().BOOST_PP_CAT(parametersOf_, NAME)().addr_;                                           \
       }                                                                                                                \
+      ,                                                                                                                \
+      /* Method */                                                                                                     \
 )
 // clang-format on
 #define _DEFINE_METADATA_MEMBERS(R, DATA, TYPE_NAME) _DEFINE_METADATA_MEMBERS_IMPL TYPE_NAME
@@ -195,6 +199,8 @@
             *  CPP_TYPE::RowsAtCompileTime * CPP_TYPE::ColsAtCompileTime;                                              \
           BOOST_PP_CAT(NAME, _) = reinterpret_cast<CPP_TYPE::Scalar*>(newAddr);                                        \
       }                                                                                                                \
+      ,                                                                                                                \
+      /* Method */                                                                                                     \
   )   
 // clang-format on    
 
@@ -211,6 +217,8 @@
       (BOOST_PP_CAT(NAME, Stride_)(0))                                                                                 \
       (BOOST_PP_CAT(NAME, ElementsWithPadding_)(0))                                                                    \
       (BOOST_PP_CAT(NAME, _)(nullptr))                                                                                 \
+      ,                                                                                                                \
+      /* Method */                                                                                                             \
   )
 // clang-format on
 
@@ -228,6 +236,8 @@
       (BOOST_PP_CAT(NAME, Stride_){_soa_impl_other.BOOST_PP_CAT(NAME, Stride_)})                                       \
       (BOOST_PP_CAT(NAME, ElementsWithPadding_){_soa_impl_other.BOOST_PP_CAT(NAME, ElementsWithPadding_)})             \
       (BOOST_PP_CAT(NAME, _){_soa_impl_other.BOOST_PP_CAT(NAME, _)})                                                   \
+      ,                                                                                                                \
+      /* Method */                                                                                                     \
   )
 // clang-format on
 
@@ -245,6 +255,8 @@
       BOOST_PP_CAT(NAME, ElementsWithPadding_) = _soa_impl_other.BOOST_PP_CAT(NAME, ElementsWithPadding_);             \
       BOOST_PP_CAT(NAME, _) = _soa_impl_other.BOOST_PP_CAT(NAME, _);                                                   \
       BOOST_PP_CAT(NAME, Stride_) = _soa_impl_other.BOOST_PP_CAT(NAME, Stride_);                                       \
+      ,                                                                                                                \
+      /* Method */                                                                                                     \
   )
 // clang-format on
 
@@ -263,6 +275,8 @@
       ,                                                                                                                \
       /* Eigen column */                                                                                               \
       CPP_TYPE NAME;                                                                                                   \
+      ,                                                                                                                \
+      /* Method */                                                                                                     \
   )
 // clang-format on
 
@@ -280,6 +294,8 @@
       (CPP_TYPE NAME),                                                                                                 \
       /* Eigen column */                                                                                               \
       (CPP_TYPE NAME)                                                                                                  \
+      ,                                                                                                                \
+      /* Method */                                                                                                     \
   )
 // clang-format on
 
@@ -297,6 +313,8 @@
       (NAME{NAME}),                                                                                                    \
       /* Eigen column */                                                                                               \
       (NAME{NAME})                                                                                                     \
+      ,                                                                                                                \
+      /* Method */                                                                                                     \
   )
 // clang-format on
 
@@ -311,6 +329,8 @@
       (BOOST_PP_CAT(NAME, _){parent_.metadata().BOOST_PP_CAT(parametersOf_, NAME)()}),                                 \
       /* Eigen column */                                                                                               \
       (BOOST_PP_CAT(NAME, _){parent_.metadata().BOOST_PP_CAT(parametersOf_, NAME)()})                                  \
+      ,                                                                                                                \
+      /* Mwthod */                                                                                                     \
   )
 // clang-format on
 
@@ -321,8 +341,21 @@
  */
 // clang-format off
 #define _ROOT_FREE_SOA_COLUMN_OR_SCALAR_IMPL(VALUE_TYPE, CPP_TYPE, NAME)                                               \
-  delete[] BOOST_PP_CAT(NAME, _);                                                                                      \
-  BOOST_PP_CAT(NAME, _) = nullptr; \
+  _SWITCH_ON_TYPE(VALUE_TYPE,                                                                                          \
+      /* Scalar */                                                                                                     \
+      delete[] BOOST_PP_CAT(NAME, _);                                                                                  \
+      BOOST_PP_CAT(NAME, _) = nullptr;                                                                                 \
+      ,                                                                                                                \
+      /* Column */                                                                                                     \
+      delete[] BOOST_PP_CAT(NAME, _);                                                                                  \
+      BOOST_PP_CAT(NAME, _) = nullptr;                                                                                 \
+      ,                                                                                                                \
+      /* Eigen Column*/                                                                                                \
+      delete[] BOOST_PP_CAT(NAME, _);                                                                                  \
+      BOOST_PP_CAT(NAME, _) = nullptr;                                                                                 \
+      ,                                                                                                                \
+      /* Method */                                                                                                     \
+  )
   // clang-format on
 
 #define _ROOT_FREE_SOA_COLUMN_OR_SCALAR(R, DATA, TYPE_NAME) _ROOT_FREE_SOA_COLUMN_OR_SCALAR_IMPL TYPE_NAME
@@ -336,10 +369,16 @@
       /* Scalar */                                                                                                     \
       BOOST_PP_CAT(NAME, _) = reinterpret_cast<CPP_TYPE*>(_soa_impl_curMem);                                           \
       _soa_impl_curMem += cms::soa::alignSize(sizeof(CPP_TYPE), alignment);                                            \
+      if constexpr (alignmentEnforcement == AlignmentEnforcement::enforced)                                                \
+        if (reinterpret_cast<intptr_t>(BOOST_PP_CAT(NAME, _)) % alignment)                                                 \
+        throw std::runtime_error("In layout constructor: misaligned column: " #NAME);                                    \
       ,                                                                                                                \
       /* Column */                                                                                                     \
       BOOST_PP_CAT(NAME, _) = reinterpret_cast<CPP_TYPE*>(_soa_impl_curMem);                                           \
       _soa_impl_curMem += cms::soa::alignSize(elements_ * sizeof(CPP_TYPE), alignment);                                \
+      if constexpr (alignmentEnforcement == AlignmentEnforcement::enforced)                                                \
+        if (reinterpret_cast<intptr_t>(BOOST_PP_CAT(NAME, _)) % alignment)                                                 \
+        throw std::runtime_error("In layout constructor: misaligned column: " #NAME);                                    \
       ,                                                                                                                \
       /* Eigen column */                                                                                               \
       BOOST_PP_CAT(NAME, Stride_) = cms::soa::alignSize(elements_ * sizeof(CPP_TYPE::Scalar), alignment)               \
@@ -349,21 +388,15 @@
       BOOST_PP_CAT(NAME, _) = reinterpret_cast<CPP_TYPE::Scalar*>(_soa_impl_curMem);                                   \
       _soa_impl_curMem += cms::soa::alignSize(elements_ * sizeof(CPP_TYPE::Scalar), alignment)                         \
         * CPP_TYPE::RowsAtCompileTime * CPP_TYPE::ColsAtCompileTime;                                                   \
+      if constexpr (alignmentEnforcement == AlignmentEnforcement::enforced)                                                \
+        if (reinterpret_cast<intptr_t>(BOOST_PP_CAT(NAME, _)) % alignment)                                                 \
+        throw std::runtime_error("In layout constructor: misaligned column: " #NAME);                                    \
+      ,                                                                                                                \
+      /* Method */                                                                                                     \
   )                                                                                                                    \
-  if constexpr (alignmentEnforcement == AlignmentEnforcement::enforced)                                                \
-    if (reinterpret_cast<intptr_t>(BOOST_PP_CAT(NAME, _)) % alignment)                                                 \
-      throw std::runtime_error("In layout constructor: misaligned column: " #NAME);
 // clang-format on
 
 #define _ASSIGN_SOA_COLUMN_OR_SCALAR(R, DATA, TYPE_NAME) _ASSIGN_SOA_COLUMN_OR_SCALAR_IMPL TYPE_NAME
-
-#define _INITIALIZE_MEM_ADDRESS_IMPL(VALUE_TYPE, CPP_TYPE, NAME)    \
-  if (mem_start) {                                                  \
-    mem_ = BOOST_PP_CAT(custom_view.metadata().addressOf_, NAME)(); \
-    mem_start = false;                                              \
-  }
-
-#define _INITIALIZE_MEM_ADDRESS(R, DATA, TYPE_NAME) _INITIALIZE_MEM_ADDRESS_IMPL TYPE_NAME
 
 #define _ASSIGN_SOA_COLUMN_OR_SCALAR_FROM_VIEW_IMPL(VALUE_TYPE, CPP_TYPE, NAME)                                        \
   _SWITCH_ON_TYPE(VALUE_TYPE, /* Scalar */                                                                             \
@@ -389,7 +422,10 @@
                   memcpy(BOOST_PP_CAT(NAME, _),                                                                        \
                          BOOST_PP_CAT(custom_view.metadata().addressOf_, NAME)(),                                      \
                          cms::soa::alignSize(elements_ * sizeof(CPP_TYPE::Scalar), alignment) *                        \
-                             CPP_TYPE::RowsAtCompileTime * CPP_TYPE::ColsAtCompileTime);)
+                             CPP_TYPE::RowsAtCompileTime * CPP_TYPE::ColsAtCompileTime);                               \
+                    ,                                                                                                  \
+                    /* Method */                                                                                       \
+                  )
 
 #define _ASSIGN_SOA_COLUMN_OR_SCALAR_FROM_VIEW(R, DATA, TYPE_NAME) _ASSIGN_SOA_COLUMN_OR_SCALAR_FROM_VIEW_IMPL TYPE_NAME
 
@@ -400,11 +436,17 @@
       memcpy(_soa_impl_curMem, BOOST_PP_CAT(NAME, _), sizeof(CPP_TYPE));                                               \
       BOOST_PP_CAT(NAME, _) = reinterpret_cast<CPP_TYPE*>(_soa_impl_curMem);                                           \
       _soa_impl_curMem += cms::soa::alignSize(sizeof(CPP_TYPE), alignment);                                            \
+      if constexpr (alignmentEnforcement == AlignmentEnforcement::enforced)                                                \
+        if (reinterpret_cast<intptr_t>(BOOST_PP_CAT(NAME, _)) % alignment)                                                 \
+        throw std::runtime_error("In layout constructor: misaligned column: " #NAME);                                    \
       ,                                                                                                                \
       /* Column */                                                                                                     \
       memcpy(_soa_impl_curMem, BOOST_PP_CAT(NAME, _), elements_ * sizeof(CPP_TYPE));                                   \
       BOOST_PP_CAT(NAME, _) = reinterpret_cast<CPP_TYPE*>(_soa_impl_curMem);                                           \
       _soa_impl_curMem += cms::soa::alignSize(elements_ * sizeof(CPP_TYPE), alignment);                                \
+      if constexpr (alignmentEnforcement == AlignmentEnforcement::enforced)                                                \
+        if (reinterpret_cast<intptr_t>(BOOST_PP_CAT(NAME, _)) % alignment)                                                 \
+        throw std::runtime_error("In layout constructor: misaligned column: " #NAME);                                    \
       ,                                                                                                                \
       /* Eigen column */                                                                                               \
       memcpy(_soa_impl_curMem, BOOST_PP_CAT(NAME, _), cms::soa::alignSize(elements_ * sizeof(CPP_TYPE::Scalar), alignment)                             \
@@ -412,10 +454,12 @@
       BOOST_PP_CAT(NAME, _) = reinterpret_cast<CPP_TYPE::Scalar*>(_soa_impl_curMem);                                   \
       _soa_impl_curMem += cms::soa::alignSize(elements_ * sizeof(CPP_TYPE::Scalar), alignment)                         \
         * CPP_TYPE::RowsAtCompileTime * CPP_TYPE::ColsAtCompileTime;                                                   \
+      if constexpr (alignmentEnforcement == AlignmentEnforcement::enforced)                                                \
+        if (reinterpret_cast<intptr_t>(BOOST_PP_CAT(NAME, _)) % alignment)                                                 \
+        throw std::runtime_error("In layout constructor: misaligned column: " #NAME);                                    \
+      ,                                                                                                                \
+      /* Method */                                                                                                     \
   )                                                                                                                    \
-  if constexpr (alignmentEnforcement == AlignmentEnforcement::enforced)                                                \
-    if (reinterpret_cast<intptr_t>(BOOST_PP_CAT(NAME, _)) % alignment)                                                 \
-      throw std::runtime_error("In layout constructor: misaligned column: " #NAME);
 // clang-format on
 
 #define _AGGREGATE_SOA_COLUMNS(R, DATA, TYPE_NAME) _AGGREGATE_SOA_COLUMNS_IMPL TYPE_NAME
@@ -435,6 +479,8 @@
       /* Eigen column */                                                                                               \
       _soa_impl_ret += cms::soa::alignSize(elements * sizeof(CPP_TYPE::Scalar), alignment)                             \
              * CPP_TYPE::RowsAtCompileTime * CPP_TYPE::ColsAtCompileTime;                                              \
+      ,                                                                                                                \
+      /* Method */                                                                                                     \
   )
 // clang-format on
 
@@ -458,6 +504,8 @@
       /* Eigen column */                                                                                               \
       /* TODO: implement*/                                                                                             \
       BOOST_PP_EMPTY()                                                                                                 \
+      ,                                                                                                                \
+      /* Method */                                                                                                     \
   )
 // clang-format on
 
@@ -481,6 +529,8 @@
       /* Eigen column */                                                                                               \
       SOA_HOST_DEVICE SOA_INLINE CPP_TYPE::Scalar const* NAME() const { return BOOST_PP_CAT(NAME, _); }                \
       SOA_HOST_DEVICE SOA_INLINE size_type BOOST_PP_CAT(NAME, Stride)() { return BOOST_PP_CAT(NAME, Stride_); }        \
+      ,                                                                                                                \
+      /* Method */                                                                                                     \
   )
 // clang-format on
 
@@ -501,6 +551,8 @@
       /* Eigen column */                                                                                               \
       memcpy(BOOST_PP_CAT(NAME, _), onfile.BOOST_PP_CAT(NAME, _),                                                      \
         sizeof(CPP_TYPE::Scalar) * BOOST_PP_CAT(NAME, ElementsWithPadding_));                                          \
+      ,                                                                                                                \
+      /* Method */                                                                                                     \
   )
 // clang-format on
 
@@ -523,6 +575,8 @@
       byte_size_type BOOST_PP_CAT(NAME, Stride_) = 0;                                                                  \
       size_type BOOST_PP_CAT(NAME, ElementsWithPadding_) = 0; /* For ROOT serialization */                             \
       CPP_TYPE::Scalar * BOOST_PP_CAT(NAME, _) EDM_REFLEX_SIZE(BOOST_PP_CAT(NAME, ElementsWithPadding_)) = nullptr;    \
+      ,                                                                                                                \
+      /* Method */                                                                                                     \
   )
 // clang-format on
 
@@ -530,36 +584,67 @@
 
 // clang-format off
 #define _ACCESSORS_STRUCT_MEMBERS_IMPL(VALUE_TYPE, CPP_TYPE, NAME)                                                     \
-    const typename Metadata::BOOST_PP_CAT(ParametersTypeOf_, NAME)& NAME() const { return BOOST_PP_CAT(NAME, _); }
+    _SWITCH_ON_TYPE(VALUE_TYPE,                                                                                        \
+        /* Scalar */                                                                                                   \
+        const typename Metadata::BOOST_PP_CAT(ParametersTypeOf_, NAME)& NAME() const { return BOOST_PP_CAT(NAME, _); } \
+        ,                                                                                                              \
+        /* Column */                                                                                                   \
+        const typename Metadata::BOOST_PP_CAT(ParametersTypeOf_, NAME)& NAME() const { return BOOST_PP_CAT(NAME, _); } \
+        ,                                                                                                              \
+        /* Eigen Column */                                                                                             \
+        const typename Metadata::BOOST_PP_CAT(ParametersTypeOf_, NAME)& NAME() const { return BOOST_PP_CAT(NAME, _); } \
+        ,                                                                                                              \
+        /* Method */                                                                                                   \
+    )
 // clang-format on
 
 #define _ACCESSORS_STRUCT_MEMBERS(R, DATA, TYPE_NAME) BOOST_PP_EXPAND(_ACCESSORS_STRUCT_MEMBERS_IMPL TYPE_NAME)
 
 // clang-format off
 #define _DECLARE_STRUCT_DATA_MEMBER_IMPL(VALUE_TYPE, CPP_TYPE, NAME)                                                   \
-    typename Metadata::BOOST_PP_CAT(ParametersTypeOf_, NAME) BOOST_PP_CAT(NAME, _);
+    _SWITCH_ON_TYPE(VALUE_TYPE,                                                                                        \
+        /* Scalar */                                                                                                   \
+        typename Metadata::BOOST_PP_CAT(ParametersTypeOf_, NAME) BOOST_PP_CAT(NAME, _);                                \
+        ,                                                                                                              \
+        /* Column */                                                                                                   \
+        typename Metadata::BOOST_PP_CAT(ParametersTypeOf_, NAME) BOOST_PP_CAT(NAME, _);                                \
+        ,                                                                                                              \
+        /* Eigen Column */                                                                                             \
+        typename Metadata::BOOST_PP_CAT(ParametersTypeOf_, NAME) BOOST_PP_CAT(NAME, _);                                \
+        ,                                                                                                              \
+        /* Method */                                                                                                   \
+    )
 // clang-format on
 
 #define _DECLARE_STRUCT_DATA_MEMBER(R, DATA, TYPE_NAME) BOOST_PP_EXPAND(_DECLARE_STRUCT_DATA_MEMBER_IMPL TYPE_NAME)
 
 // clang-format off
 #define _DECLARE_STRUCT_MEMBERS_IMPL(VALUE_TYPE, CPP_TYPE, NAME)                                                       \
-    typename Metadata::BOOST_PP_CAT(ParametersTypeOf_, NAME) NAME;
+    _SWITCH_ON_TYPE(VALUE_TYPE,                                                                                        \
+        /* Scalar */                                                                                                   \
+        typename Metadata::BOOST_PP_CAT(ParametersTypeOf_, NAME) NAME;                                                 \
+        ,                                                                                                              \
+        /* Column */                                                                                                   \
+        typename Metadata::BOOST_PP_CAT(ParametersTypeOf_, NAME) NAME;                                                 \
+        ,                                                                                                              \
+        /* Eigen Column */                                                                                             \
+        typename Metadata::BOOST_PP_CAT(ParametersTypeOf_, NAME) NAME;                                                 \
+        ,                                                                                                              \
+        /* Method */                                                                                                   \
+    )
 // clang-format on
 
 #define _DECLARE_STRUCT_MEMBERS(R, DATA, TYPE_NAME) BOOST_PP_EXPAND(_DECLARE_STRUCT_MEMBERS_IMPL TYPE_NAME)
 
-#define _COUNT_SOA_COLUMNS(R, DATA, TYPE_NAME) _soa_column_count++;
+/* #define _COUNT_SOA_COLUMNS(R, DATA, TYPE_NAME) _soa_column_count++; */
 
 /**
  * Array of string column names
  */
 // clang-format off
-#define _DECLARE_SOA_COLUMNS_NAMES_IMPL(VALUE_TYPE, CPP_TYPE, NAME)                                                    \
-  _columns_names[i++] = BOOST_PP_STRINGIZE(NAME);                                                                      \
-// clang-format on 
+/* #define _DECLARE_SOA_COLUMNS_NAMES_IMPL(VALUE_TYPE, CPP_TYPE, NAME)  _columns_names[i++] = BOOST_PP_STRINGIZE(NAME);  \ */
 
-#define _DECLARE_SOA_COLUMNS_NAMES(R, DATA, NAME) BOOST_PP_EXPAND(_DECLARE_SOA_COLUMNS_NAMES_IMPL  NAME)
+/* #define _DECLARE_SOA_COLUMNS_NAMES(R, DATA, NAME) BOOST_PP_EXPAND(_DECLARE_SOA_COLUMNS_NAMES_IMPL  NAME) */
 
 /**
  * List of data members in the layout-by-columns constructor arguments
@@ -573,21 +658,34 @@
         (CPP_TYPE* NAME),                                                                                              \
         /* Eigen column */                                                                                             \
         (CPP_TYPE::Scalar* NAME)                                                                                       \
+        ,                                                                                                              \
+        /* Method */                                                                                                   \
     )
 // clang-format on
 
-#define _DECLARE_CONSTRUCTOR_ARGUMENT(R, DATA, TYPE_NAME) BOOST_PP_EXPAND(_DECLARE_CONSTRUCTOR_ARGUMENT_IMPL TYPE_NAME)
+#define _DECLARE_CONSTRUCTOR_ARGUMENT(R, DATA, TYPE_NAME) BOOST_PP_EXPAND(_DECLARE_CONSTRUCTOR_ARGUMENT_IMPL TYPE_NAME) 
 
 // clang-format off
-#define _CALL_SET_COLUMN_FUNCTIONS_FROM_ARGS_IMPL(VALUE_TYPE, CPP_TYPE, NAME)                                          \
-        setColumn_##NAME(NAME);
+/* #define _CALL_SET_COLUMN_FUNCTIONS_FROM_ARGS_IMPL(VALUE_TYPE, CPP_TYPE, NAME)                                          \ */
+        /* setColumn_##NAME(NAME); */
 // clang-format on
 
-#define _CALL_SET_COLUMN_FUNCTIONS_FROM_ARGS(R, DATA, TYPE_NAME) \
-  BOOST_PP_EXPAND(_CALL_SET_COLUMN_FUNCTIONS_FROM_ARGS_IMPL TYPE_NAME)
+/* #define _CALL_SET_COLUMN_FUNCTIONS_FROM_ARGS(R, DATA, TYPE_NAME) \ */
+/*  BOOST_PP_EXPAND(_CALL_SET_COLUMN_FUNCTIONS_FROM_ARGS_IMPL TYPE_NAME) */
 
-#define _DECLARE_CONSTRUCTOR_PARAMETERS_IMPL(VALUE_TYPE, CPP_TYPE, NAME) \
-  (typename Metadata::BOOST_PP_CAT(ParametersTypeOf_, NAME) NAME)
+#define _DECLARE_CONSTRUCTOR_PARAMETERS_IMPL(VALUE_TYPE, CPP_TYPE, NAME)                                               \
+    _SWITCH_ON_TYPE(VALUE_TYPE,                                                                                        \
+    /* Scalar */                                                                                                       \
+    (typename Metadata::BOOST_PP_CAT(ParametersTypeOf_, NAME) NAME)                                                    \
+    ,                                                                                                                  \
+    /* Column */                                                                                                       \
+    (typename Metadata::BOOST_PP_CAT(ParametersTypeOf_, NAME) NAME)                                                    \
+    ,                                                                                                                  \
+    /* Eigen Column */                                                                                                 \
+    (typename Metadata::BOOST_PP_CAT(ParametersTypeOf_, NAME) NAME)                                                    \
+    ,                                                                                                                  \
+    /* Method */                                                                                                       \
+    )
 
 #define _DECLARE_CONSTRUCTOR_PARAMETERS(R, DATA, TYPE_NAME) \
   BOOST_PP_EXPAND(_DECLARE_CONSTRUCTOR_PARAMETERS_IMPL TYPE_NAME)
@@ -636,6 +734,8 @@
               BOOST_PP_STRINGIZE(NAME));                                                                               \
           return std::get<0>(NAME.tupleOrPointer());                                                                   \
             }()))                                                                                                      \
+        ,                                                                                                              \
+        /* Method */                                                                                                   \
         )
 // clang-format on                       
 
@@ -685,6 +785,8 @@
               BOOST_PP_STRINGIZE(NAME));                                                                               \
           return std::get<0>(helper.NAME.tupleOrPointer());                                                            \
             }()))                                                                                                      \
+        ,                                                                                                              \
+        /* Method */                                                                                                   \
     )
 // clang-format on
 
@@ -752,6 +854,8 @@
         BOOST_PP_CAT(NAME, Stride_) = BOOST_PP_CAT(NAME, Stride_tmp);                                                  \
         BOOST_PP_CAT(NAME, ElementsWithPadding_) = BOOST_PP_CAT(NAME, ElementsWithPadding_tmp);                        \
         BOOST_PP_CAT(NAME, _) = BOOST_PP_CAT(NAME, _tmp);                                                              \
+        ,                                                                                                              \
+        /* Method */                                                                                                   \
       )
 // clang-format on
 
@@ -771,7 +875,10 @@
                   memcpy(BOOST_PP_CAT(soa.metadata().addressOf_, NAME)(),                       \
                          BOOST_PP_CAT(NAME, _),                                                 \
                          cms::soa::alignSize(elements_ * sizeof(CPP_TYPE::Scalar), alignment) * \
-                             CPP_TYPE::RowsAtCompileTime * CPP_TYPE::ColsAtCompileTime);)
+                             CPP_TYPE::RowsAtCompileTime * CPP_TYPE::ColsAtCompileTime);        \
+                  ,                                                                             \
+                  /* Method */                                                                  \
+                  )   
 
 #define _COPY_COLUMN_BY_COLUMN(R, DATA, TYPE_NAME) BOOST_PP_EXPAND(_COPY_COLUMN_BY_COLUMN_IMPL TYPE_NAME)
 
@@ -786,7 +893,9 @@
       /* Eigen column */                                                                                               \
       memcpy(BOOST_PP_CAT(this -> metadata().addressOf_, NAME)(), BOOST_PP_CAT(view.metadata().addressOf_, NAME)(), cms::soa::alignSize(this -> elements_ * sizeof(CPP_TYPE::Scalar), alignment)                                    \
                                                         * CPP_TYPE::RowsAtCompileTime * CPP_TYPE::ColsAtCompileTime);  \
-  )                                                                                                                    \
+      ,                                                                                                                \
+      /* Method */                                                                                                     \
+  )                                                                                                                    
 
 #define _COPY_VIEW_COLUMNS(R, DATA, TYPE_NAME) BOOST_PP_EXPAND(_COPY_VIEW_COLUMNS_IMPL TYPE_NAME)
 
@@ -852,21 +961,6 @@
       return _soa_impl_ret;                                                                                            \
     }                                                                                                                  \
                                                                                                                        \
-    /* Helper function to compute the total number of columns */                                                       \
-    static constexpr size_type computeColumnNumber() {                                                                 \
-      size_type _soa_column_count = 0;                                                                                 \
-      _ITERATE_ON_ALL(_COUNT_SOA_COLUMNS, ~, __VA_ARGS__)                                                              \
-      return _soa_column_count;                                                                                        \
-    }                                                                                                                  \
-                                                                                                                       \
-    /* Helper function used by caller to generate an array of strings containing column names */                       \
-    static constexpr std::array<const char*, computeColumnNumber()> generateColumnNames() {                            \
-      std::array<const char*, computeColumnNumber()> _columns_names = {};                                              \
-      size_type i = 0;                                                                                                 \
-      _ITERATE_ON_ALL(_DECLARE_SOA_COLUMNS_NAMES, ~, __VA_ARGS__)                                                      \
-      return _columns_names;                                                                                           \
-    }                                                                                                                  \
-                                                                                                                       \
     SOA_HOST_ONLY                                                                                                      \
     void aggregateInPlace() {                                                                                          \
       std::byte* buffer {                                                                                              \
@@ -885,7 +979,6 @@
                                                                                                                        \
     /* Helper function to set the starting memory byte */                                                              \
     inline void setData(std::byte* newMem) {mem_ = newMem;}                                                            \
-                                                                                                                       \
                                                                                                                        \
     _ITERATE_ON_ALL(_DEFINE_SET_COLUMN_FUNCTIONS, ~, __VA_ARGS__)                                                      \
                                                                                                                        \

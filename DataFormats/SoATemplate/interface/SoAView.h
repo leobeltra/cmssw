@@ -482,6 +482,8 @@ namespace cms::soa {
       ,                                                                                                                \
       /* Eigen column */                                                                                               \
       NAME() = _soa_impl_value.NAME;                                                                                   \
+      ,                                                                                                                \
+      /* Method */                                                                                                     \
 )
 // clang-format on
 

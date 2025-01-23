@@ -7,6 +7,8 @@
 #include "FWCore/ParameterSet/interface/ParameterSetDescription.h"
 #include "FWCore/Utilities/interface/InputTag.h"
 #include "FWCore/Framework/interface/global/EDProducer.h"
+#include "DataFormats/Portable/interface/PortableCollection.h"
+#include "DataFormats/NGTSoATest/interface/SoALayoutTest.h"
 #include "DataFormats/NGTSoATest/interface/PortableCollectionSoATest.h"
 #include "DataFormats/NGTSoATest/interface/alpaka/NGTSoACollection.h"
 #include "HeterogeneousCore/AlpakaCore/interface/alpaka/global/EDProducer.h"
@@ -30,11 +32,33 @@ namespace ALPAKA_ACCELERATOR_NAMESPACE {
 
     // Method to produce in SoAProducer4
     void produce(device::Event& event, device::EventSetup const&) override {
-      auto const& PortableCollection_0 = event.getHandle(inputToken_);  // Combined Collection
+      auto const& aggregated_collection = event.getHandle(inputToken_);  // Combined Collection
 
-      int elems = PortableCollection_0->view().metadata().size();
+      int elems = aggregated_collection->view().metadata().size();
       std::cout << "SoAProducer4: Number of elements in the input collection: " << elems << std::endl;
-      event.emplace(outputToken_, NGTSoACollection{elems, event.queue()});
+
+      auto& queue = event.queue();
+
+      // std::cout << typeid(decltype(event.queue())).name() << std::endl;
+
+      auto deviceCollection = std::make_unique<NGTSoACollection>(elems, queue);
+      // Copia i dati dalla collezione host al dispositivo
+      // auto deviceData = cms::alpakatools::CopyToDevice<CombinedPhysicsObjectCollection>::copyAsync(queue, *aggregated_collection);      
+
+      assert(deviceCollection->buffer().data() != nullptr);
+      assert(aggregated_collection->buffer().data() != nullptr);
+
+      assert(aggregated_collection->view().metadata().size() == deviceCollection->view().metadata().size());
+      // auto device = alpaka::getDev(queue);
+      // std::cout << "The device is: " << device << std::endl;
+
+      alpaka::memcpy(queue, deviceCollection -> buffer(), aggregated_collection -> buffer());
+
+      alpaka::wait(queue);
+
+      // printSoAView(deviceCollection -> view());    // It works only if backend is serial_sync  
+
+      event.emplace(outputToken_, std::move(*deviceCollection));
     }
 
     void acquire(device::Event const& event, device::EventSetup const& setup) override {}
@@ -47,7 +71,7 @@ namespace ALPAKA_ACCELERATOR_NAMESPACE {
 
   private:
     const edm::EDGetTokenT<CombinedPhysicsObjectCollection> inputToken_;
-    const edm::EDPutTokenT<NGTSoACollection> outputToken_;
+    const device::EDPutToken<NGTSoACollection> outputToken_;
   };
 }  // namespace ALPAKA_ACCELERATOR_NAMESPACE
 

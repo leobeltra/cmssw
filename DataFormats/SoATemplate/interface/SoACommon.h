@@ -52,6 +52,7 @@
 #define _VALUE_TYPE_SCALAR 0
 #define _VALUE_TYPE_COLUMN 1
 #define _VALUE_TYPE_EIGEN_COLUMN 2
+#define _VALUE_TYPE_METHOD 3
 
 /* The size type need to be "hardcoded" in the template parameters for classes serialized by ROOT */
 /* In practice, using a typedef as a template parameter to the Layout or its ViewTemplateFreeParams member
@@ -574,6 +575,7 @@ namespace cms::soa {
 #define SOA_SCALAR(TYPE, NAME) (_VALUE_TYPE_SCALAR, TYPE, NAME)
 #define SOA_COLUMN(TYPE, NAME) (_VALUE_TYPE_COLUMN, TYPE, NAME)
 #define SOA_EIGEN_COLUMN(TYPE, NAME) (_VALUE_TYPE_EIGEN_COLUMN, TYPE, NAME)
+#define SOA_METHOD(TYPE, NAME, ...) (_VALUE_TYPE_METHOD, TYPE, NAME) 
 
 /* Iterate on the macro MACRO and return the result as a comma separated list, converting
    the boost sequence into tuples and then into list */
@@ -584,14 +586,20 @@ namespace cms::soa {
 #define _ITERATE_ON_ALL(MACRO, DATA, ...) BOOST_PP_SEQ_FOR_EACH(MACRO, DATA, BOOST_PP_VARIADIC_TO_SEQ(__VA_ARGS__))
 
 /* Switch on macros depending on scalar / column type */
-#define _SWITCH_ON_TYPE(VALUE_TYPE, IF_SCALAR, IF_COLUMN, IF_EIGEN_COLUMN) \
+#define _SWITCH_ON_TYPE(VALUE_TYPE, IF_SCALAR, IF_COLUMN, IF_EIGEN_COLUMN, IF_METHOD) \
   BOOST_PP_IF(                                                             \
       BOOST_PP_EQUAL(VALUE_TYPE, _VALUE_TYPE_SCALAR),                      \
       IF_SCALAR,                                                           \
       BOOST_PP_IF(                                                         \
           BOOST_PP_EQUAL(VALUE_TYPE, _VALUE_TYPE_COLUMN),                  \
           IF_COLUMN,                                                       \
-          BOOST_PP_IF(BOOST_PP_EQUAL(VALUE_TYPE, _VALUE_TYPE_EIGEN_COLUMN), IF_EIGEN_COLUMN, BOOST_PP_EMPTY())))
+          BOOST_PP_IF(                                                     \
+            BOOST_PP_EQUAL(VALUE_TYPE, _VALUE_TYPE_EIGEN_COLUMN),          \
+            IF_EIGEN_COLUMN,                                               \
+            BOOST_PP_IF(                                                   \
+              BOOST_PP_EQUAL(VALUE_TYPE, _VALUE_TYPE_METHOD),              \
+              IF_METHOD,                                                   \
+              BOOST_PP_EMPTY()))))                                         
 
 namespace cms::soa {
 

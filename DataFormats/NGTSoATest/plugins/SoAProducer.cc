@@ -5,7 +5,8 @@
 #include "FWCore/Framework/interface/MakerMacros.h"
 #include "FWCore/Framework/interface/global/EDProducer.h"
 
-#include "DataFormats/NGTSoATest/interface/PortableCollectionSoATest.h"
+#include "DataFormats/NGTSoATest/interface/PositionSoACollection.h"
+#include "DataFormats/NGTSoATest/interface/SoALayoutTest.h"
 #include <iostream>
 
 class SoAProducer : public edm::global::EDProducer<> {
@@ -22,7 +23,7 @@ private:
 SoAProducer::SoAProducer(const edm::ParameterSet& iConfig) {
   // soaParameter_ = iConfig.getParameter<int>("soaParameter");
   // Product produced by the Producer
-  produces<PhysicsObjCollection>("SoAProduct");
+  produces<PositionSoACollection>("SoAProduct");
 }
 
 // Destructor
@@ -36,7 +37,7 @@ void SoAProducer::produce(edm::StreamID iID, edm::Event& event, const edm::Event
   std::size_t elems = 16;
   // std::array<int32_t, 2> sizes = {{16,0}};
   // SoA producer input
-  auto SoAProduct = std::make_unique<PhysicsObjCollection>(elems, cms::alpakatools::host());
+  auto SoAProduct = std::make_unique<PositionSoACollection>(elems, cms::alpakatools::host());
 
   // auto& view0 = SoAProduct -> view<0>();
   auto& view = SoAProduct->view();

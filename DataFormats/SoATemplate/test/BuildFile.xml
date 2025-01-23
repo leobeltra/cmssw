@@ -21,6 +21,12 @@
   <use name="catch2"/>
 </bin>
 
+<bin file="SoAMethodTest.cc" name="SoAUnitTests">
+  <use name="boost"/>
+  <use name="eigen"/>
+  <use name="catch2"/>
+</bin>
+
 <iftool name="cuda-gcc-support">
   <bin file="SoATest.cc" name="SoATest">
     <use name="boost"/>

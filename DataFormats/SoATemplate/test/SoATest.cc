@@ -1,5 +1,4 @@
 // #include <memory>
-#include <tuple>
 #include <Eigen/Core>
 #include <Eigen/Dense>
 
@@ -187,15 +186,15 @@ int main() {
   std::size_t hostDeviceSize = SoAHostDeviceLayout::computeDataSize(numElements);
   std::size_t hostSize = SoAHostLayout::computeDataSize(numElements);
 
-  //Total number of columns
-  static constexpr std::size_t number_columns = SoAHostDeviceLayout::computeColumnNumber();
+  // //Total number of columns
+  // static constexpr std::size_t number_columns = SoAHostDeviceLayout::computeColumnNumber();
 
-  //Array of names
-  std::array<const char *, number_columns> col_names = SoAHostDeviceLayout::generateColumnNames();
-  std::cout << "Names: ";
-  for (const char *i : col_names)
-    std::cout << i << " ";
-  std::cout << std::endl;
+  // //Array of names
+  // std::array<const char *, number_columns> col_names = SoAHostDeviceLayout::generateColumnNames();
+  // std::cout << "Names: ";
+  // for (const char *i : col_names)
+  //   std::cout << i << " ";
+  // std::cout << std::endl;
 
   //Memory allocation
   std::unique_ptr<std::byte, decltype(std::free) *> slBuffer{

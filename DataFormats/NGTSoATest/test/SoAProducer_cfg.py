@@ -21,7 +21,7 @@ process.soaproducer3 = cms.EDProducer("SoAProducer3", soaInput_0 = cms.InputTag(
 process.soaproducer4 = cms.EDProducer("SoAProducer4@alpaka",
     soaInput_2 = cms.InputTag("soaproducer3", "SoAProduct3"),
     alpaka = cms.untracked.PSet(
-        backend = cms.untracked.string("serial_sync")
+        backend = cms.untracked.string("cuda_async")
     )
 )
 

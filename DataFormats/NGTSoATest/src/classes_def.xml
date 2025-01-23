@@ -1,14 +1,14 @@
 <lcgdict>
-  <class name="PhysicsObj" />
-  <class name="PhysicsObjExtra" />
+  <class name="PositionSoA" />
+  <class name="AlgebraSoA" />
   <class name="CombinedPhysicsObject"/>
   <class name="NGTSoA"/>
-  <class name="PhysicsObjCollection"/>
-  <class name="PhysicsObjExtraCollection"/>
+  <class name="PositionSoACollection"/>
+  <class name="AlgebraSoACollection"/>
   <class name="CombinedPhysicsObjectCollection"/>
-  <class name="PortableHostCollection<NGTSoA>" />
-  <class name="edm::Wrapper<PhysicsObjCollection>"/>
-  <class name="edm::Wrapper<PhysicsObjExtraCollection>"/>
+  <class name="NGTSoAHostCollection" />
+  <class name="edm::Wrapper<PositionSoACollection>"/>
+  <class name="edm::Wrapper<AlgebraSoACollection>"/>
   <class name="edm::Wrapper<CombinedPhysicsObjectCollection>"/>
-  <class name="edm::Wrapper<PortableHostCollection<NGTSoA>>"/>
+  <class name="edm::Wrapper<NGTSoAHostCollection>"/>
 </lcgdict>

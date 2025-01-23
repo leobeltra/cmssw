@@ -4,6 +4,8 @@
 #include "FWCore/Framework/interface/MakerMacros.h"
 #include "FWCore/Framework/interface/global/EDProducer.h"
 #include "DataFormats/NGTSoATest/interface/PortableCollectionSoATest.h"
+#include "DataFormats/NGTSoATest/interface/PositionSoACollection.h"
+#include "DataFormats/NGTSoATest/interface/AlgebraSoACollection.h"
 #include <iostream>
 
 #define TIME 0.01
@@ -16,13 +18,13 @@ public:
   void produce(edm::StreamID, edm::Event&, const edm::EventSetup&) const override;
 
 private:
-  edm::EDGetTokenT<PhysicsObjCollection> inputToken_;
+  edm::EDGetTokenT<PositionSoACollection> inputToken_;
 };
 
 // Constructor
 SoAProducer2::SoAProducer2(const edm::ParameterSet& iConfig)
-    : inputToken_(consumes<PhysicsObjCollection>(iConfig.getParameter<edm::InputTag>("soaInput"))) {
-  produces<PhysicsObjExtraCollection>("SoAProduct2");
+    : inputToken_(consumes<PositionSoACollection>(iConfig.getParameter<edm::InputTag>("soaInput"))) {
+  produces<AlgebraSoACollection>("SoAProduct2");
 }
 
 // Destructor
@@ -40,7 +42,7 @@ void SoAProducer2::produce(edm::StreamID iID, edm::Event& event, const edm::Even
 
   // // Copy input and modify it
   auto elems = view.metadata().size();
-  auto modifiedSoA = std::make_unique<PhysicsObjExtraCollection>(elems, cms::alpakatools::host());
+  auto modifiedSoA = std::make_unique<AlgebraSoACollection>(elems, cms::alpakatools::host());
   auto& modifiedView = modifiedSoA->view();
 
   for (int i = 0; i < modifiedView.metadata().size(); i++) {
