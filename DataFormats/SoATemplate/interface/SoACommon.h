@@ -575,8 +575,22 @@ namespace cms::soa {
 #define SOA_SCALAR(TYPE, NAME) (_VALUE_TYPE_SCALAR, TYPE, NAME)
 #define SOA_COLUMN(TYPE, NAME) (_VALUE_TYPE_COLUMN, TYPE, NAME)
 #define SOA_EIGEN_COLUMN(TYPE, NAME) (_VALUE_TYPE_EIGEN_COLUMN, TYPE, NAME)
-#define SOA_METHOD(TYPE, NAME, ...) (_VALUE_TYPE_METHOD, TYPE, NAME) 
-#define SOA_METHOD_DECLARATION(...) { __VA_ARGS__ }
+#define SOA_METHOD(TYPE, NAME, ...) (_VALUE_TYPE_METHOD, TYPE, NAME) { __VA_ARGS__ }
+//#define SOA_METHOD_DEFINITION(...) {__VA_ARGS__}
+
+/* Prendi il primo elemento della tupla: il tipo (es. _VALUE_TYPE_METHOD) */
+#define GET_TYPE(TUPLE) BOOST_PP_TUPLE_ELEM(0, TUPLE)
+
+#define WRITE_METHOD(MACRO_TYPE, TYPE, NAME) \
+TYPE NAME()  
+
+// #define CLOSE_METHOD }  
+
+/* Genera un metodo solo se il tipo è _VALUE_TYPE_METHOD */
+#define GENERATE_METHOD(R, DATA, FIELD) \
+    BOOST_PP_IF(BOOST_PP_EQUAL(GET_TYPE(FIELD), _VALUE_TYPE_METHOD), \
+        BOOST_PP_EXPAND(WRITE_METHOD FIELD), \
+        /* Se non è un metodo, non fa nulla */ )
 
 /* Iterate on the macro MACRO and return the result as a comma separated list, converting
    the boost sequence into tuples and then into list */
@@ -586,8 +600,10 @@ namespace cms::soa {
 /* Iterate MACRO on all elements of the boost sequence */
 #define _ITERATE_ON_ALL(MACRO, DATA, ...) BOOST_PP_SEQ_FOR_EACH(MACRO, DATA, BOOST_PP_VARIADIC_TO_SEQ(__VA_ARGS__))
 
+//#define _ITERATE_ON_ALL_METHODS(DATA, ...) BOOST_PP_SEQ_FOR_EACH(MACRO, DATA, BOOST_PP_VARIADIC_TO_SEQ(__VA_ARGS__))
+
 /* Switch on macros depending on scalar / column type */
-#define _SWITCH_ON_TYPE(VALUE_TYPE, IF_SCALAR, IF_COLUMN, IF_EIGEN_COLUMN, IF_METHOD) \
+#define _SWITCH_ON_TYPE(VALUE_TYPE, IF_SCALAR, IF_COLUMN, IF_EIGEN_COLUMN) \
   BOOST_PP_IF(                                                             \
       BOOST_PP_EQUAL(VALUE_TYPE, _VALUE_TYPE_SCALAR),                      \
       IF_SCALAR,                                                           \
@@ -597,10 +613,7 @@ namespace cms::soa {
           BOOST_PP_IF(                                                     \
             BOOST_PP_EQUAL(VALUE_TYPE, _VALUE_TYPE_EIGEN_COLUMN),          \
             IF_EIGEN_COLUMN,                                               \
-            BOOST_PP_IF(                                                   \
-              BOOST_PP_EQUAL(VALUE_TYPE, _VALUE_TYPE_METHOD),              \
-              IF_METHOD,                                                   \
-              BOOST_PP_EMPTY()))))                                         
+            BOOST_PP_EMPTY())))                                         
 
 namespace cms::soa {
 

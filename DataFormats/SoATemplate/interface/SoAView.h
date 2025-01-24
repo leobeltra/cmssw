@@ -482,12 +482,13 @@ namespace cms::soa {
       ,                                                                                                                \
       /* Eigen column */                                                                                               \
       NAME() = _soa_impl_value.NAME;                                                                                   \
-      ,                                                                                                                \
-      /* Method */                                                                                                     \
 )
 // clang-format on
 
-#define _TRIVIAL_VIEW_ASSIGN_VALUE_ELEMENT(R, DATA, TYPE_NAME) _TRIVIAL_VIEW_ASSIGN_VALUE_ELEMENT_IMPL TYPE_NAME
+#define _TRIVIAL_VIEW_ASSIGN_VALUE_ELEMENT(R, DATA, TYPE_NAME) \
+    BOOST_PP_IF(BOOST_PP_EQUAL(BOOST_PP_TUPLE_ELEM(0, TYPE_NAME), _VALUE_TYPE_METHOD), \
+                BOOST_PP_EMPTY(), \
+                BOOST_PP_EXPAND(_TRIVIAL_VIEW_ASSIGN_VALUE_ELEMENT_IMPL TYPE_NAME)) \
 
 #define _DECLARE_VIEW_CONSTRUCTOR_COLUMNS_IMPL(LAYOUT_NAME, LAYOUT_MEMBER, LOCAL_NAME)                              \
     (typename Metadata::BOOST_PP_CAT(ParametersTypeOf_, LOCAL_NAME) LOCAL_NAME)
@@ -572,7 +573,7 @@ namespace cms::soa {
  */
 
 // clang-format off
-#define _GENERATE_SOA_VIEW_PART_1(CONST_VIEW, VIEW, LAYOUTS_LIST, VALUE_LIST)                                          \
+#define _GENERATE_SOA_VIEW_PART_1(CONST_VIEW, VIEW, LAYOUTS_LIST, VALUE_LIST, ...)                                          \
     using size_type = cms::soa::size_type;                                                                             \
     using byte_size_type = cms::soa::byte_size_type;                                                                   \
     using AlignmentEnforcement = cms::soa::AlignmentEnforcement;                                                       \
@@ -694,7 +695,8 @@ namespace cms::soa {
       element& operator=(const const_element& _soa_impl_other) {                                                       \
         _ITERATE_ON_ALL(_DECLARE_VIEW_ELEMENT_VALUE_COPY, ~, VALUE_LIST)                                               \
         return *this;                                                                                                  \
-      }
+      }                                                                                                                \
+   _ITERATE_ON_ALL(GENERATE_METHOD, ~, __VA_ARGS__)  \
 // clang-format on
 
 // clang-format off
@@ -925,7 +927,7 @@ namespace cms::soa {
      SOA_VIEW_LAYOUT_LIST(LAYOUTS_LIST), SOA_VIEW_VALUE_LIST(VALUE_LIST))                                              \
    using BOOST_PP_CAT(CLASS, _parametrized) = CLASS<VIEW_ALIGNMENT, VIEW_ALIGNMENT_ENFORCEMENT>;                       \
    _GENERATE_SOA_VIEW_PART_1(ConstViewTemplateFreeParams, ViewTemplateFreeParams,                                      \
-     SOA_VIEW_LAYOUT_LIST(LAYOUTS_LIST), SOA_VIEW_VALUE_LIST(VALUE_LIST))                                              \
+     SOA_VIEW_LAYOUT_LIST(LAYOUTS_LIST), SOA_VIEW_VALUE_LIST(VALUE_LIST), __VA_ARGS__)                                              \
                                                                                                                        \
    /* Extra operator=() for mutable element to emulate the aggregate initialisation syntax */                          \
    SOA_HOST_DEVICE SOA_INLINE constexpr element & operator=(const typename                                             \
