@@ -21,7 +21,7 @@
   <use name="catch2"/>
 </bin>
 
-<bin file="SoAMethodTest.cc" name="SoAUnitTests">
+<bin file="SoAMethodTest.cc" name="SoAMethodTest">
   <use name="boost"/>
   <use name="eigen"/>
   <use name="catch2"/>

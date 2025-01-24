@@ -17,6 +17,11 @@
 GENERATE_SOA_LAYOUT(SoALayout,
                     SOA_COLUMN(double, x),
                     SOA_EIGEN_COLUMN(Eigen::Vector3d, a),
-                    SOA_METHOD(double, number, return 10 * 0.1;))
+                    SOA_METHOD(double, number))
 
-int main () {}
+using SoA = SoALayout<>;
+using SoAView = SoA::View;
+
+int main () {
+
+}
