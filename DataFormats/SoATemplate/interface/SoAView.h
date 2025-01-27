@@ -573,7 +573,7 @@ namespace cms::soa {
  */
 
 // clang-format off
-#define _GENERATE_SOA_VIEW_PART_1(CONST_VIEW, VIEW, LAYOUTS_LIST, VALUE_LIST, ...)                                          \
+#define _GENERATE_SOA_VIEW_PART_1(CONST_VIEW, VIEW, LAYOUTS_LIST, VALUE_LIST)                                          \
     using size_type = cms::soa::size_type;                                                                             \
     using byte_size_type = cms::soa::byte_size_type;                                                                   \
     using AlignmentEnforcement = cms::soa::AlignmentEnforcement;                                                       \
@@ -696,14 +696,13 @@ namespace cms::soa {
         _ITERATE_ON_ALL(_DECLARE_VIEW_ELEMENT_VALUE_COPY, ~, VALUE_LIST)                                               \
         return *this;                                                                                                  \
       }                                                                                                                \
-   _ITERATE_ON_ALL(GENERATE_METHOD, ~, __VA_ARGS__)  \
 // clang-format on
 
 // clang-format off
-#define _GENERATE_SOA_VIEW_PART_2(CONST_VIEW, VIEW, LAYOUTS_LIST, VALUE_LIST)                                          \
+#define _GENERATE_SOA_VIEW_PART_2(CONST_VIEW, VIEW, LAYOUTS_LIST, VALUE_LIST, ...)                                          \
       _ITERATE_ON_ALL(_DECLARE_VIEW_ELEMENT_VALUE_MEMBER, ~, VALUE_LIST)                                               \
     };                                                                                                                 \
-                                                                                                                       \
+                                                                                                                      \
     SOA_HOST_DEVICE SOA_INLINE                                                                                         \
     element operator[](size_type _soa_impl_index) {                                                                    \
       if constexpr (rangeChecking == cms::soa::RangeChecking::enabled) {                                               \
@@ -927,7 +926,7 @@ namespace cms::soa {
      SOA_VIEW_LAYOUT_LIST(LAYOUTS_LIST), SOA_VIEW_VALUE_LIST(VALUE_LIST))                                              \
    using BOOST_PP_CAT(CLASS, _parametrized) = CLASS<VIEW_ALIGNMENT, VIEW_ALIGNMENT_ENFORCEMENT>;                       \
    _GENERATE_SOA_VIEW_PART_1(ConstViewTemplateFreeParams, ViewTemplateFreeParams,                                      \
-     SOA_VIEW_LAYOUT_LIST(LAYOUTS_LIST), SOA_VIEW_VALUE_LIST(VALUE_LIST), __VA_ARGS__)                                              \
+     SOA_VIEW_LAYOUT_LIST(LAYOUTS_LIST), SOA_VIEW_VALUE_LIST(VALUE_LIST))                                              \
                                                                                                                        \
    /* Extra operator=() for mutable element to emulate the aggregate initialisation syntax */                          \
    SOA_HOST_DEVICE SOA_INLINE constexpr element & operator=(const typename                                             \
@@ -935,6 +934,8 @@ namespace cms::soa {
      _ITERATE_ON_ALL(_TRIVIAL_VIEW_ASSIGN_VALUE_ELEMENT, ~, __VA_ARGS__)                                               \
      return *this;                                                                                                     \
    }                                                                                                                   \
+                                                                                                                       \
+  _ITERATE_ON_ALL(GENERATE_METHOD, ~, __VA_ARGS__)                                                                     \
                                                                                                                        \
    _GENERATE_SOA_VIEW_PART_2(ConstViewTemplateFreeParams, ViewTemplateFreeParams,                                      \
      SOA_VIEW_LAYOUT_LIST(LAYOUTS_LIST), SOA_VIEW_VALUE_LIST(VALUE_LIST))

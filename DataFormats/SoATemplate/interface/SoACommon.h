@@ -584,8 +584,6 @@ namespace cms::soa {
 #define WRITE_METHOD(MACRO_TYPE, TYPE, NAME) \
 TYPE NAME()  
 
-// #define CLOSE_METHOD }  
-
 /* Genera un metodo solo se il tipo è _VALUE_TYPE_METHOD */
 #define GENERATE_METHOD(R, DATA, FIELD) \
     BOOST_PP_IF(BOOST_PP_EQUAL(GET_TYPE(FIELD), _VALUE_TYPE_METHOD), \
