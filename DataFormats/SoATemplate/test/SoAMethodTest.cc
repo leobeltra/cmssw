@@ -19,12 +19,24 @@ GENERATE_SOA_LAYOUT(SoALayout,
                     SOA_COLUMN(double, y),
                     SOA_COLUMN(double, z),
                     SOA_EIGEN_COLUMN(Eigen::Vector3d, a),
-                    SOA_METHOD(auto, r, return x() * x() + y() * y() + z() * z();))
-                    // SOA_METHOD(auto, mean(const element& other), element center;
-                    //                                              center.x() = (x() + other.x()) / 2;
-                    //                                              center.y() = (y() + other.y()) / 2;
-                    //                                              center.z() = (z() + other.z()) / 2;
-                    //                                              return center;))
+                    SOA_METHODS(auto r() { return x() * x() + y() * y() + z() * z(); } 
+                                auto mean_x(const element& other) { x() += other.x();
+                                                                    x() /= 2;
+                                                                    return x(); }
+                                auto more_then_one_input(double x, double y) { return x + y;}))
+
+// GENERATE_SOA_LAYOUT_WITH_METHODS(SoALayout,
+//                                 SOA_MEMBERS(
+//                                       SOA_COLUMN(double, x),
+//                                       SOA_COLUMN(double, y),
+//                                       SOA_COLUMN(double, z),
+//                                       SOA_EIGEN_COLUMN(Eigen::Vector3d, a)),
+//                                 SOA_METHODS(        
+//                                       SOA_METHOD(auto, r(), { return x() * x() + y() * y() + z() * z(); } )
+//                                       SOA_METHOD(void, zero(), { x() = y() = z() = 0; } )
+//                                       SOA_METHOD(void, shift(), { lambda(*this);})
+//                                     ) 
+//                                 )                    
 
 using SoA = SoALayout<>;
 using SoAView = SoA::View;
@@ -44,4 +56,5 @@ int main () {
   }
 
   std::cout << "It works? " << view[0].r() << std::endl;
+  std::cout << "The mean of x direction between the first and the second element is: " << view[0].mean_x(view[1]) << std::endl;
 }
