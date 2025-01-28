@@ -11,6 +11,20 @@
 // #include "DataFormats/Portable/interface/PortableCollection.h"
 // #include "DataFormats/Portable/interface/PortableHostCollection.h"
 
+// template <typename T1, typename T2>
+// struct A {
+//   double a;
+//   double b;
+// };
+
+// template <typename A1>
+// struct T {
+//   template <typename A2>
+//   struct F : public A<A1, A2> {
+//     using A<A1, A2>::A;
+//   }; 
+// }
+
 #include "DataFormats/SoATemplate/interface/SoALayout.h"
 #include "DataFormats/SoATemplate/interface/SoAView.h"
 
@@ -23,7 +37,8 @@ GENERATE_SOA_LAYOUT(SoALayout,
                                 auto mean_x(const element& other) { x() += other.x();
                                                                     x() /= 2;
                                                                     return x(); }
-                                auto more_then_one_input(double x, double y) { return x + y;}))
+                                //template <typename T1, typename T2>                                       
+                                auto more_than_one_input(double x, double y) { return x + y; }))
 
 // GENERATE_SOA_LAYOUT_WITH_METHODS(SoALayout,
 //                                 SOA_MEMBERS(
@@ -42,6 +57,8 @@ using SoA = SoALayout<>;
 using SoAView = SoA::View;
 
 int main () {
+
+  //PROTECT(template <typename T1, typename T2> double x(int a, int b) {return 0.1;})
   std::size_t numElements = 12;
   std::size_t size = SoA::computeDataSize(numElements);    
   std::unique_ptr<std::byte, decltype(std::free) *> slBuffer{

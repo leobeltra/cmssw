@@ -48861,7 +48861,7 @@ namespace cms::soa {
            : __assert_fail(
                  "false && \"Indexed access impossible for SoA scalars.\"",
                  "/data/lebeltra/alpaka_producer/CMSSW_15_0_0_pre1/src/DataFormats/SoATemplate/interface/SoACommon.h",
-                 693,
+                 695,
                  __extension__ __PRETTY_FUNCTION__));
     }
 
@@ -48882,7 +48882,7 @@ namespace cms::soa {
            : __assert_fail(
                  "false && \"Indexed access impossible for SoA scalars.\"",
                  "/data/lebeltra/alpaka_producer/CMSSW_15_0_0_pre1/src/DataFormats/SoATemplate/interface/SoACommon.h",
-                 709,
+                 711,
                  __extension__ __PRETTY_FUNCTION__));
     }
 
@@ -49921,7 +49921,7 @@ struct SoALayout {
         x() /= 2;
         return x();
       }
-      auto attempt(double x, double y) { return x + y; }
+      auto more_then_one_input(double x, double y) { return x + y; }
       SoAValueWithConf<Metadata::ColumnTypeOf_x, typename Metadata::TypeOf_x> x;
       SoAValueWithConf<Metadata::ColumnTypeOf_y, typename Metadata::TypeOf_y> y;
       SoAValueWithConf<Metadata::ColumnTypeOf_z, typename Metadata::TypeOf_z> z;
@@ -50340,6 +50340,10 @@ private:
 using SoA = SoALayout<>;
 using SoAView = SoA::View;
 int main() {
+  template <typename T1, typename T2>
+  double x(int a, int b) {
+    return 0.1;
+  }
   std::size_t numElements = 12;
   std::size_t size = SoA::computeDataSize(numElements);
   std::unique_ptr<std::byte, decltype(std::free)*> slBuffer{

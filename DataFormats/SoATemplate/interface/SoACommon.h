@@ -590,6 +590,8 @@ namespace cms::soa {
         BOOST_PP_EXPAND(WRITE_METHOD FIELD), \
         /* Se non è un metodo, non fa nulla */ )
 
+#define PROTECT(...) __VA_ARGS__       
+
 /* Iterate on the macro MACRO and return the result as a comma separated list, converting
    the boost sequence into tuples and then into list */
 #define _ITERATE_ON_ALL_COMMA(MACRO, DATA, ...) \
