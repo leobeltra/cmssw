@@ -19,11 +19,30 @@ GENERATE_SOA_LAYOUT(SoALayout,
                     SOA_COLUMN(double, y),
                     SOA_COLUMN(double, z),
                     SOA_EIGEN_COLUMN(Eigen::Vector3d, a),
-                    SOA_METHODS(auto r() { return x() * x() + y() * y() + z() * z(); } 
-                                auto mean_x(const element& other) { x() += other.x();
-                                                                    x() /= 2;
-                                                                    return x(); }
-                                auto more_then_one_input(double x, double y) { return x + y;}))
+                    SOA_METHODS(template <typename T1>
+                                         auto more_then_one_input(T1 x, T2 y) { return x + y;}
+                                         auto r() { return x() * x() + y() * y() + z() * z(); }
+                                template <typename T1> 
+                                         auto mean_x(const element& other) { x() += other.x();
+                                                                             x() /= 2;
+                                                                             return x(); })
+                               )
+
+// GENERATE_SOA_LAYOUT(SoALayout,
+//                     SOA_COLUMN(double, x),
+//                     SOA_COLUMN(double, y),
+//                     SOA_COLUMN(double, z),
+//                     SOA_EIGEN_COLUMN(Eigen::Vector3d, a),
+//                     SOA_METHODS(FUNCTION(TEMPLATE(template <typename T1, typename T2, typename T3>)
+//                                          auto more_then_one_input(T1 x, T2 y) { return x + y;})
+//                                 FUNCTION(
+//                                          auto r() { return x() * x() + y() * y() + z() * z(); })
+//                                 // PROTECT(template <typename T1, typename T2, typename T3>) 
+//                                 FUNCTION(
+//                                          auto mean_x(const element& other), { x() += other.x();
+//                                                                              x() /= 2;
+//                                                                              return x(); })
+//                                ))
 
 // GENERATE_SOA_LAYOUT_WITH_METHODS(SoALayout,
 //                                 SOA_MEMBERS(
@@ -40,6 +59,9 @@ GENERATE_SOA_LAYOUT(SoALayout,
 
 using SoA = SoALayout<>;
 using SoAView = SoA::View;
+
+  // FUNCTION(PROTECT(template <typename T1, typename T2, typename T3>)
+  //          int const r() { return 2 + 1; })
 
 int main () {
   std::size_t numElements = 12;

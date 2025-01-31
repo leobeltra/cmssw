@@ -934,8 +934,8 @@ namespace cms::soa {
      _ITERATE_ON_ALL(_TRIVIAL_VIEW_ASSIGN_VALUE_ELEMENT, ~, __VA_ARGS__)                                               \
      return *this;                                                                                                     \
    }                                                                                                                   \
-                                                                                                                       \
-  _ITERATE_ON_ALL(GENERATE_METHOD, ~, __VA_ARGS__)                                                                     \
+                                                                                                                      \
+  _ITERATE_ON_ALL(GENERATE_METHODS_IF_VALID, ~, __VA_ARGS__)                                           \
                                                                                                                        \
    _GENERATE_SOA_VIEW_PART_2(ConstViewTemplateFreeParams, ViewTemplateFreeParams,                                      \
      SOA_VIEW_LAYOUT_LIST(LAYOUTS_LIST), SOA_VIEW_VALUE_LIST(VALUE_LIST))

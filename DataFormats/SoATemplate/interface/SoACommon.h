@@ -575,20 +575,26 @@ namespace cms::soa {
 #define SOA_SCALAR(TYPE, NAME) (_VALUE_TYPE_SCALAR, TYPE, NAME)
 #define SOA_COLUMN(TYPE, NAME) (_VALUE_TYPE_COLUMN, TYPE, NAME)
 #define SOA_EIGEN_COLUMN(TYPE, NAME) (_VALUE_TYPE_EIGEN_COLUMN, TYPE, NAME)
-#define SOA_METHODS(...) (_VALUE_TYPE_METHOD, _, _)  __VA_ARGS__ 
+// #define SOA_METHODS_IMPL(...) (_VALUE_TYPE_METHOD, _, _) __VA_ARGS__
+#define SOA_METHODS(...) (_VALUE_TYPE_METHOD, _, _) BOOST_PP_TUPLE_ENUM((__VA_ARGS__)) /* SOA_METHODS_IMPL(__VA_ARGS__ ) */
+// #define SOA_METHOD(TEMPLATE, ...) TEMPLATE __VA_ARGS__ 
+#define TEMPLATE(...) PROTECT(__VA_ARGS__)
+#define PROTECT(...) BOOST_PP_TUPLE_ENUM(BOOST_PP_SEQ_TO_TUPLE(BOOST_PP_VARIADIC_TO_SEQ(__VA_ARGS__)))
+#define FUNCTION(...) __VA_ARGS__ 
+
+#define EMPTY_TUPLE ()
 //#define SOA_METHOD_DEFINITION(...) {__VA_ARGS__}
 
-#define GET_MACRO_TYPE(TUPLE) BOOST_PP_TUPLE_ELEM(0, TUPLE)
+#define GET_MACRO_TYPE(TUPLE) BBOOST_PP_TUPLE_ELEM(0, BOOST_PP_TUPLE_ELEM(0, TUPLE))
 #define GET_TYPE(TUPLE) BOOST_PP_TUPLE_ELEM(1, TUPLE)
 #define GET_NAME(TUPLE) BOOST_PP_TUPLE_ELEM(2, TUPLE)
 
-#define WRITE_METHOD(R, DATA, NAME) BOOST_PP_EMPTY()
-  
-/* Genera un metodo solo se il tipo è _VALUE_TYPE_METHOD */
-#define GENERATE_METHOD(R, DATA, FIELD) \
-    BOOST_PP_IF(BOOST_PP_EQUAL(GET_MACRO_TYPE(FIELD), _VALUE_TYPE_METHOD), \
-        BOOST_PP_EXPAND(WRITE_METHOD FIELD), \
-        /* Se non è un metodo, non fa nulla */ )
+#define WRITE_METHOD(R, DATA, FIELD) BOOST_PP_EMPTY()
+
+#define GENERATE_METHODS_IF_VALID(R, DATA, FIELD) \
+    BOOST_PP_IF(BOOST_PP_EQUAL(BOOST_PP_TUPLE_ELEM(0, FIELD), _VALUE_TYPE_METHOD), \
+                WRITE_METHOD FIELD, \
+                BOOST_PP_EMPTY())      
 
 /* Iterate on the macro MACRO and return the result as a comma separated list, converting
    the boost sequence into tuples and then into list */
@@ -598,7 +604,7 @@ namespace cms::soa {
 /* Iterate MACRO on all elements of the boost sequence */
 #define _ITERATE_ON_ALL(MACRO, DATA, ...) BOOST_PP_SEQ_FOR_EACH(MACRO, DATA, BOOST_PP_VARIADIC_TO_SEQ(__VA_ARGS__))
 
-//#define _ITERATE_ON_ALL_METHODS(DATA, ...) BOOST_PP_SEQ_FOR_EACH(MACRO, DATA, BOOST_PP_VARIADIC_TO_SEQ(__VA_ARGS__))
+// #define _ITERATE_ON_ALL_METHODS(MACRO, DATA, ...) BOOST_PP_SEQ_FOR_EACH(MACRO, DATA, BOOST_PP_VARIADIC_TO_SEQ(__VA_ARGS__))
 
 /* Switch on macros depending on scalar / column type */
 #define _SWITCH_ON_TYPE(VALUE_TYPE, IF_SCALAR, IF_COLUMN, IF_EIGEN_COLUMN) \
