@@ -38,7 +38,9 @@ GENERATE_SOA_LAYOUT(SoALayout,
                                                                     x() /= 2;
                                                                     return x(); }
                                 //template <typename T1, typename T2>                                       
-                                auto more_than_one_input(double x, double y) { return x + y; }))
+                                auto more_than_one_input(double x, double y) { return x + y; }),
+                    SOA_COLUMN(int, ab),
+                    SOA_METHODS(double s() {return 0.1;}))
 
 // GENERATE_SOA_LAYOUT_WITH_METHODS(SoALayout,
 //                                 SOA_MEMBERS(
