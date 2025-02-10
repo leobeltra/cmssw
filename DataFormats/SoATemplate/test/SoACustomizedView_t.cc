@@ -147,33 +147,36 @@ TEST_CASE("SoACustomizedView") {
     // aggregate the columns from the view with runtime check for the size
     customSoA.aggregate(customizedView);
 
+    // building the View of the aggregated SoA
+    CustomizedSoAView customizedAggregatedView{customSoA};
+
     // Check for inequality of memory addresses
-    REQUIRE(customSoA.metadata().addressOf_x() != positionConstView.metadata().addressOf_x());
-    REQUIRE(customSoA.metadata().addressOf_y() != positionConstView.metadata().addressOf_y());
-    REQUIRE(customSoA.metadata().addressOf_z() != positionConstView.metadata().addressOf_z());
-    REQUIRE(customSoA.metadata().addressOf_candidateDirection() !=
+    REQUIRE(customizedAggregatedView.metadata().addressOf_x() != positionConstView.metadata().addressOf_x());
+    REQUIRE(customizedAggregatedView.metadata().addressOf_y() != positionConstView.metadata().addressOf_y());
+    REQUIRE(customizedAggregatedView.metadata().addressOf_z() != positionConstView.metadata().addressOf_z());
+    REQUIRE(customizedAggregatedView.metadata().addressOf_candidateDirection() !=
             pcaConstView.metadata().addressOf_candidateDirection());
 
     // Check for column alignments
-    REQUIRE(0 == reinterpret_cast<uintptr_t>(customSoA.metadata().addressOf_x()) % decltype(customSoA)::alignment);
-    REQUIRE(0 == reinterpret_cast<uintptr_t>(customSoA.metadata().addressOf_y()) % decltype(customSoA)::alignment);
-    REQUIRE(0 == reinterpret_cast<uintptr_t>(customSoA.metadata().addressOf_z()) % decltype(customSoA)::alignment);
-    REQUIRE(0 == reinterpret_cast<uintptr_t>(customSoA.metadata().addressOf_candidateDirection()) %
+    REQUIRE(0 == reinterpret_cast<uintptr_t>(customizedAggregatedView.metadata().addressOf_x()) % decltype(customSoA)::alignment);
+    REQUIRE(0 == reinterpret_cast<uintptr_t>(customizedAggregatedView.metadata().addressOf_y()) % decltype(customSoA)::alignment);
+    REQUIRE(0 == reinterpret_cast<uintptr_t>(customizedAggregatedView.metadata().addressOf_z()) % decltype(customSoA)::alignment);
+    REQUIRE(0 == reinterpret_cast<uintptr_t>(customizedAggregatedView.metadata().addressOf_candidateDirection()) %
                      decltype(customSoA)::alignment);
 
     // Check for contiguity of columns
-    REQUIRE((std::byte *)customSoA.metadata().addressOf_x() +
+    REQUIRE((std::byte *)customizedAggregatedView.metadata().addressOf_x() +
                 cms::soa::alignSize(elems * sizeof(float), CustomizedSoA::alignment) ==
-            (std::byte *)customSoA.metadata().addressOf_y());
-    REQUIRE((std::byte *)customSoA.metadata().addressOf_y() +
+            (std::byte *)customizedAggregatedView.metadata().addressOf_y());
+    REQUIRE((std::byte *)customizedAggregatedView.metadata().addressOf_y() +
                 cms::soa::alignSize(elems * sizeof(float), CustomizedSoA::alignment) ==
-            (std::byte *)customSoA.metadata().addressOf_z());
-    REQUIRE((std::byte *)customSoA.metadata().addressOf_z() +
+            (std::byte *)customizedAggregatedView.metadata().addressOf_z());
+    REQUIRE((std::byte *)customizedAggregatedView.metadata().addressOf_z() +
                 cms::soa::alignSize(elems * sizeof(float), CustomizedSoA::alignment) ==
-            (std::byte *)customSoA.metadata().addressOf_candidateDirection());
+            (std::byte *)customizedAggregatedView.metadata().addressOf_candidateDirection());
 
     // Check for the independency of the aggregated SoA
-    customizedView.x()[3] = 0.;
-    REQUIRE(customizedView.x()[3] != positionView.x()[3]);
+    customizedAggregatedView.x()[3] = 0.;
+    REQUIRE(customizedAggregatedView.x()[3] != positionView.x()[3]);
   }
 }
