@@ -158,9 +158,12 @@ TEST_CASE("SoACustomizedView") {
             pcaConstView.metadata().addressOf_candidateDirection());
 
     // Check for column alignments
-    REQUIRE(0 == reinterpret_cast<uintptr_t>(customizedAggregatedView.metadata().addressOf_x()) % decltype(customSoA)::alignment);
-    REQUIRE(0 == reinterpret_cast<uintptr_t>(customizedAggregatedView.metadata().addressOf_y()) % decltype(customSoA)::alignment);
-    REQUIRE(0 == reinterpret_cast<uintptr_t>(customizedAggregatedView.metadata().addressOf_z()) % decltype(customSoA)::alignment);
+    REQUIRE(0 == reinterpret_cast<uintptr_t>(customizedAggregatedView.metadata().addressOf_x()) %
+                     decltype(customSoA)::alignment);
+    REQUIRE(0 == reinterpret_cast<uintptr_t>(customizedAggregatedView.metadata().addressOf_y()) %
+                     decltype(customSoA)::alignment);
+    REQUIRE(0 == reinterpret_cast<uintptr_t>(customizedAggregatedView.metadata().addressOf_z()) %
+                     decltype(customSoA)::alignment);
     REQUIRE(0 == reinterpret_cast<uintptr_t>(customizedAggregatedView.metadata().addressOf_candidateDirection()) %
                      decltype(customSoA)::alignment);
 
