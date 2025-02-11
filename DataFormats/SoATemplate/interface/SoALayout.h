@@ -606,6 +606,21 @@
             "In "#CLASS "::deepCopy method: number of elements mismatch ");                                            \
       _ITERATE_ON_ALL(_COPY_VIEW_COLUMNS, ~, __VA_ARGS__)                                                              \
     }                                                                                                                  \
+                                                                                                                       \
+    /* ROOT read streamer */                                                                                           \
+    template <typename T>                                                                                              \
+    void ROOTReadStreamer(T & onfile) {                                                                                \
+      _ITERATE_ON_ALL(_STREAMER_READ_SOA_DATA_MEMBER, ~, __VA_ARGS__)                                                  \
+    }                                                                                                                  \
+                                                                                                                       \
+    /* ROOT allocation cleanup */                                                                                      \
+    void ROOTStreamerCleaner() {                                                                                       \
+      /* This function should only be called from the PortableCollection ROOT streamer */                              \
+      _ITERATE_ON_ALL(_ROOT_FREE_SOA_COLUMN_OR_SCALAR, ~, __VA_ARGS__)                                                 \
+    }                                                                                                                  \
+                                                                                                                       \
+    /* Dump the SoA internal structure */                                                                              \
+    template <typename T>                                                                                              \
     SOA_HOST_ONLY friend void dump();                                                                                  \
                                                                                                                        \
   private:                                                                                                             \
