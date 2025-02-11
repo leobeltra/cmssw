@@ -601,15 +601,7 @@
     }                                                                                                                  \
                                                                                                                        \
     SOA_HOST_ONLY                                                                                                      \
-    void aggregate(View& view) {                                                                                       \
-      if (elements_ < view.metadata().size())                                                                          \
-        throw std::runtime_error(                                                                                      \
-            "In aggregate method: number of elements mismatch ");                                                      \
-      _ITERATE_ON_ALL(_COPY_VIEW_COLUMNS, ~, __VA_ARGS__)                                                              \
-    }                                                                                                                  \
-                                                                                                                       \
-    SOA_HOST_ONLY                                                                                                      \
-    void aggregate(ConstView& view) {                                                                                  \
+    void aggregate(ConstView const& view) {                                                                            \
       if (elements_ < view.metadata().size())                                                                          \
         throw std::runtime_error(                                                                                      \
             "In aggregate method: number of elements mismatch ");                                                      \

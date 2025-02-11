@@ -55,8 +55,8 @@ TEST_CASE("Aggregate from SoA Customized View") {
   // fill up
   for (size_t i = 0; i < elems; i++) {
     positionCollectionView.x()[i] = static_cast<float>(i);
-    positionCollectionView.y()[i] = static_cast<float>(i) * 2.0;
-    positionCollectionView.z()[i] = static_cast<float>(i) * 3.0;
+    positionCollectionView.y()[i] = static_cast<float>(i) * 2.0f;
+    positionCollectionView.z()[i] = static_cast<float>(i) * 3.0f;
   }
   positionCollectionView.detectorType() = 1;
 
