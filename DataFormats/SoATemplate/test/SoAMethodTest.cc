@@ -20,12 +20,13 @@ GENERATE_SOA_LAYOUT(SoALayout,
                     SOA_COLUMN(double, z),
                     SOA_EIGEN_COLUMN(Eigen::Vector3d, a),
                     SOA_METHODS(template <typename T1, typename T2, typename T3>
-                                         auto more_then_one_input(T1 x, T2 y) { return x + y;}         
+                                         auto more_then_one_input(T1 x, T2 y, T3 z) { return x + y + z;}         
                                         auto r() { return x() * x() + y() * y() + z() * z(); }
                                         template <typename T6, typename T7, typename T8>
-                                        auto mean_x(const element& other) { x() += other.x();
+                                        auto mean_x(const element& other, T6 f, T7 h, T8 v) { x() += other.x();
                                                                              x() /= 2;
-                                                                             return x(); })
+                                                                             return x(); }),
+                    SOA_SCALAR(int, n)                                                                                        
                                )
 
 // GENERATE_SOA_LAYOUT(SoALayout,
@@ -77,6 +78,6 @@ int main () {
     view.z()[i] = 10;
   }
 
-  std::cout << "It works? " << view[0].r() << std::endl;
-  std::cout << "The mean of x direction between the first and the second element is: " << view[0].mean_x(view[1]) << std::endl;
+  // std::cout << "It works? " << view[0].r() << std::endl;
+  // std::cout << "The mean of x direction between the first and the second element is: " << view[0].mean_x(view[1]) << std::endl;
 }

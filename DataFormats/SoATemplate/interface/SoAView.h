@@ -934,9 +934,10 @@ namespace cms::soa {
      _ITERATE_ON_ALL(_TRIVIAL_VIEW_ASSIGN_VALUE_ELEMENT, ~, __VA_ARGS__)                                               \
      return *this;                                                                                                     \
    }                                                                                                                   \
-                                                                                                                      \
-  BOOST_PP_TUPLE_ENUM(_ITERATE_ON_ALL(GENERATE_METHODS_IF_VALID, ~, __VA_ARGS__))                                           \
                                                                                                                        \
+   ENUM_IF_VALID(_ITERATE_ON_ALL(GENERATE_METHODS, ~, __VA_ARGS__))           \
+  /* ENUM_TUPLE_IF_NOT_EMPTY(_ITERATE_ON_ALL(GENERATE_METHODS, ~, __VA_ARGS__)) */                   \
+                                                                                                                      \
    _GENERATE_SOA_VIEW_PART_2(ConstViewTemplateFreeParams, ViewTemplateFreeParams,                                      \
      SOA_VIEW_LAYOUT_LIST(LAYOUTS_LIST), SOA_VIEW_VALUE_LIST(VALUE_LIST))
 // clang-format on
@@ -945,7 +946,7 @@ namespace cms::soa {
  * Helper macro turning layout field declaration into view field declaration.
  */
 
-#define _VIEW_FIELD_FROM_LAYOUT_IMPL(VALUE_TYPE, CPP_TYPE, NAME, DATA, args) (DATA, NAME, NAME) \
+#define _VIEW_FIELD_FROM_LAYOUT_IMPL(VALUE_TYPE, CPP_TYPE, NAME, args, DATA) (DATA, NAME, NAME) \
 
 #define _VIEW_FIELD_FROM_LAYOUT(R, DATA, VALUE_TYPE_NAME) \
     BOOST_PP_IF(BOOST_PP_EQUAL(BOOST_PP_TUPLE_ELEM(0, VALUE_TYPE_NAME), _VALUE_TYPE_METHOD), \

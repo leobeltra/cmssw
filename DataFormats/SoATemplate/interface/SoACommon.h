@@ -581,7 +581,40 @@ namespace cms::soa {
 // #define PROTECT(TUPLE) _ITERATE_ON_ALL_COMMA_SEQ(FUNCTION, ~, BOOST_PP_TUPLE_TO_SEQ(TUPLE))
 // #define FUNCTION(text) (text)
 
-#define GENERATE_METHODS_IF_VALID(R, DATA, FIELD) BOOST_PP_TUPLE_ELEM(3, FIELD)    
+// Genera i metodi solo se il campo è di tipo _VALUE_TYPE_METHOD
+#define GENERATE_METHODS(R, DATA, FIELD) \
+    BOOST_PP_IF(BOOST_PP_EQUAL(BOOST_PP_TUPLE_ELEM(0, FIELD), _VALUE_TYPE_METHOD), \
+                BOOST_PP_TUPLE_ELEM(3, FIELD), \
+                BOOST_PP_EMPTY())
+ 
+// #define ENUM_IF_VALID(X, ...) 
+//   BOOST_PP_IF(BOOST_PP_NOT_EQUAL(0, BOOST_PP_VARIADIC_SIZE(__VA_ARGS__)), 
+//               BOOST_PP_TUPLE_ENUM(X) ENUM_IF_VALID(__VA_ARGS__), 
+//               BOOST_PP_EMPTY())
+
+#define ENUM_FOR_PRED(r, state) \
+  BOOST_PP_LESS( BOOST_PP_TUPLE_ELEM(0, state), BOOST_PP_TUPLE_ELEM(1, state) )
+
+// Operazione: incrementa l'indice
+#define ENUM_FOR_OP(r, state) \
+  ( BOOST_PP_INC( BOOST_PP_TUPLE_ELEM(0, state) ), \
+    BOOST_PP_TUPLE_ELEM(1, state), \
+    BOOST_PP_TUPLE_ELEM(2, state) )
+
+// Macro di output: per ogni iterazione, applica BOOST_PP_TUPLE_ENUM all'elemento corrente
+#define ENUM_FOR_MACRO(r, state) \
+  BOOST_PP_TUPLE_ENUM( \
+    BOOST_PP_SEQ_ELEM( BOOST_PP_TUPLE_ELEM(0, state), BOOST_PP_TUPLE_ELEM(2, state) ) \
+  )
+
+// Macro principale: converte gli argomenti variadici in una sequenza e itera su di essa
+#define ENUM_IF_VALID(...) \
+  BOOST_PP_FOR( \
+    ( 0, BOOST_PP_VARIADIC_SIZE(__VA_ARGS__), BOOST_PP_VARIADIC_TO_SEQ(__VA_ARGS__) ), \
+    ENUM_FOR_PRED, \
+    ENUM_FOR_OP, \
+    ENUM_FOR_MACRO \
+  )                    
 
 /* Iterate on the macro MACRO and return the result as a comma separated list, converting
    the boost sequence into tuples and then into list */
@@ -604,7 +637,29 @@ namespace cms::soa {
           BOOST_PP_IF(                                                     \
             BOOST_PP_EQUAL(VALUE_TYPE, _VALUE_TYPE_EIGEN_COLUMN),          \
             IF_EIGEN_COLUMN,                                               \
-            BOOST_PP_EMPTY())))                                         
+            BOOST_PP_EMPTY())))  
+            
+#define BOOST_PP_TUPLE_ENUM_0(X) X
+#define BOOST_PP_TUPLE_ENUM_1(X) BOOST_PP_TUPLE_ENUM(BOOST_PP_TUPLE_ENUM_0(X))
+#define BOOST_PP_TUPLE_ENUM_2(X) BOOST_PP_TUPLE_ENUM(BOOST_PP_TUPLE_ENUM_1(X))
+#define BOOST_PP_TUPLE_ENUM_3(X) BOOST_PP_TUPLE_ENUM(BOOST_PP_TUPLE_ENUM_2(X))
+#define BOOST_PP_TUPLE_ENUM_4(X) BOOST_PP_TUPLE_ENUM(BOOST_PP_TUPLE_ENUM_3(X))
+#define BOOST_PP_TUPLE_ENUM_5(X) BOOST_PP_TUPLE_ENUM(BOOST_PP_TUPLE_ENUM_4(X))
+#define BOOST_PP_TUPLE_ENUM_6(X) BOOST_PP_TUPLE_ENUM(BOOST_PP_TUPLE_ENUM_5(X))
+#define BOOST_PP_TUPLE_ENUM_7(X) BOOST_PP_TUPLE_ENUM(BOOST_PP_TUPLE_ENUM_6(X))
+#define BOOST_PP_TUPLE_ENUM_8(X) BOOST_PP_TUPLE_ENUM(BOOST_PP_TUPLE_ENUM_7(X))
+#define BOOST_PP_TUPLE_ENUM_9(X) BOOST_PP_TUPLE_ENUM(BOOST_PP_TUPLE_ENUM_8(X))
+#define BOOST_PP_TUPLE_ENUM_10(X) BOOST_PP_TUPLE_ENUM(BOOST_PP_TUPLE_ENUM_9(X))
+#define BOOST_PP_TUPLE_ENUM_11(X) BOOST_PP_TUPLE_ENUM(BOOST_PP_TUPLE_ENUM_10(X))
+#define BOOST_PP_TUPLE_ENUM_12(X) BOOST_PP_TUPLE_ENUM(BOOST_PP_TUPLE_ENUM_11(X))
+#define BOOST_PP_TUPLE_ENUM_13(X) BOOST_PP_TUPLE_ENUM(BOOST_PP_TUPLE_ENUM_12(X))
+#define BOOST_PP_TUPLE_ENUM_14(X) BOOST_PP_TUPLE_ENUM(BOOST_PP_TUPLE_ENUM_13(X))
+#define BOOST_PP_TUPLE_ENUM_15(X) BOOST_PP_TUPLE_ENUM(BOOST_PP_TUPLE_ENUM_14(X))
+#define BOOST_PP_TUPLE_ENUM_16(X) BOOST_PP_TUPLE_ENUM(BOOST_PP_TUPLE_ENUM_15(X))
+#define BOOST_PP_TUPLE_ENUM_17(X) BOOST_PP_TUPLE_ENUM(BOOST_PP_TUPLE_ENUM_16(X))
+#define BOOST_PP_TUPLE_ENUM_18(X) BOOST_PP_TUPLE_ENUM(BOOST_PP_TUPLE_ENUM_17(X))
+#define BOOST_PP_TUPLE_ENUM_19(X) BOOST_PP_TUPLE_ENUM(BOOST_PP_TUPLE_ENUM_18(X))
+#define BOOST_PP_TUPLE_ENUM_20(X) BOOST_PP_TUPLE_ENUM(BOOST_PP_TUPLE_ENUM_19(X))            
 
 namespace cms::soa {
 
