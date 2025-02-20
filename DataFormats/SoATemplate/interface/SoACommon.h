@@ -52,6 +52,7 @@
 #define _VALUE_TYPE_SCALAR 0
 #define _VALUE_TYPE_COLUMN 1
 #define _VALUE_TYPE_EIGEN_COLUMN 2
+#define _VALUE_TYPE_METHOD 3
 
 /* The size type need to be "hardcoded" in the template parameters for classes serialized by ROOT */
 /* In practice, using a typedef as a template parameter to the Layout or its ViewTemplateFreeParams member
@@ -574,6 +575,7 @@ namespace cms::soa {
 #define SOA_SCALAR(TYPE, NAME) (_VALUE_TYPE_SCALAR, TYPE, NAME)
 #define SOA_COLUMN(TYPE, NAME) (_VALUE_TYPE_COLUMN, TYPE, NAME)
 #define SOA_EIGEN_COLUMN(TYPE, NAME) (_VALUE_TYPE_EIGEN_COLUMN, TYPE, NAME)
+#define SOA_METHODS(...) (_VALUE_TYPE_METHOD, ~, ~, (__VA_ARGS__))
 
 /* Iterate on the macro MACRO and return the result as a comma separated list, converting
    the boost sequence into tuples and then into list */
