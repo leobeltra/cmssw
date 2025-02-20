@@ -53,6 +53,7 @@
 #define _VALUE_TYPE_COLUMN 1
 #define _VALUE_TYPE_EIGEN_COLUMN 2
 #define _VALUE_TYPE_METHOD 3
+#define _VALUE_TYPE_CONST_METHOD 4
 
 /* The size type need to be "hardcoded" in the template parameters for classes serialized by ROOT */
 /* In practice, using a typedef as a template parameter to the Layout or its ViewTemplateFreeParams member
@@ -576,16 +577,21 @@ namespace cms::soa {
 #define SOA_COLUMN(TYPE, NAME) (_VALUE_TYPE_COLUMN, TYPE, NAME, BOOST_PP_EMPTY())
 #define SOA_EIGEN_COLUMN(TYPE, NAME) (_VALUE_TYPE_EIGEN_COLUMN, TYPE, NAME, BOOST_PP_EMPTY())
 #define SOA_METHODS(...) (_VALUE_TYPE_METHOD, _, _, (__VA_ARGS__))
+#define SOA_CONST_METHODS(...) (_VALUE_TYPE_CONST_METHOD, _, _, (__VA_ARGS__))
 // #define SOA_METHOD(TEMPLATE, ...) TEMPLATE __VA_ARGS__ 
 // #define TEMPLATE(z, n, args) BOOST_PP_COMMA_IF(n) BOOST_PP_VARIADIC_ELEM(n, args)
 // #define PROTECT(TUPLE) _ITERATE_ON_ALL_COMMA_SEQ(FUNCTION, ~, BOOST_PP_TUPLE_TO_SEQ(TUPLE))
-// #define FUNCTION(text) (text)
 
 // Genera i metodi solo se il campo è di tipo _VALUE_TYPE_METHOD
 #define GENERATE_METHODS(R, DATA, FIELD) \
     BOOST_PP_IF(BOOST_PP_EQUAL(BOOST_PP_TUPLE_ELEM(0, FIELD), _VALUE_TYPE_METHOD), \
                 BOOST_PP_TUPLE_ELEM(3, FIELD), \
                 BOOST_PP_EMPTY())
+
+#define GENERATE_CONST_METHODS(R, DATA, FIELD) \
+    BOOST_PP_IF(BOOST_PP_EQUAL(BOOST_PP_TUPLE_ELEM(0, FIELD), _VALUE_TYPE_CONST_METHOD), \
+                BOOST_PP_TUPLE_ELEM(3, FIELD), \
+                BOOST_PP_EMPTY())                
  
 // #define ENUM_IF_VALID(X, ...) 
 //   BOOST_PP_IF(BOOST_PP_NOT_EQUAL(0, BOOST_PP_VARIADIC_SIZE(__VA_ARGS__)), 
@@ -623,8 +629,6 @@ namespace cms::soa {
 
 /* Iterate MACRO on all elements of the boost sequence */
 #define _ITERATE_ON_ALL(MACRO, DATA, ...) BOOST_PP_SEQ_FOR_EACH(MACRO, DATA, BOOST_PP_VARIADIC_TO_SEQ(__VA_ARGS__))
-
-// #define _ITERATE_ON_ALL_METHODS(MACRO, DATA, ...) BOOST_PP_SEQ_FOR_EACH(MACRO, DATA, BOOST_PP_VARIADIC_TO_SEQ(__VA_ARGS__))
 
 /* Switch on macros depending on scalar / column type */
 #define _SWITCH_ON_TYPE(VALUE_TYPE, IF_SCALAR, IF_COLUMN, IF_EIGEN_COLUMN) \

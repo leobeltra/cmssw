@@ -21,12 +21,14 @@ GENERATE_SOA_LAYOUT(SoALayout,
                     SOA_EIGEN_COLUMN(Eigen::Vector3d, a),
                     SOA_METHODS(template <typename T1, typename T2, typename T3>
                                          auto more_then_one_input(T1 x, T2 y, T3 z) { return x + y + z;}         
-                                        auto r() { return x() * x() + y() * y() + z() * z(); }
                                         template <typename T6, typename T7, typename T8>
                                         auto mean_x(const element& other, T6 f, T7 h, T8 v) { x() += other.x();
                                                                              x() /= 2;
-                                                                             return x(); }),
-                    SOA_SCALAR(int, n)                                                                                        
+                                                                             return x(); }),                                                      
+//                     SOA_CONST_METHODS(auto r() { return x() * x() + y() * y() + z() * z(); }  
+// ),                                                         
+                    SOA_SCALAR(int, n),
+                    SOA_COLUMN(float, col)
                                )
 
 // GENERATE_SOA_LAYOUT(SoALayout,
