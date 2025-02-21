@@ -25,8 +25,8 @@ GENERATE_SOA_LAYOUT(SoALayout,
                                         auto mean_x(const element& other, T6 f, T7 h, T8 v) { x() += other.x();
                                                                              x() /= 2;
                                                                              return x(); }),                                                      
-//                     SOA_CONST_METHODS(auto r() { return x() * x() + y() * y() + z() * z(); }  
-// ),                                                         
+                    SOA_CONST_METHODS(auto r() { return x() * x() + y() * y() + z() * z(); }  
+),                                                         
                     SOA_SCALAR(int, n),
                     SOA_COLUMN(float, col)
                                )
