@@ -63,6 +63,10 @@ per column and the stride for the Eigen columns. This is useful for building the
 [View](#view) as soon as run-time check on the column sizes is performed. This nested class can be useful also
 in the perspective of being able to manage columns of different sizes in the same data structure.  
 
+## Customized methods
+
+It is possible to generate methods inside the `element` and `const_element` nested structs using the `SOA_METHODS` and `SOA_CONST_METHODS` macros. More than one declaration of these macros are not allowed and all the customized methods can be implemented as macro argument. [An example is showed below.](#examples)
+
 ## ROOT serialization and de-serialization
 
 Layouts can be serialized and de-serialized with ROOT. In order to generate the ROOT dictionary, separate
@@ -138,6 +142,40 @@ GENERATE_SOA_LAYOUT(SoA1LayoutTemplate,
 using SoA1Layout = SoA1LayoutTemplate<>;
 
 using SoA1LayoutAligned = SoA1LayoutTemplate<cms::soa::CacheLineSize::defaultSize, cms::soa::AlignmentEnforcement::enforced>;
+```
+
+It is possible to declare methods that operate on the SoA elements:
+
+```C++
+#include "DataFormats/SoALayout.h"
+
+GENERATE_SOA_LAYOUT(SoATemplate,
+  SOA_COLUMN(double, x),
+  SOA_COLUMN(double, y),
+  SOA_COLUMN(double, z),
+  
+  // methods operating on const_element
+  SOA_CONST_METHODS(
+    auto norm() {
+      return sqrt(x()*x() + y()+y() + z()*z());
+    }
+  ),
+
+  // methods operating on element
+  SOA_METHODS(
+    void scale() {
+      double r = norm()
+      x() /= r;
+      y() /= r;
+      z() /= r;
+    }
+  ),
+  SOA_SCALAR(int, detectorType)
+);
+
+using SoA = SoATemplate<>;
+using SoAView = SoA::View;
+using SoAConstView = SoA::ConstView;
 ```
 
 The buffer of the proper size is allocated, and the layout is populated with:
