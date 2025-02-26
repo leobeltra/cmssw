@@ -87,7 +87,7 @@ TEST_CASE("Aggregate from SoA Customized View") {
 
     // PortableHostCollection that will host the aggregated columns
     PortableHostCollection<CustomizedSoA> customCollection(elems, cms::alpakatools::host());
-    customCollection.aggregate(customView);
+    customCollection.deep_copy(customView);
 
     // Check for inequality of memory addresses
     REQUIRE(customCollection.view().metadata().addressOf_x() != positionCollectionView.metadata().addressOf_x());
@@ -114,7 +114,7 @@ TEST_CASE("Aggregate from SoA Customized View") {
 
     // PortableHostCollection that will host the aggregated columns
     PortableHostCollection<CustomizedSoA> customCollection(elems, cms::alpakatools::host());
-    customCollection.aggregate(customConstView);
+    customCollection.deep_copy(customConstView);
 
     // Check for inequality of memory addresses
     REQUIRE(customCollection.view().metadata().addressOf_x() != positionCollectionView.metadata().addressOf_x());
