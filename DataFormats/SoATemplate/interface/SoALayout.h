@@ -601,10 +601,10 @@
     }                                                                                                                  \
                                                                                                                        \
     SOA_HOST_ONLY                                                                                                      \
-    void aggregate(ConstView const& view) {                                                                            \
+    void deep_copy(ConstView const& view) {                                                                            \
       if (elements_ < view.metadata().size())                                                                          \
         throw std::runtime_error(                                                                                      \
-            "In aggregate method: number of elements mismatch ");                                                      \
+            "In deep_copy method: number of elements mismatch ");                                                      \
       _ITERATE_ON_ALL(_COPY_VIEW_COLUMNS, ~, __VA_ARGS__)                                                              \
     }                                                                                                                  \
                                                                                                                        \

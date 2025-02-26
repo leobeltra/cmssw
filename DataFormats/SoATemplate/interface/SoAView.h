@@ -487,65 +487,69 @@ namespace cms::soa {
 
 #define _TRIVIAL_VIEW_ASSIGN_VALUE_ELEMENT(R, DATA, TYPE_NAME) _TRIVIAL_VIEW_ASSIGN_VALUE_ELEMENT_IMPL TYPE_NAME
 
-// clang-format off
-#define _DECLARE_CONST_VIEW_CONSTRUCTOR_COLUMNS_IMPL(LAYOUT_NAME, LAYOUT_MEMBER, LOCAL_NAME)                           \
-    (typename Metadata::BOOST_PP_CAT(ParametersTypeOf_, LOCAL_NAME)::ConstType LOCAL_NAME)
-// clang-format on
+/**
+ * Generator of parameters for (const) view Metarecords subclass.
+ */
+#define _DECLARE_CONST_VIEW_CONSTRUCTOR_COLUMNS_IMPL(LAYOUT_NAME, LAYOUT_MEMBER, LOCAL_NAME) \
+  (typename Metadata::BOOST_PP_CAT(ParametersTypeOf_, LOCAL_NAME)::ConstType LOCAL_NAME)
 
 #define _DECLARE_CONST_VIEW_CONSTRUCTOR_COLUMNS(R, DATA, LAYOUT_MEMBER_NAME) \
   BOOST_PP_EXPAND(_DECLARE_CONST_VIEW_CONSTRUCTOR_COLUMNS_IMPL LAYOUT_MEMBER_NAME)
 
-// clang-format off
-#define _DECLARE_VIEW_CONSTRUCTOR_COLUMNS_IMPL(LAYOUT_NAME, LAYOUT_MEMBER, LOCAL_NAME)                                 \
-    (typename Metadata::BOOST_PP_CAT(ParametersTypeOf_, LOCAL_NAME) LOCAL_NAME)
-// clang-format on
+/**
+ * Generator of parameters for view Metarecords subclass.
+ */
+#define _DECLARE_VIEW_CONSTRUCTOR_COLUMNS_IMPL(LAYOUT_NAME, LAYOUT_MEMBER, LOCAL_NAME) \
+  (typename Metadata::BOOST_PP_CAT(ParametersTypeOf_, LOCAL_NAME) LOCAL_NAME)
 
 #define _DECLARE_VIEW_CONSTRUCTOR_COLUMNS(R, DATA, LAYOUT_MEMBER_NAME) \
   BOOST_PP_EXPAND(_DECLARE_VIEW_CONSTRUCTOR_COLUMNS_IMPL LAYOUT_MEMBER_NAME)
 
-// clang-format off
-#define _DECLARE_STRUCT_MEMBERS_IMPL(LAYOUT_NAME, LAYOUT_MEMBER, LOCAL_NAME)                                           \
-    typename Metadata::BOOST_PP_CAT(ParametersTypeOf_, LOCAL_NAME) LOCAL_NAME;
-// clang-format on
-
-#define _DECLARE_STRUCT_MEMBERS(R, DATA, LAYOUT_MEMBER_NAME) \
-  BOOST_PP_EXPAND(_DECLARE_STRUCT_MEMBERS_IMPL LAYOUT_MEMBER_NAME)
-
-// clang-format off
-#define _DECLARE_STRUCT_CONST_DATA_MEMBER_IMPL(LAYOUT_NAME, LAYOUT_MEMBER, LOCAL_NAME)                                 \
-    typename Metadata::BOOST_PP_CAT(ParametersTypeOf_, LOCAL_NAME)::ConstType BOOST_PP_CAT(LOCAL_NAME, _);
-// clang-format on
+/**
+ * Generator of members for (const) view Metarecords subclass.
+ */
+#define _DECLARE_STRUCT_CONST_DATA_MEMBER_IMPL(LAYOUT_NAME, LAYOUT_MEMBER, LOCAL_NAME) \
+  typename Metadata::BOOST_PP_CAT(ParametersTypeOf_, LOCAL_NAME)::ConstType BOOST_PP_CAT(LOCAL_NAME, _);
 
 #define _DECLARE_STRUCT_CONST_DATA_MEMBER(R, DATA, LAYOUT_MEMBER_NAME) \
   BOOST_PP_EXPAND(_DECLARE_STRUCT_CONST_DATA_MEMBER_IMPL LAYOUT_MEMBER_NAME)
 
-// clang-format off
-#define _DECLARE_STRUCT_DATA_MEMBER_IMPL(LAYOUT_NAME, LAYOUT_MEMBER, LOCAL_NAME)                                       \
-    typename Metadata::BOOST_PP_CAT(ParametersTypeOf_, LOCAL_NAME) BOOST_PP_CAT(LOCAL_NAME, _);
-// clang-format on
+/**
+ * Generator of members for view Metarecords subclass.
+ */
+#define _DECLARE_STRUCT_DATA_MEMBER_IMPL(LAYOUT_NAME, LAYOUT_MEMBER, LOCAL_NAME) \
+  typename Metadata::BOOST_PP_CAT(ParametersTypeOf_, LOCAL_NAME) BOOST_PP_CAT(LOCAL_NAME, _);
 
 #define _DECLARE_STRUCT_DATA_MEMBER(R, DATA, LAYOUT_MEMBER_NAME) \
   BOOST_PP_EXPAND(_DECLARE_STRUCT_DATA_MEMBER_IMPL LAYOUT_MEMBER_NAME)
 
-// clang-format off
-#define _STRUCT_ELEMENT_INITIALIZERS_IMPL(LAYOUT_NAME, LAYOUT_MEMBER, LOCAL_NAME)                                      \
-      (BOOST_PP_CAT(LOCAL_NAME, _){parent_.metadata().BOOST_PP_CAT(parametersOf_, LOCAL_NAME)()})  // clang-format on
+/**
+ * Assign the value of the records to the column parameters.
+ */
+#define _STRUCT_ELEMENT_INITIALIZERS_IMPL(LAYOUT_NAME, LAYOUT_MEMBER, LOCAL_NAME) \
+  (BOOST_PP_CAT(LOCAL_NAME, _){parent_.metadata().BOOST_PP_CAT(parametersOf_, LOCAL_NAME)()})
 
 #define _STRUCT_ELEMENT_INITIALIZERS(R, DATA, LAYOUT_MEMBER_NAME) \
   BOOST_PP_EXPAND(_STRUCT_ELEMENT_INITIALIZERS_IMPL LAYOUT_MEMBER_NAME)
 
-// clang-format off
-#define _CONST_ACCESSORS_STRUCT_MEMBERS_IMPL(LAYOUT_NAME, LAYOUT_MEMBER, LOCAL_NAME)                                   \
-    const typename Metadata::BOOST_PP_CAT(ParametersTypeOf_, LOCAL_NAME)::ConstType& LOCAL_NAME() const { return BOOST_PP_CAT(LOCAL_NAME, _); }
-// clang-format on
+/**
+ * Generator of accessors for (const) view Metarecords subclass.
+ */
+#define _CONST_ACCESSORS_STRUCT_MEMBERS_IMPL(LAYOUT_NAME, LAYOUT_MEMBER, LOCAL_NAME)                    \
+  const typename Metadata::BOOST_PP_CAT(ParametersTypeOf_, LOCAL_NAME)::ConstType& LOCAL_NAME() const { \
+    return BOOST_PP_CAT(LOCAL_NAME, _);                                                                 \
+  }
 
 #define _CONST_ACCESSORS_STRUCT_MEMBERS(R, DATA, LAYOUT_MEMBER_NAME) \
   BOOST_PP_EXPAND(_CONST_ACCESSORS_STRUCT_MEMBERS_IMPL LAYOUT_MEMBER_NAME)
 
-// clang-format off
-#define _ACCESSORS_STRUCT_MEMBERS_IMPL(LAYOUT_NAME, LAYOUT_MEMBER, LOCAL_NAME)                                         \
-    const typename Metadata::BOOST_PP_CAT(ParametersTypeOf_, LOCAL_NAME)& LOCAL_NAME() const { return BOOST_PP_CAT(LOCAL_NAME, _); }
-// clang-format on
+/**
+ * Generator of accessors for (const) view Metarecords subclass.
+ */
+#define _ACCESSORS_STRUCT_MEMBERS_IMPL(LAYOUT_NAME, LAYOUT_MEMBER, LOCAL_NAME)                \
+  const typename Metadata::BOOST_PP_CAT(ParametersTypeOf_, LOCAL_NAME) & LOCAL_NAME() const { \
+    return BOOST_PP_CAT(LOCAL_NAME, _);                                                       \
+  }
 
 #define _ACCESSORS_STRUCT_MEMBERS(R, DATA, LAYOUT_MEMBER_NAME) \
   BOOST_PP_EXPAND(_ACCESSORS_STRUCT_MEMBERS_IMPL LAYOUT_MEMBER_NAME)

@@ -37,9 +37,6 @@ using CustomizedSoA = CustomizedSoATemplate<>;
 using CustomizedSoAView = CustomizedSoA::View;
 using CustomizedSoAConstView = CustomizedSoA::ConstView;
 
-// test section per ConstView from VIews
-// change after aggregate
-
 TEST_CASE("SoACustomizedView") {
   // common number of elements for the SoAs
   const std::size_t elems = 10;
@@ -145,7 +142,7 @@ TEST_CASE("SoACustomizedView") {
     CustomizedSoAView customizedView(posRecs.x(), posRecs.y(), posRecs.z(), pcaRecs.candidateDirection());
 
     // aggregate the columns from the view with runtime check for the size
-    customSoA.aggregate(customizedView);
+    customSoA.deep_copy(customizedView);
 
     // building the View of the aggregated SoA
     CustomizedSoAView customizedAggregatedView{customSoA};
