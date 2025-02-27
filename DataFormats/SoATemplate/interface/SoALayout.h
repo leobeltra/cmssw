@@ -6,8 +6,6 @@
  * with compile-time size and alignment, and accessors to the "rows" and "columns".
  */
 
-#include <cassert>
-
 #include "FWCore/Reflection/interface/reflex.h"
 
 #include "SoACommon.h"
@@ -600,11 +598,10 @@
         return *this;                                                                                                  \
     }                                                                                                                  \
                                                                                                                        \
-    SOA_HOST_ONLY                                                                                                      \
-    void deep_copy(ConstView const& view) {                                                                            \
+    void deepCopy(ConstView const& view, TQueue& queue) {                                                              \
       if (elements_ < view.metadata().size())                                                                          \
         throw std::runtime_error(                                                                                      \
-            "In deep_copy method: number of elements mismatch ");                                                      \
+            "In deepCopy method: number of elements mismatch ");                                                       \
       _ITERATE_ON_ALL(_COPY_VIEW_COLUMNS, ~, __VA_ARGS__)                                                              \
     }                                                                                                                  \
                                                                                                                        \

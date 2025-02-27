@@ -1,5 +1,6 @@
 #include <Eigen/Core>
 #include <Eigen/Dense>
+#include <alpaka/alpaka.hpp>  
 
 #define CATCH_CONFIG_MAIN
 #include <catch.hpp>
@@ -142,7 +143,7 @@ TEST_CASE("SoACustomizedView") {
     CustomizedSoAView customizedView(posRecs.x(), posRecs.y(), posRecs.z(), pcaRecs.candidateDirection());
 
     // aggregate the columns from the view with runtime check for the size
-    customSoA.deep_copy(customizedView);
+    customSoA.deepCopy(customizedView);
 
     // building the View of the aggregated SoA
     CustomizedSoAView customizedAggregatedView{customSoA};
