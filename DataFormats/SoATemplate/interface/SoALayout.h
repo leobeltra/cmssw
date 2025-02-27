@@ -769,7 +769,12 @@
     /* So instead we make the code unconditional with paceholder names which are protected by a private protection. */ \
     /* This will be handled later as we handle the integration of the view as a subclass of the layout.             */ \
                                                                                                                        \
-  };
+  };                                                                                                                   \
+                                                                                                                       \
+template <CMS_SOA_BYTE_SIZE_TYPE ALIGNMENT = cms::soa::CacheLineSize::defaultSize,                                     \
+bool ALIGNMENT_ENFORCEMENT = cms::soa::AlignmentEnforcement::relaxed>                                                  \
+  struct BOOST_PP_CAT(AoS_, CLASS) {                                                                                   \
+                                                                                                         };                                                                                                       \
 // clang-format on
 
 #endif  // DataFormats_SoATemplate_interface_SoALayout_h
