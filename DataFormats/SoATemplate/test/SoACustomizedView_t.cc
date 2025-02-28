@@ -2,10 +2,13 @@
 #include <Eigen/Dense>
 #include <alpaka/alpaka.hpp>  
 
+#include <ostream>
+
 #define CATCH_CONFIG_MAIN
 #include <catch.hpp>
 
 #include "DataFormats/SoATemplate/interface/SoALayout.h"
+#include "HeterogeneousCore/AlpakaInterface/interface/config.h"
 
 GENERATE_SOA_LAYOUT(SoAPositionTemplate,
                     SOA_COLUMN(float, x),
@@ -39,6 +42,13 @@ using CustomizedSoAView = CustomizedSoA::View;
 using CustomizedSoAConstView = CustomizedSoA::ConstView;
 
 TEST_CASE("SoACustomizedView") {
+
+  // using namespace ALPAKA_ACCELERATOR_NAMESPACE;
+
+  alpaka::DevCpu devCpu = alpaka::getDevByIdx(alpaka::PlatformCpu{}, 0u);
+
+  alpaka::QueueCpuBlocking queue(devCpu);
+
   // common number of elements for the SoAs
   const std::size_t elems = 10;
 
@@ -142,12 +152,32 @@ TEST_CASE("SoACustomizedView") {
     const auto pcaRecs = pcaView.records();
     CustomizedSoAView customizedView(posRecs.x(), posRecs.y(), posRecs.z(), pcaRecs.candidateDirection());
 
-    // aggregate the columns from the view with runtime check for the size
-    customSoA.deepCopy(customizedView);
+    customSoA.soaToStreamInternal(std::cout);
 
+    std::cout << "Addr x: " << customizedView.metadata().addressOf_x() << " vs " 
+    << positionConstView.metadata().addressOf_x() << std::endl;
+std::cout << "Addr y: " << customizedView.metadata().addressOf_y() << " vs " 
+    << positionConstView.metadata().addressOf_y() << std::endl;
+std::cout << "Addr z: " << customizedView.metadata().addressOf_z() << " vs " 
+    << positionConstView.metadata().addressOf_z() << std::endl;
+
+    for (size_t i = 0; i < elems; i++) {
+      std::cout << "x_Elem " << i << ": " << positionConstView.x()[i] << std::endl;
+    }
+    // aggregate the columns from the view with runtime check for the size
+    customSoA.deepCopy(customizedView, queue);
+    std::cout << std::endl;
     // building the View of the aggregated SoA
     CustomizedSoAView customizedAggregatedView{customSoA};
-
+    for (size_t i = 0; i < elems; i++) {
+      std::cout << "x_Elem " << i << ": " << customizedAggregatedView.x()[i] << std::endl;
+    }
+    std::cout << "Addr x: " << customizedAggregatedView.metadata().addressOf_x() << " vs " 
+          << positionConstView.metadata().addressOf_x() << std::endl;
+std::cout << "Addr y: " << customizedAggregatedView.metadata().addressOf_y() << " vs " 
+          << positionConstView.metadata().addressOf_y() << std::endl;
+std::cout << "Addr z: " << customizedAggregatedView.metadata().addressOf_z() << " vs " 
+          << positionConstView.metadata().addressOf_z() << std::endl;
     // Check for inequality of memory addresses
     REQUIRE(customizedAggregatedView.metadata().addressOf_x() != positionConstView.metadata().addressOf_x());
     REQUIRE(customizedAggregatedView.metadata().addressOf_y() != positionConstView.metadata().addressOf_y());
@@ -179,5 +209,7 @@ TEST_CASE("SoACustomizedView") {
     // Check for the independency of the aggregated SoA
     customizedAggregatedView.x()[3] = 0.;
     REQUIRE(customizedAggregatedView.x()[3] != positionView.x()[3]);
+    std::cout << "POPA" << std::endl;
+
   }
 }

@@ -6,7 +6,10 @@
  * with compile-time size and alignment, and accessors to the "rows" and "columns".
  */
 
+#include <ostream> 
+
 #include "FWCore/Reflection/interface/reflex.h"
+#include "HeterogeneousCore/AlpakaInterface/interface/memory.h"
 
 #include "SoACommon.h"
 #include "SoAView.h"
@@ -419,18 +422,60 @@
 
 #define _COPY_VIEW_COLUMNS_IMPL(VALUE_TYPE, CPP_TYPE, NAME)                                           \
   _SWITCH_ON_TYPE(VALUE_TYPE, /* Scalar */                                                            \
-                  memcpy(BOOST_PP_CAT(this->metadata().addressOf_, NAME)(),                           \
-                         BOOST_PP_CAT(view.metadata().addressOf_, NAME)(),                            \
-                         cms::soa::alignSize(sizeof(CPP_TYPE), alignment));                           \
+                  alpaka::memcpy(queue, \
+                            alpaka::createView(alpaka::getDev(queue),                                         \
+                              BOOST_PP_CAT(this->metadata().addressOf_, NAME)(),   \
+                              1),                           \
+                            alpaka::createView(alpaka::getDev(queue),                                           \
+                              BOOST_PP_CAT(view.metadata().addressOf_, NAME)(),   \
+                              1));                \
+                              alpaka::wait(queue);                                                                                             \
                   , /* Column */                                                                      \
-                  memcpy(BOOST_PP_CAT(this->metadata().addressOf_, NAME)(),                           \
-                         BOOST_PP_CAT(view.metadata().addressOf_, NAME)(),                            \
-                         cms::soa::alignSize(this->elements_ * sizeof(CPP_TYPE), alignment));         \
+                  std::cout << "size: " << cms::soa::alignSize(this->elements_ * sizeof(CPP_TYPE), alignment) << std::endl; \
+                  auto BOOST_PP_CAT(view_dest_, NAME) =                             alpaka::createView(alpaka::getDev(queue),                                         \
+                  BOOST_PP_CAT(this->metadata().addressOf_, NAME)(),   \
+                  cms::soa::alignSize(this->elements_ * sizeof(CPP_TYPE), alignment)); \
+                  using BOOST_PP_CAT(ViewType_, NAME) = decltype(BOOST_PP_CAT(view_dest_, NAME)); \
+                  std::cout << alpaka::trait::GetExtents<BOOST_PP_CAT(ViewType_, NAME)>{}(BOOST_PP_CAT(view_dest_, NAME))[0] << std::endl;  \
+                    std::cout << "marlo!" << std::endl;  \
+                  alpaka::memcpy(queue,                                                                 \
+                            alpaka::createView(alpaka::getDev(queue),                                         \
+                              BOOST_PP_CAT(this->metadata().addressOf_, NAME)(),   \
+                              this->elements_),                           \
+                            alpaka::createView(alpaka::getDev(queue),                                           \
+                              BOOST_PP_CAT(view.metadata().addressOf_, NAME)(),   \
+                              this->elements_)); \
+                              alpaka::wait(queue);                                                                                             \
                   , /* Eigen column */                                                                \
-                  memcpy(BOOST_PP_CAT(this->metadata().addressOf_, NAME)(),                           \
-                         BOOST_PP_CAT(view.metadata().addressOf_, NAME)(),                            \
-                         cms::soa::alignSize(this->elements_ * sizeof(CPP_TYPE::Scalar), alignment) * \
-                             CPP_TYPE::RowsAtCompileTime * CPP_TYPE::ColsAtCompileTime);)
+                  std::cout << "size: " << cms::soa::alignSize(this->elements_ * sizeof(CPP_TYPE::Scalar), alignment) * \
+                  CPP_TYPE::RowsAtCompileTime * CPP_TYPE::ColsAtCompileTime << std::endl; \
+                  alpaka::memcpy(queue,                                                               \
+                    alpaka::createView(alpaka::getDev(queue),                                         \
+                    BOOST_PP_CAT(this->metadata().addressOf_, NAME)(),   \
+                    this->elements_ * \
+                    CPP_TYPE::RowsAtCompileTime * CPP_TYPE::ColsAtCompileTime),      \
+                    alpaka::createView(alpaka::getDev(queue),                                           \
+                              BOOST_PP_CAT(view.metadata().addressOf_, NAME)(),   \
+                              this->elements_ * \
+                              CPP_TYPE::RowsAtCompileTime * CPP_TYPE::ColsAtCompileTime)); \
+                              std::cout << "size: " << cms::soa::alignSize(this->elements_ * sizeof(CPP_TYPE::Scalar), alignment) * \
+                              CPP_TYPE::RowsAtCompileTime * CPP_TYPE::ColsAtCompileTime << std::endl;  \
+                              alpaka::wait(queue);        ) 
+
+#define _COPY_VIEW_COLUMNS_IMPL_L(VALUE_TYPE, CPP_TYPE, NAME)                                           \
+_SWITCH_ON_TYPE(VALUE_TYPE, /* Scalar */                                                            \
+                memcpy(BOOST_PP_CAT(this->metadata().addressOf_, NAME)(),                           \
+                        BOOST_PP_CAT(view.metadata().addressOf_, NAME)(),                            \
+                        cms::soa::alignSize(sizeof(CPP_TYPE), alignment));                           \
+                , /* Column */                                                                      \
+                memcpy(BOOST_PP_CAT(this->metadata().addressOf_, NAME)(),                           \
+                        BOOST_PP_CAT(view.metadata().addressOf_, NAME)(),                            \
+                        cms::soa::alignSize(this->elements_ * sizeof(CPP_TYPE), alignment));         \
+                , /* Eigen column */                                                                \
+                memcpy(BOOST_PP_CAT(this->metadata().addressOf_, NAME)(),                           \
+                        BOOST_PP_CAT(view.metadata().addressOf_, NAME)(),                            \
+                        cms::soa::alignSize(this->elements_ * sizeof(CPP_TYPE::Scalar), alignment) * \
+                            CPP_TYPE::RowsAtCompileTime * CPP_TYPE::ColsAtCompileTime);) 
 
 #define _COPY_VIEW_COLUMNS(R, DATA, TYPE_NAME) BOOST_PP_EXPAND(_COPY_VIEW_COLUMNS_IMPL TYPE_NAME)
 
@@ -598,11 +643,13 @@
         return *this;                                                                                                  \
     }                                                                                                                  \
                                                                                                                        \
+    template <typename TQueue, typename = std::enable_if_t<alpaka::isQueue<TQueue>>>                                   \
     void deepCopy(ConstView const& view, TQueue& queue) {                                                              \
       if (elements_ < view.metadata().size())                                                                          \
         throw std::runtime_error(                                                                                      \
             "In deepCopy method: number of elements mismatch ");                                                       \
       _ITERATE_ON_ALL(_COPY_VIEW_COLUMNS, ~, __VA_ARGS__)                                                              \
+      alpaka::wait(queue);                                                                                             \
     }                                                                                                                  \
                                                                                                                        \
     /* ROOT read streamer */                                                                                           \

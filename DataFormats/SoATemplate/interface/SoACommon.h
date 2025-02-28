@@ -5,6 +5,7 @@
  * Definitions of SoA common parameters for SoA class generators
  */
 
+#include <alpaka/alpaka.hpp>
 #include <cstdint>
 #include <cassert>
 #include <cstring>

@@ -1,5 +1,6 @@
 <iftool name="cuda-gcc-support">
   <bin file="SoALayoutAndView_t.cu" name="testCudaSoALayoutAndView_t">
+    <use name="alpaka"/>
     <use name="boost"/>
     <use name="cuda"/>
     <use name="eigen"/>
@@ -9,6 +10,7 @@
 
 <iftool name="rocm">
   <bin file="SoALayoutAndView_t.hip.cc" name="testRocmSoALayoutAndView_t">
+    <use name="alpaka"/>
     <use name="boost"/>
     <use name="eigen"/>
     <use name="rocm"/>
@@ -17,11 +19,13 @@
 </iftool>
 
 <bin file="SoAUnitTests.cc" name="SoAUnitTests">
+  <use name="alpaka"/>
   <use name="boost"/>
   <use name="catch2"/>
 </bin>
 
 <bin file="SoACustomizedView_t.cc" name="SoACustomizedView_t">
+  <use name="alpaka"/>
   <use name="boost"/>
   <use name="catch2"/>
   <use name="eigen"/>
