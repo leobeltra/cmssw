@@ -1,6 +1,7 @@
 #include <Eigen/Core>
 #include <Eigen/Dense>
 
+#include <alpaka/alpaka.hpp>
 #include <catch.hpp>
 
 #include "DataFormats/SoATemplate/interface/SoALayout.h"
@@ -38,6 +39,9 @@ using CustomizedSoAView = CustomizedSoA::View;
 using CustomizedSoAConstView = CustomizedSoA::ConstView;
 
 TEST_CASE("Aggregate from SoA Customized View") {
+  alpaka::DevCpu devCpu = alpaka::getDevByIdx(alpaka::PlatformCpu{}, 0u);
+
+  alpaka::QueueCpuBlocking queue(devCpu);
   // common number of elements for the SoAs
   const std::size_t elems = 10;
 
@@ -87,7 +91,7 @@ TEST_CASE("Aggregate from SoA Customized View") {
 
     // PortableHostCollection that will host the aggregated columns
     PortableHostCollection<CustomizedSoA> customCollection(elems, cms::alpakatools::host());
-    customCollection.deepCopy(customView);
+    customCollection.deepCopy(customView, queue);
 
     // Check for inequality of memory addresses
     REQUIRE(customCollection.view().metadata().addressOf_x() != positionCollectionView.metadata().addressOf_x());
@@ -114,7 +118,7 @@ TEST_CASE("Aggregate from SoA Customized View") {
 
     // PortableHostCollection that will host the aggregated columns
     PortableHostCollection<CustomizedSoA> customCollection(elems, cms::alpakatools::host());
-    customCollection.deepCopy(customConstView);
+    customCollection.deepCopy(customConstView, queue);
 
     // Check for inequality of memory addresses
     REQUIRE(customCollection.view().metadata().addressOf_x() != positionCollectionView.metadata().addressOf_x());

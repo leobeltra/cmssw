@@ -4,7 +4,7 @@
 #include <cassert>
 #include <optional>
 
-#include <alpaka/alpaka.hpp>
+#include <alpaka/alpaka.hpp> 
 
 #include "DataFormats/Common/interface/Uninitialized.h"
 #include "DataFormats/Portable/interface/PortableCollectionCommon.h"
@@ -94,7 +94,8 @@ public:
     layout.ROOTStreamerCleaner();
   }
 
-  void deepCopy(ConstView const& view) { layout_.deepCopy(view); }
+  template <typename TQueue, typename = std::enable_if_t<alpaka::isQueue<TQueue>>>
+  void deepCopy(ConstView const& view, TQueue& queue) { layout_.deepCopy(view, queue); }
 
 private:
   std::optional<Buffer> buffer_;  //!

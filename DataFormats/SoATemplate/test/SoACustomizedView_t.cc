@@ -27,7 +27,7 @@ GENERATE_SOA_LAYOUT(SoAPCATemplate,
                     SOA_COLUMN(float, eigenvector_3),
                     SOA_EIGEN_COLUMN(Eigen::Vector3d, candidateDirection))
 
-using SoAPCA = SoAPCATemplate<>;
+using SoAPCA = SoAPCATemplate<cms::soa::CacheLineSize::IntelCPU>;
 using SoAPCAView = SoAPCA::View;
 using SoAPCAConstView = SoAPCA::ConstView;
 
@@ -37,7 +37,7 @@ GENERATE_SOA_LAYOUT(CustomizedSoATemplate,
                     SOA_COLUMN(float, z),
                     SOA_EIGEN_COLUMN(Eigen::Vector3d, candidateDirection))
 
-using CustomizedSoA = CustomizedSoATemplate<>;
+using CustomizedSoA = CustomizedSoATemplate<cms::soa::CacheLineSize::IntelCPU>;
 using CustomizedSoAView = CustomizedSoA::View;
 using CustomizedSoAConstView = CustomizedSoA::ConstView;
 
@@ -50,7 +50,7 @@ TEST_CASE("SoACustomizedView") {
   alpaka::QueueCpuBlocking queue(devCpu);
 
   // common number of elements for the SoAs
-  const std::size_t elems = 113;
+  const std::size_t elems = 51;
 
   // buffer sizes
   const std::size_t positionBufferSize = SoAPosition::computeDataSize(elems);
@@ -153,6 +153,7 @@ TEST_CASE("SoACustomizedView") {
     CustomizedSoAView customizedView(posRecs.x(), posRecs.y(), posRecs.z(), pcaRecs.candidateDirection());
 
     customSoA.soaToStreamInternal(std::cout);
+    position.soaToStreamInternal(std::cout);
 
 //     std::cout << "Addr x: " << customizedView.metadata().addressOf_x() << " vs " 
 //     << positionConstView.metadata().addressOf_x() << std::endl;
@@ -184,7 +185,6 @@ TEST_CASE("SoACustomizedView") {
 // std::cout << "Addr z: " << customizedAggregatedView.metadata().addressOf_z() << " vs " 
 //           << positionConstView.metadata().addressOf_z() << std::endl;
     // Check for inequality of memory addresses
-    std::cout << "POPA" << std::endl;
     REQUIRE(customizedAggregatedView.metadata().addressOf_x() != positionConstView.metadata().addressOf_x());
     REQUIRE(customizedAggregatedView.metadata().addressOf_y() != positionConstView.metadata().addressOf_y());
     REQUIRE(customizedAggregatedView.metadata().addressOf_z() != positionConstView.metadata().addressOf_z());
