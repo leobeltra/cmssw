@@ -50,7 +50,7 @@ TEST_CASE("SoACustomizedView") {
   alpaka::QueueCpuBlocking queue(devCpu);
 
   // common number of elements for the SoAs
-  const std::size_t elems = 10;
+  const std::size_t elems = 113;
 
   // buffer sizes
   const std::size_t positionBufferSize = SoAPosition::computeDataSize(elems);
@@ -154,15 +154,18 @@ TEST_CASE("SoACustomizedView") {
 
     customSoA.soaToStreamInternal(std::cout);
 
-    std::cout << "Addr x: " << customizedView.metadata().addressOf_x() << " vs " 
-    << positionConstView.metadata().addressOf_x() << std::endl;
-std::cout << "Addr y: " << customizedView.metadata().addressOf_y() << " vs " 
-    << positionConstView.metadata().addressOf_y() << std::endl;
-std::cout << "Addr z: " << customizedView.metadata().addressOf_z() << " vs " 
-    << positionConstView.metadata().addressOf_z() << std::endl;
+//     std::cout << "Addr x: " << customizedView.metadata().addressOf_x() << " vs " 
+//     << positionConstView.metadata().addressOf_x() << std::endl;
+// std::cout << "Addr y: " << customizedView.metadata().addressOf_y() << " vs " 
+//     << positionConstView.metadata().addressOf_y() << std::endl;
+// std::cout << "Addr z: " << customizedView.metadata().addressOf_z() << " vs " 
+//     << positionConstView.metadata().addressOf_z() << std::endl;
 
     for (size_t i = 0; i < elems; i++) {
       std::cout << "x_Elem " << i << ": " << positionConstView.x()[i] << std::endl;
+      std::cout << "y_Elem " << i << ": " << positionConstView.y()[i] << std::endl;
+      std::cout << "z_Elem " << i << ": " << positionConstView.z()[i] << std::endl;
+      std::cout << "direction_Elem " << i << ": " << pcaConstView[i].candidateDirection().transpose() << std::endl;
     }
     // aggregate the columns from the view with runtime check for the size
     customSoA.deepCopy(customizedView, queue);
@@ -171,14 +174,17 @@ std::cout << "Addr z: " << customizedView.metadata().addressOf_z() << " vs "
     CustomizedSoAView customizedAggregatedView{customSoA};
     for (size_t i = 0; i < elems; i++) {
       std::cout << "x_Elem " << i << ": " << customizedAggregatedView.x()[i] << std::endl;
-    }
-    std::cout << "Addr x: " << customizedAggregatedView.metadata().addressOf_x() << " vs " 
-          << positionConstView.metadata().addressOf_x() << std::endl;
-std::cout << "Addr y: " << customizedAggregatedView.metadata().addressOf_y() << " vs " 
-          << positionConstView.metadata().addressOf_y() << std::endl;
-std::cout << "Addr z: " << customizedAggregatedView.metadata().addressOf_z() << " vs " 
-          << positionConstView.metadata().addressOf_z() << std::endl;
+      std::cout << "y_Elem " << i << ": " << customizedAggregatedView.y()[i] << std::endl;
+      std::cout << "z_Elem " << i << ": " << customizedAggregatedView.z()[i] << std::endl;
+      std::cout << "direction_Elem " << i << ": " << customizedAggregatedView[i].candidateDirection().transpose() << std::endl;    }
+//     std::cout << "Addr x: " << customizedAggregatedView.metadata().addressOf_x() << " vs " 
+//           << positionConstView.metadata().addressOf_x() << std::endl;
+// std::cout << "Addr y: " << customizedAggregatedView.metadata().addressOf_y() << " vs " 
+//           << positionConstView.metadata().addressOf_y() << std::endl;
+// std::cout << "Addr z: " << customizedAggregatedView.metadata().addressOf_z() << " vs " 
+//           << positionConstView.metadata().addressOf_z() << std::endl;
     // Check for inequality of memory addresses
+    std::cout << "POPA" << std::endl;
     REQUIRE(customizedAggregatedView.metadata().addressOf_x() != positionConstView.metadata().addressOf_x());
     REQUIRE(customizedAggregatedView.metadata().addressOf_y() != positionConstView.metadata().addressOf_y());
     REQUIRE(customizedAggregatedView.metadata().addressOf_z() != positionConstView.metadata().addressOf_z());
@@ -209,7 +215,5 @@ std::cout << "Addr z: " << customizedAggregatedView.metadata().addressOf_z() << 
     // Check for the independency of the aggregated SoA
     customizedAggregatedView.x()[3] = 0.;
     REQUIRE(customizedAggregatedView.x()[3] != positionView.x()[3]);
-    std::cout << "POPA" << std::endl;
-
   }
 }

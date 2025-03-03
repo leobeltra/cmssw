@@ -420,47 +420,41 @@
 
 #define _DECLARE_SOA_DATA_MEMBER(R, DATA, TYPE_NAME) BOOST_PP_EXPAND(_DECLARE_SOA_DATA_MEMBER_IMPL TYPE_NAME)
 
-#define _COPY_VIEW_COLUMNS_IMPL(VALUE_TYPE, CPP_TYPE, NAME)                                           \
-  _SWITCH_ON_TYPE(VALUE_TYPE, /* Scalar */                                                            \
-                  alpaka::memcpy(queue, \
-                            alpaka::createView(alpaka::getDev(queue),                                         \
-                              BOOST_PP_CAT(this->metadata().addressOf_, NAME)(),   \
-                              1),                           \
-                            alpaka::createView(alpaka::getDev(queue),                                           \
-                              BOOST_PP_CAT(view.metadata().addressOf_, NAME)(),   \
-                              1));                \
-                              alpaka::wait(queue);                                                                                             \
-                  , /* Column */                                                                      \
-                  std::cout << "size: " << cms::soa::alignSize(this->elements_ * sizeof(CPP_TYPE), alignment) << std::endl; \
-                  auto BOOST_PP_CAT(view_dest_, NAME) =                             alpaka::createView(alpaka::getDev(queue),                                         \
-                  BOOST_PP_CAT(this->metadata().addressOf_, NAME)(),   \
-                  cms::soa::alignSize(this->elements_ * sizeof(CPP_TYPE), alignment)); \
-                  using BOOST_PP_CAT(ViewType_, NAME) = decltype(BOOST_PP_CAT(view_dest_, NAME)); \
-                  std::cout << alpaka::trait::GetExtents<BOOST_PP_CAT(ViewType_, NAME)>{}(BOOST_PP_CAT(view_dest_, NAME))[0] << std::endl;  \
-                    std::cout << "marlo!" << std::endl;  \
-                  alpaka::memcpy(queue,                                                                 \
-                            alpaka::createView(alpaka::getDev(queue),                                         \
-                              BOOST_PP_CAT(this->metadata().addressOf_, NAME)(),   \
-                              this->elements_),                           \
-                            alpaka::createView(alpaka::getDev(queue),                                           \
-                              BOOST_PP_CAT(view.metadata().addressOf_, NAME)(),   \
-                              this->elements_)); \
-                              alpaka::wait(queue);                                                                                             \
-                  , /* Eigen column */                                                                \
-                  std::cout << "size: " << cms::soa::alignSize(this->elements_ * sizeof(CPP_TYPE::Scalar), alignment) * \
-                  CPP_TYPE::RowsAtCompileTime * CPP_TYPE::ColsAtCompileTime << std::endl; \
-                  alpaka::memcpy(queue,                                                               \
-                    alpaka::createView(alpaka::getDev(queue),                                         \
-                    BOOST_PP_CAT(this->metadata().addressOf_, NAME)(),   \
-                    this->elements_ * \
-                    CPP_TYPE::RowsAtCompileTime * CPP_TYPE::ColsAtCompileTime),      \
-                    alpaka::createView(alpaka::getDev(queue),                                           \
-                              BOOST_PP_CAT(view.metadata().addressOf_, NAME)(),   \
-                              this->elements_ * \
-                              CPP_TYPE::RowsAtCompileTime * CPP_TYPE::ColsAtCompileTime)); \
-                              std::cout << "size: " << cms::soa::alignSize(this->elements_ * sizeof(CPP_TYPE::Scalar), alignment) * \
-                              CPP_TYPE::RowsAtCompileTime * CPP_TYPE::ColsAtCompileTime << std::endl;  \
-                              alpaka::wait(queue);        ) 
+#define _COPY_VIEW_COLUMNS_IMPL(VALUE_TYPE, CPP_TYPE, NAME)                                                            \
+  _SWITCH_ON_TYPE(VALUE_TYPE, /* Scalar */                                                                             \
+                  alpaka::memcpy(queue,                                                                                \
+                            alpaka::createView(alpaka::getDev(queue),                                                  \
+                              BOOST_PP_CAT(this->metadata().addressOf_, NAME)(),                                       \
+                              1),                                                                                      \
+                            alpaka::createView(alpaka::getDev(queue),                                                  \
+                              BOOST_PP_CAT(view.metadata().addressOf_, NAME)(),                                        \
+                              1));                                                                                     \
+                  alpaka::wait(queue);                                                                                 \
+                  , /* Column */                                                                                       \
+                  /* auto BOOST_PP_CAT(view_dest_, NAME) = alpaka::createView(alpaka::getDev(queue), */                \
+                  /* BOOST_PP_CAT(this->metadata().addressOf_, NAME)(),   */                                           \
+                  /* cms::soa::alignSize(this->elements_ * sizeof(CPP_TYPE), alignment)); */                           \
+                  /* using BOOST_PP_CAT(ViewType_, NAME) = decltype(BOOST_PP_CAT(view_dest_, NAME)); */                \
+                  /* std::cout << alpaka::trait::GetExtents<BOOST_PP_CAT(ViewType_, NAME)>{}(BOOST_PP_CAT(view_dest_, NAME))[0] << std::endl;  */ \
+                  auto BOOST_PP_CAT(NAME, Column_elems) = (alignment / sizeof(CPP_TYPE)) * ((this->elements_*sizeof(CPP_TYPE) / alignment) + 1);  \
+                  alpaka::memcpy(queue,                                                                                \
+                            alpaka::createView(alpaka::getDev(queue),                                                  \
+                              BOOST_PP_CAT(this->metadata().addressOf_, NAME)(),                                       \
+                              BOOST_PP_CAT(NAME, Column_elems)),                                                                        \
+                            alpaka::createView(alpaka::getDev(queue),                                                  \
+                              BOOST_PP_CAT(view.metadata().addressOf_, NAME)(),                                        \
+                              BOOST_PP_CAT(NAME, Column_elems)));                                                                       \
+                  alpaka::wait(queue);                                                                                 \
+                  , /* Eigen column */                                                                                 \
+                  auto BOOST_PP_CAT(NAME, Eigen_Column_elems) = (alignment / sizeof(CPP_TYPE)) * ((this->elements_*BOOST_PP_CAT(NAME, Stride_) / alignment));  \
+                  alpaka::memcpy(queue,                                                                                \
+                            alpaka::createView(alpaka::getDev(queue),                                                  \
+                              BOOST_PP_CAT(this->metadata().addressOf_, NAME)(),                                       \
+                              BOOST_PP_CAT(NAME, Eigen_Column_elems)),                              \
+                            alpaka::createView(alpaka::getDev(queue),                                                  \
+                              BOOST_PP_CAT(view.metadata().addressOf_, NAME)(),                                        \
+                              BOOST_PP_CAT(NAME, Eigen_Column_elems)));                             \
+                            alpaka::wait(queue);        ) 
 
 #define _COPY_VIEW_COLUMNS_IMPL_L(VALUE_TYPE, CPP_TYPE, NAME)                                           \
 _SWITCH_ON_TYPE(VALUE_TYPE, /* Scalar */                                                            \
