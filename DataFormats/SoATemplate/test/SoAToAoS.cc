@@ -101,6 +101,7 @@ int main() {
             view.z()[i] = static_cast<double>(i) * 3.0;
             Eigen::Vector3d::Scalar* vec = &view.a()[0];
             *vec = 11.11;
+            *(vec + 1) = 6.2;
             *(vec + 2*sizeof(Eigen::Vector3d::Scalar)) = 12.12;
             *(vec + 4*sizeof(Eigen::Vector3d::Scalar)) = 13.13;
     }
