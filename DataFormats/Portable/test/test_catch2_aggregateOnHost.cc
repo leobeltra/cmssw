@@ -48,6 +48,7 @@ TEST_CASE("Aggregate from SoA Customized View") {
   // Portable Collections
   PortableHostCollection<SoAPosition> positionCollection(elems, cms::alpakatools::host());
   PortableHostCollection<SoAPCA> pcaCollection(elems, cms::alpakatools::host());
+  // PortableDeviceCOllection ...
 
   // Portable Collection Views
   SoAPositionView& positionCollectionView = positionCollection.view();
