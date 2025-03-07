@@ -536,8 +536,85 @@
 #define _COPY_VIEW_COLUMNS(R, DATA, TYPE_NAME)                                                                         \
   BOOST_PP_IF(BOOST_PP_GREATER(BOOST_PP_TUPLE_ELEM(0, TYPE_NAME), 2),                                                  \
               BOOST_PP_EMPTY(),                                                                                        \
-              BOOST_PP_EXPAND(_COPY_VIEW_COLUMNS_IMPL TYPE_NAME))
+              BOOST_PP_EXPAND(_COPY_VIEW_COLUMNS_IMPL TYPE_NAME))         
 // clang-format on
+
+#define _DEFINE_VALUE_ELEMENT_SCALAR_MEMBER_IMPL(VALUE_TYPE, CPP_TYPE, NAME, args)                                     \
+  CPP_TYPE NAME;                                                                                                       \
+
+
+#define _DEFINE_VALUE_ELEMENT_SCALAR_MEMBERS(R, DATA, TYPE_NAME)                                                       \
+  BOOST_PP_IF(BOOST_PP_EQUAL(BOOST_PP_TUPLE_ELEM(0, TYPE_NAME), 0),                                                    \
+              BOOST_PP_EXPAND(_DEFINE_VALUE_ELEMENT_SCALAR_MEMBER_IMPL TYPE_NAME),                                     \
+              BOOST_PP_EMPTY())                                                                                        \
+             
+#define _ACCUMULATE_AOS_MEMBERS_IMPL(VALUE_TYPE, CPP_TYPE, NAME, args)                                                 \
+  _SWITCH_ON_TYPE(VALUE_TYPE,                                                                                          \
+      /* Scalar */                                                                                                     \
+      ,                                                                                                                \
+      /* Column */                                                                                                     \
+      _aos_impl_ret += sizeof(CPP_TYPE);                                                                               \
+      ,                                                                                                                \
+      /* Eigen column */                                                                                               \
+      _aos_impl_ret += sizeof(CPP_TYPE::Scalar) * CPP_TYPE::RowsAtCompileTime * CPP_TYPE::ColsAtCompileTime;           \
+  )
+
+// clang-format off
+#define _ACCUMULATE_AOS_MEMBERS(R, DATA, TYPE_NAME)                                                                   \
+  BOOST_PP_IF(BOOST_PP_GREATER(BOOST_PP_TUPLE_ELEM(0, TYPE_NAME), 2),                                                  \
+              BOOST_PP_EMPTY(),                                                                                        \
+              BOOST_PP_EXPAND(_ACCUMULATE_AOS_MEMBERS_IMPL TYPE_NAME))
+// clang-format on
+
+#define _ASSIGN_DATA_TO_AOS_IMPL(VALUE_TYPE, CPP_TYPE, NAME, args)                                                     \
+  _SWITCH_ON_TYPE(VALUE_TYPE,                                                                                          \
+      /* Scalar */                                                                                                     \
+      ,                                                                                                                \
+      aos[i].NAME = *(BOOST_PP_CAT(this->metadata().addressOf_, NAME)() + i);                                             \
+      ,                                                                                                                \
+  )
+      // aos[i].NAME = BOOST_PP_CAT(this->metadata().addressOf_, NAME)() + i;) 
+
+#define _ASSIGN_DATA_TO_AOS(R, DATA, TYPE_NAME)                                                                         \
+  BOOST_PP_IF(BOOST_PP_GREATER(BOOST_PP_TUPLE_ELEM(0, TYPE_NAME), 2),                                                  \
+              BOOST_PP_EMPTY(),                                                                                        \
+              BOOST_PP_EXPAND(_ASSIGN_DATA_TO_AOS_IMPL TYPE_NAME))
+
+#define _DEFINE_AOS_ALIAS_IMPL(VALUE_TYPE, CPP_TYPE, NAME, args)                                                       \
+  _SWITCH_ON_TYPE(VALUE_TYPE,                                                                                          \
+    /* Scalar */                                                                                                       \
+    using BOOST_PP_CAT(ParametersTypeOf_, NAME) =                                                                        \
+                    cms::soa::SoAParameters_ColumnType<cms::soa::SoAColumnType::scalar>::DataType<CPP_TYPE>;             \
+    using BOOST_PP_CAT(TypeOf_, NAME) = CPP_TYPE;                                                                        \
+    constexpr static cms::soa::SoAColumnType BOOST_PP_CAT(ColumnTypeOf_, NAME) = cms::soa::SoAColumnType::scalar;    \
+    ,                                                                                                                  \
+    /* Column */                                                                                                       \
+    using BOOST_PP_CAT(ParametersTypeOf_, NAME) =                                                                      \
+    cms::soa::SoAParameters_ColumnType<cms::soa::SoAColumnType::column>::DataType<CPP_TYPE>;                           \
+    using BOOST_PP_CAT(TypeOf_, NAME) = CPP_TYPE;                                                                      \
+    constexpr static cms::soa::SoAColumnType BOOST_PP_CAT(ColumnTypeOf_, NAME) = cms::soa::SoAColumnType::column;      \
+    ,                                                                                                                  \
+    /* Eigen column */                                                                                                 \
+    using BOOST_PP_CAT(ParametersTypeOf_, NAME) =                                                                      \
+    cms::soa::SoAParameters_ColumnType<cms::soa::SoAColumnType::eigen>::DataType<CPP_TYPE>;                           \
+    using BOOST_PP_CAT(TypeOf_, NAME) = CPP_TYPE;                                                                      \
+    constexpr static cms::soa::SoAColumnType BOOST_PP_CAT(ColumnTypeOf_, NAME) = cms::soa::SoAColumnType::eigen;      \
+  )
+
+#define _DEFINE_AOS_ALIAS(R, DATA, TYPE_NAME)                                                                          \
+  BOOST_PP_IF(BOOST_PP_GREATER(BOOST_PP_TUPLE_ELEM(0, TYPE_NAME), 2),                                                  \
+              BOOST_PP_EMPTY(),                                                                                        \
+              BOOST_PP_EXPAND(_DEFINE_AOS_ALIAS_IMPL TYPE_NAME))           
+              
+#define _DEFINE_AOS_ELEMENT_MEMBERS_IMPL(VALUE_TYPE, CPP_TYPE, NAME, args)                                             \
+  SoAValueWithConf<BOOST_PP_CAT(ColumnTypeOf_, NAME),                                                                  \
+                   typename BOOST_PP_CAT(TypeOf_, NAME)>                                                               \
+                   NAME;                                                                                                
+
+#define _DEFINE_AOS_ELEMENT_MEMBERS(R, DATA, TYPE_NAME)                                                                \
+BOOST_PP_IF(BOOST_PP_GREATER(BOOST_PP_TUPLE_ELEM(0, TYPE_NAME), 2),                                                  \
+            BOOST_PP_EMPTY(),                                                                                          \
+            BOOST_PP_DEFER(_DEFINE_AOS_ELEMENT_MEMBERS_IMPL) BOOST_PP_OBSTRUCT() TYPE_NAME)           
 
 #ifdef DEBUG
 #define _DO_RANGECHECK true
@@ -550,6 +627,54 @@
  */
 // clang-format off
 #define GENERATE_SOA_LAYOUT(CLASS, ...)                                                                                \
+template <CMS_SOA_BYTE_SIZE_TYPE ALIGNMENT = cms::soa::CacheLineSize::defaultSize,                                     \
+bool ALIGNMENT_ENFORCEMENT = cms::soa::AlignmentEnforcement::relaxed>                                                  \
+  struct BOOST_PP_CAT(AoS_, CLASS) {                                                                                   \
+    using size_type = cms::soa::size_type;                                                                             \
+    using byte_size_type = cms::soa::byte_size_type;                                                                   \
+    constexpr static byte_size_type defaultAlignment = 128;                                                            \
+    constexpr static byte_size_type alignment = ALIGNMENT;                                                             \
+    constexpr static bool alignmentEnforcement = ALIGNMENT_ENFORCEMENT;                                                \
+    constexpr static byte_size_type conditionalAlignment =                                                             \
+        alignmentEnforcement == cms::soa::AlignmentEnforcement::enforced ? alignment : 0;                              \
+    template <cms::soa::SoAColumnType COLUMN_TYPE, class C>                                                            \
+    using SoAValueWithConf = cms::soa::SoAValue<COLUMN_TYPE, C, conditionalAlignment>;                                 \
+    _ITERATE_ON_ALL(_DEFINE_AOS_ALIAS, ~, __VA_ARGS__)                                                                 \
+    /* Here it is possible to inherit from SoA to obtain Metadata::value_element or implement a new one */             \
+    struct Element {                                                                                                   \
+      _ITERATE_ON_ALL(_DEFINE_AOS_ELEMENT_MEMBERS, ~, __VA_ARGS__)                                                   \
+      struct scalar {                                                                                                  \
+        _ITERATE_ON_ALL(_DEFINE_VALUE_ELEMENT_SCALAR_MEMBERS, ~, __VA_ARGS__)                                          \
+      };                                                                                                                \
+      /* Helper function used to retrieve the total size of the element */                                             \
+      static constexpr byte_size_type element_size() {                                                                 \
+        byte_size_type _aos_impl_ret = 0;                                                                              \
+        _ITERATE_ON_ALL(_ACCUMULATE_AOS_MEMBERS, ~, __VA_ARGS__)                                                       \
+        return _aos_impl_ret;                                                                                          \
+      }                                                                                                                \
+    };                                                                                                                 \
+                                                                                                                       \
+  BOOST_PP_CAT(AoS_, CLASS)() : elem(nullptr), elements_(0) { }                                                       \
+                                                                                                                      \
+  BOOST_PP_CAT(AoS_, CLASS)(size_type elements) : elements_(elements) {                                                     \
+    elem = std::make_unique<Element[]>(elements);                                                                     \
+  }                                                                                                                   \
+                                                                                                                      \
+  /* Access operator */                                                                                               \
+  Element& operator[](size_type i) {                                                                                   \
+    return elem[i];                                                                                                 \
+  }                                                                                                                   \
+                                                                                                                      \
+  /* Access operator (const) */                                                                                          \
+  const Element& operator[](size_type i) const {                                                                         \
+    return elem[i];                                                                                                 \
+  }                                                                                                                   \
+                                                                                                                      \
+  private:                                                                                                            \
+    std::unique_ptr<Element[]> elem;                                                                                  \
+    size_type elements_;                                                                                                      \
+  };                                                                                                                  \
+                                                                                                                      \
   template <CMS_SOA_BYTE_SIZE_TYPE ALIGNMENT = cms::soa::CacheLineSize::defaultSize,                                   \
             bool ALIGNMENT_ENFORCEMENT = cms::soa::AlignmentEnforcement::relaxed>                                      \
   struct CLASS {                                                                                                       \
@@ -728,6 +853,15 @@
             "In aggregate method: number of elements mismatch ");                                                      \
       _ITERATE_ON_ALL(_COPY_VIEW_COLUMNS, ~, __VA_ARGS__)                                                              \
     }                                                                                                                  \
+                                                                                                                      \
+    SOA_HOST_ONLY                                                                                                      \
+    BOOST_PP_CAT(AoS_, CLASS)<ALIGNMENT, ALIGNMENT_ENFORCEMENT> transpose() {                                                                            \
+      BOOST_PP_CAT(AoS_, CLASS) aos(elements_);                                                                        \
+      for (size_type i = 0; i < elements_; i++) {                                                                         \
+        _ITERATE_ON_ALL(_ASSIGN_DATA_TO_AOS, ~, __VA_ARGS__)                                                            \
+      }                                                                                                                \
+      return aos;                                                                                                       \
+    }                                                                                                                  \
                                                                                                                        \
     /* ROOT read streamer */                                                                                           \
     template <typename T>                                                                                              \
@@ -770,11 +904,6 @@
     /* This will be handled later as we handle the integration of the view as a subclass of the layout.             */ \
                                                                                                                        \
   };                                                                                                                   \
-                                                                                                                       \
-template <CMS_SOA_BYTE_SIZE_TYPE ALIGNMENT = cms::soa::CacheLineSize::defaultSize,                                     \
-bool ALIGNMENT_ENFORCEMENT = cms::soa::AlignmentEnforcement::relaxed>                                                  \
-  struct BOOST_PP_CAT(AoS_, CLASS) {                                                                                   \
-                                                                                                         };                                                                                                       \
 // clang-format on
 
 #endif  // DataFormats_SoATemplate_interface_SoALayout_h

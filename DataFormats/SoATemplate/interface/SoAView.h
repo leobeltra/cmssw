@@ -529,7 +529,8 @@ namespace cms::soa {
 
 // clang-format off
 #define _STRUCT_ELEMENT_INITIALIZERS_IMPL(LAYOUT_NAME, LAYOUT_MEMBER, LOCAL_NAME)                                      \
-      (BOOST_PP_CAT(LOCAL_NAME, _){parent_.metadata().BOOST_PP_CAT(parametersOf_, LOCAL_NAME)()})  // clang-format on
+      (BOOST_PP_CAT(LOCAL_NAME, _){parent_.metadata().BOOST_PP_CAT(parametersOf_, LOCAL_NAME)()})  
+// clang-format on
 
 #define _STRUCT_ELEMENT_INITIALIZERS(R, DATA, LAYOUT_MEMBER_NAME) \
   BOOST_PP_EXPAND(_STRUCT_ELEMENT_INITIALIZERS_IMPL LAYOUT_MEMBER_NAME)

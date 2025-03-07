@@ -52,6 +52,7 @@ GENERATE_SOA_LAYOUT(SoATemplate,
 using SoA = SoATemplate<>;
 using SoAView = SoA::View;
 using SoAConstView = SoA::ConstView;
+using AoS = AoS_SoATemplate<>;
 
 template <typename View>
 void printSoAView(View view) {
@@ -111,6 +112,22 @@ int main() {
     soa.soaToStreamInternal(std::cout);
     printSoAView<SoAView>(view);
 
+    AoS aos(numElements);
 
+    AoS soa_to_aos = soa.transpose();
 
+    for (size_t i = 0; i < numElements; i++) {
+        std::cout << "Element " << i << " :" << soa_to_aos[i].x << soa_to_aos[i].y << soa_to_aos[i].z << std::endl;
+    }
+
+    // Calcolare la differenza di indirizzo tra x e y per il primo elemento
+    std::ptrdiff_t offset = reinterpret_cast<char*>(&soa_to_aos[0].y) - 
+    reinterpret_cast<char*>(&soa_to_aos[0].x);
+
+    std::cout << "Offset tra x e y: " << offset << " bytes\n"; 
+
+    std::ptrdiff_t offsetsoa = reinterpret_cast<char*>(&view[0].y()) - 
+    reinterpret_cast<char*>(&view[0].x());
+
+    std::cout << "Offset tra x e y: " << offsetsoa << " bytes\n";
 }
