@@ -1,3 +1,6 @@
+
+#include <tuple> /* clang -E -fkeep-system-includes */
+
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wconstant-logical-operand"
 #pragma clang diagnostic ignored "-Wimplicit-int-float-conversion"
@@ -48471,6 +48474,8 @@ namespace Eigen {
 }  // namespace Eigen
 #pragma clang diagnostic pop
 
+#include <iostream> /* clang -E -fkeep-system-includes */
+
 #include <cassert> /* clang -E -fkeep-system-includes */
 
 #include <cstdint> /* clang -E -fkeep-system-includes */
@@ -48965,10 +48970,207 @@ namespace cms::soa {
     inline __attribute__((always_inline)) ConstValueTraits(size_type, const typename C::ConstParams&) {}
   };
 }  // namespace cms::soa
+template <typename T>
+class has_description {
+private:
+  template <typename U>
+  static auto test(int) -> decltype(std::declval<U>().description(), std::true_type());
+  template <typename>
+  static std::false_type test(...);
 
+public:
+  static constexpr bool value = std::is_same<decltype(test<T>(0)), std::true_type>::value;
+};
+template <typename T>
+class has_someNumber {
+private:
+  template <typename U>
+  static auto test(int) -> decltype(std::declval<U>().someNumber(), std::true_type());
+  template <typename>
+  static std::false_type test(...);
+
+public:
+  static constexpr bool value = std::is_same<decltype(test<T>(0)), std::true_type>::value;
+};
+template <typename T>
+class has_metadata {
+private:
+  template <typename U>
+  static auto test(int) -> decltype(std::declval<U>().metadata(), std::true_type());
+  template <typename>
+  static std::false_type test(...);
+
+public:
+  static constexpr bool value = std::is_same<decltype(test<T>(0)), std::true_type>::value;
+};
+template <typename T>
+class has_x {
+private:
+  template <typename U>
+  static auto test(int) -> decltype(std::declval<U>().x(), std::true_type());
+  template <typename>
+  static std::false_type test(...);
+
+public:
+  static constexpr bool value = std::is_same<decltype(test<T>(0)), std::true_type>::value;
+};
+template <typename T>
+class has_y {
+private:
+  template <typename U>
+  static auto test(int) -> decltype(std::declval<U>().y(), std::true_type());
+  template <typename>
+  static std::false_type test(...);
+
+public:
+  static constexpr bool value = std::is_same<decltype(test<T>(0)), std::true_type>::value;
+};
+template <typename T>
+class has_z {
+private:
+  template <typename U>
+  static auto test(int) -> decltype(std::declval<U>().z(), std::true_type());
+  template <typename>
+  static std::false_type test(...);
+
+public:
+  static constexpr bool value = std::is_same<decltype(test<T>(0)), std::true_type>::value;
+};
+template <typename T>
+class has_a {
+private:
+  template <typename U>
+  static auto test(int) -> decltype(std::declval<U>().a(), std::true_type());
+  template <typename>
+  static std::false_type test(...);
+
+public:
+  static constexpr bool value = std::is_same<decltype(test<T>(0)), std::true_type>::value;
+};
+template <typename T>
+class has_b {
+private:
+  template <typename U>
+  static auto test(int) -> decltype(std::declval<U>().b(), std::true_type());
+  template <typename>
+  static std::false_type test(...);
+
+public:
+  static constexpr bool value = std::is_same<decltype(test<T>(0)), std::true_type>::value;
+};
+template <typename T>
+class has_r {
+private:
+  template <typename U>
+  static auto test(int) -> decltype(std::declval<U>().r(), std::true_type());
+  template <typename>
+  static std::false_type test(...);
+
+public:
+  static constexpr bool value = std::is_same<decltype(test<T>(0)), std::true_type>::value;
+};
+template <typename T>
+class has_p_x {
+private:
+  template <typename U>
+  static auto test(int) -> decltype(std::declval<U>().p_x(), std::true_type());
+  template <typename>
+  static std::false_type test(...);
+
+public:
+  static constexpr bool value = std::is_same<decltype(test<T>(0)), std::true_type>::value;
+};
+template <typename T>
+class has_p_y {
+private:
+  template <typename U>
+  static auto test(int) -> decltype(std::declval<U>().p_y(), std::true_type());
+  template <typename>
+  static std::false_type test(...);
+
+public:
+  static constexpr bool value = std::is_same<decltype(test<T>(0)), std::true_type>::value;
+};
+template <typename T>
+class has_p_z {
+private:
+  template <typename U>
+  static auto test(int) -> decltype(std::declval<U>().p_z(), std::true_type());
+  template <typename>
+  static std::false_type test(...);
+
+public:
+  static constexpr bool value = std::is_same<decltype(test<T>(0)), std::true_type>::value;
+};
+template <typename T>
+class has_v_a {
+private:
+  template <typename U>
+  static auto test(int) -> decltype(std::declval<U>().v_a(), std::true_type());
+  template <typename>
+  static std::false_type test(...);
+
+public:
+  static constexpr bool value = std::is_same<decltype(test<T>(0)), std::true_type>::value;
+};
+template <typename T>
+class has_v_b {
+private:
+  template <typename U>
+  static auto test(int) -> decltype(std::declval<U>().v_b(), std::true_type());
+  template <typename>
+  static std::false_type test(...);
+
+public:
+  static constexpr bool value = std::is_same<decltype(test<T>(0)), std::true_type>::value;
+};
+template <typename T>
+class has_v_r {
+private:
+  template <typename U>
+  static auto test(int) -> decltype(std::declval<U>().v_r(), std::true_type());
+  template <typename>
+  static std::false_type test(...);
+
+public:
+  static constexpr bool value = std::is_same<decltype(test<T>(0)), std::true_type>::value;
+};
+template <typename T>
+class has_p_a {
+private:
+  template <typename U>
+  static auto test(int) -> decltype(std::declval<U>().p_a(), std::true_type());
+  template <typename>
+  static std::false_type test(...);
+
+public:
+  static constexpr bool value = std::is_same<decltype(test<T>(0)), std::true_type>::value;
+};
+template <typename T>
+class has_p_b {
+private:
+  template <typename U>
+  static auto test(int) -> decltype(std::declval<U>().p_b(), std::true_type());
+  template <typename>
+  static std::false_type test(...);
+
+public:
+  static constexpr bool value = std::is_same<decltype(test<T>(0)), std::true_type>::value;
+};
+template <typename T>
+class has_num {
+private:
+  template <typename U>
+  static auto test(int) -> decltype(std::declval<U>().num(), std::true_type());
+  template <typename>
+  static std::false_type test(...);
+
+public:
+  static constexpr bool value = std::is_same<decltype(test<T>(0)), std::true_type>::value;
+};
 template <std::size_t ALIGNMENT = cms::soa::CacheLineSize::defaultSize,
           bool ALIGNMENT_ENFORCEMENT = cms::soa::AlignmentEnforcement::relaxed>
-struct AoS_SoAPositionTemplate {
+struct AoS_SoATemplate {
   using size_type = cms::soa::size_type;
   using byte_size_type = cms::soa::byte_size_type;
   constexpr static byte_size_type defaultAlignment = 128;
@@ -48978,48 +49180,64 @@ struct AoS_SoAPositionTemplate {
       alignmentEnforcement == cms::soa::AlignmentEnforcement::enforced ? alignment : 0;
   template <cms::soa::SoAColumnType COLUMN_TYPE, class C>
   using SoAValueWithConf = cms::soa::SoAValue<COLUMN_TYPE, C, conditionalAlignment>;
-  using ParametersTypeOf_x = cms::soa::SoAParameters_ColumnType<cms::soa::SoAColumnType::column>::DataType<float>;
-  using TypeOf_x = float;
+  using ParametersTypeOf_x = cms::soa::SoAParameters_ColumnType<cms::soa::SoAColumnType::column>::DataType<double>;
+  using TypeOf_x = double;
   constexpr static cms::soa::SoAColumnType ColumnTypeOf_x = cms::soa::SoAColumnType::column;
-  using ParametersTypeOf_y = cms::soa::SoAParameters_ColumnType<cms::soa::SoAColumnType::column>::DataType<float>;
-  using TypeOf_y = float;
+  using ParametersTypeOf_y = cms::soa::SoAParameters_ColumnType<cms::soa::SoAColumnType::column>::DataType<double>;
+  using TypeOf_y = double;
   constexpr static cms::soa::SoAColumnType ColumnTypeOf_y = cms::soa::SoAColumnType::column;
-  using ParametersTypeOf_z = cms::soa::SoAParameters_ColumnType<cms::soa::SoAColumnType::column>::DataType<float>;
-  using TypeOf_z = float;
+  using ParametersTypeOf_z = cms::soa::SoAParameters_ColumnType<cms::soa::SoAColumnType::column>::DataType<double>;
+  using TypeOf_z = double;
   constexpr static cms::soa::SoAColumnType ColumnTypeOf_z = cms::soa::SoAColumnType::column;
-  using ParametersTypeOf_detectorType =
-      cms::soa::SoAParameters_ColumnType<cms::soa::SoAColumnType::scalar>::DataType<int>;
-  using TypeOf_detectorType = int;
-  constexpr static cms::soa::SoAColumnType ColumnTypeOf_detectorType = cms::soa::SoAColumnType::scalar;
+  using ParametersTypeOf_a =
+      cms::soa::SoAParameters_ColumnType<cms::soa::SoAColumnType::eigen>::DataType<Eigen::Vector3d>;
+  using TypeOf_a = Eigen::Vector3d;
+  constexpr static cms::soa::SoAColumnType ColumnTypeOf_a = cms::soa::SoAColumnType::eigen;
   struct Element {
-    BOOST_PP_DEFER(_DEFINE_AOS_ELEMENT_MEMBERS_IMPL)
-    BOOST_PP_OBSTRUCT()(1, float, x, ~) BOOST_PP_DEFER(_DEFINE_AOS_ELEMENT_MEMBERS_IMPL)
-        BOOST_PP_OBSTRUCT()(1, float, y, ~) BOOST_PP_DEFER(_DEFINE_AOS_ELEMENT_MEMBERS_IMPL)
-            BOOST_PP_OBSTRUCT()(1, float, z, ~) BOOST_PP_DEFER(_DEFINE_AOS_ELEMENT_MEMBERS_IMPL)
-                BOOST_PP_OBSTRUCT()(0, int, detectorType, ~) struct scalar {
-      int detectorType;
-    };
+    Element(double x = 0, double y = 0, double z = 0, Eigen::Vector3d::Scalar* a = nullptr)
+        : x_(x), y_(y), z_(z), a_(a) {}
+    double x_;
+    double y_;
+    double z_;
+    Eigen::Map<Eigen::Vector3d> a_;
+    struct scalar {};
+    double& x() { return x_; }
+    double& y() { return y_; }
+    double& z() { return z_; }
+    Eigen::Map<Eigen::Vector3d>& a() { return a_; }
+    const double& x() const { return x_; }
+    const double& y() const { return y_; }
+    const double& z() const { return z_; }
+    const Eigen::Map<Eigen::Vector3d>& a() const { return a_; }
     static constexpr byte_size_type element_size() {
       byte_size_type _aos_impl_ret = 0;
-      _aos_impl_ret += sizeof(float);
-      _aos_impl_ret += sizeof(float);
-      _aos_impl_ret += sizeof(float);
+      _aos_impl_ret += sizeof(double);
+      _aos_impl_ret += sizeof(double);
+      _aos_impl_ret += sizeof(double);
+      _aos_impl_ret +=
+          sizeof(Eigen::Vector3d::Scalar) * Eigen::Vector3d::RowsAtCompileTime * Eigen::Vector3d::ColsAtCompileTime;
       return _aos_impl_ret;
     }
   };
-  AoS_SoAPositionTemplate() : elem(nullptr), elements_(0) {}
-  AoS_SoAPositionTemplate(size_type elements) : elements_(elements) { elem = std::make_unique<Element[]>(elements); }
-  Element& operator[](size_type i) { return elem[i]; }
-  const Element& operator[](size_type i) const { return elem[i]; }
+  AoS_SoATemplate() : elem_(nullptr), elements_(0) {}
+  AoS_SoATemplate(size_type elements, std::byte* mem) : elements_(elements) {
+    elem_ = reinterpret_cast<Element*>(mem);
+    for (size_type i = 0; i < elements; i++) {
+      new (&elem_[i]) Element();
+    }
+  }
+  static constexpr byte_size_type aos_size(size_type elements) { return elements * Element::element_size(); }
+  Element& operator[](size_type i) { return elem_[i]; }
+  const Element& operator[](size_type i) const { return elem_[i]; }
 
 private:
-  std::unique_ptr<Element[]> elem;
+  Element* elem_;
   size_type elements_;
 };
 template <std::size_t ALIGNMENT = cms::soa::CacheLineSize::defaultSize,
           bool ALIGNMENT_ENFORCEMENT = cms::soa::AlignmentEnforcement::relaxed>
-struct SoAPositionTemplate {
-  using self_type = SoAPositionTemplate;
+struct SoATemplate {
+  using self_type = SoATemplate;
   using AlignmentEnforcement = cms::soa::AlignmentEnforcement;
   using size_type = cms::soa::size_type;
   using byte_size_type = cms::soa::byte_size_type;
@@ -49048,131 +49266,141 @@ struct SoAPositionTemplate {
       computeMethodsNumber().second <= 1,
       "There can be at most one SOA_CONST_METHODS macro. Please declare all your methods inside the same macro.");
   void soaToStreamInternal(std::ostream& _soa_impl_os) const {
-    _soa_impl_os << "SoAPositionTemplate"
+    _soa_impl_os << "SoATemplate"
                     "("
                  << elements_ << " elements, byte alignement= " << alignment << ", @" << mem_ << "): " << std::endl;
     _soa_impl_os << "  sizeof("
-                    "SoAPositionTemplate"
+                    "SoATemplate"
                     "): "
-                 << sizeof(SoAPositionTemplate) << std::endl;
+                 << sizeof(SoATemplate) << std::endl;
     byte_size_type _soa_impl_offset = 0;
     _soa_impl_os << " Column "
                     "x"
                     " at offset "
-                 << _soa_impl_offset << " has size " << sizeof(float) * elements_ << " and padding "
-                 << cms::soa::alignSize(elements_ * sizeof(float), alignment) - (elements_ * sizeof(float))
+                 << _soa_impl_offset << " has size " << sizeof(double) * elements_ << " and padding "
+                 << cms::soa::alignSize(elements_ * sizeof(double), alignment) - (elements_ * sizeof(double))
                  << std::endl;
-    _soa_impl_offset += cms::soa::alignSize(elements_ * sizeof(float), alignment);
+    _soa_impl_offset += cms::soa::alignSize(elements_ * sizeof(double), alignment);
     _soa_impl_os << " Column "
                     "y"
                     " at offset "
-                 << _soa_impl_offset << " has size " << sizeof(float) * elements_ << " and padding "
-                 << cms::soa::alignSize(elements_ * sizeof(float), alignment) - (elements_ * sizeof(float))
+                 << _soa_impl_offset << " has size " << sizeof(double) * elements_ << " and padding "
+                 << cms::soa::alignSize(elements_ * sizeof(double), alignment) - (elements_ * sizeof(double))
                  << std::endl;
-    _soa_impl_offset += cms::soa::alignSize(elements_ * sizeof(float), alignment);
+    _soa_impl_offset += cms::soa::alignSize(elements_ * sizeof(double), alignment);
     _soa_impl_os << " Column "
                     "z"
                     " at offset "
-                 << _soa_impl_offset << " has size " << sizeof(float) * elements_ << " and padding "
-                 << cms::soa::alignSize(elements_ * sizeof(float), alignment) - (elements_ * sizeof(float))
+                 << _soa_impl_offset << " has size " << sizeof(double) * elements_ << " and padding "
+                 << cms::soa::alignSize(elements_ * sizeof(double), alignment) - (elements_ * sizeof(double))
                  << std::endl;
-    _soa_impl_offset += cms::soa::alignSize(elements_ * sizeof(float), alignment);
-    _soa_impl_os << " Scalar "
-                    "detectorType"
+    _soa_impl_offset += cms::soa::alignSize(elements_ * sizeof(double), alignment);
+    _soa_impl_os << " Eigen value "
+                    "a"
                     " at offset "
-                 << _soa_impl_offset << " has size " << sizeof(int) << " and padding "
-                 << ((sizeof(int) - 1) / alignment + 1) * alignment - sizeof(int) << std::endl;
-    _soa_impl_offset += ((sizeof(int) - 1) / alignment + 1) * alignment;
+                 << _soa_impl_offset << " has dimension "
+                 << "(" << Eigen::Vector3d::RowsAtCompileTime << " x " << Eigen::Vector3d::ColsAtCompileTime << ")"
+                 << " and per column size " << sizeof(Eigen::Vector3d::Scalar) * elements_ << " and padding "
+                 << cms::soa::alignSize(elements_ * sizeof(Eigen::Vector3d::Scalar), alignment) -
+                        (elements_ * sizeof(Eigen::Vector3d::Scalar))
+                 << std::endl;
+    _soa_impl_offset += cms::soa::alignSize(elements_ * sizeof(Eigen::Vector3d::Scalar), alignment) *
+                        Eigen::Vector3d::RowsAtCompileTime * Eigen::Vector3d::ColsAtCompileTime;
     _soa_impl_os << "Final offset = " << _soa_impl_offset << " computeDataSize(...): " << computeDataSize(elements_)
                  << std::endl;
     _soa_impl_os << std::endl;
   }
   static constexpr byte_size_type computeDataSize(size_type elements) {
     byte_size_type _soa_impl_ret = 0;
-    _soa_impl_ret += cms::soa::alignSize(elements * sizeof(float), alignment);
-    _soa_impl_ret += cms::soa::alignSize(elements * sizeof(float), alignment);
-    _soa_impl_ret += cms::soa::alignSize(elements * sizeof(float), alignment);
-    _soa_impl_ret += cms::soa::alignSize(sizeof(int), alignment);
+    _soa_impl_ret += cms::soa::alignSize(elements * sizeof(double), alignment);
+    _soa_impl_ret += cms::soa::alignSize(elements * sizeof(double), alignment);
+    _soa_impl_ret += cms::soa::alignSize(elements * sizeof(double), alignment);
+    _soa_impl_ret += cms::soa::alignSize(elements * sizeof(Eigen::Vector3d::Scalar), alignment) *
+                     Eigen::Vector3d::RowsAtCompileTime * Eigen::Vector3d::ColsAtCompileTime;
     return _soa_impl_ret;
   }
   struct Metadata {
-    friend SoAPositionTemplate;
+    friend SoATemplate;
     inline __attribute__((always_inline)) size_type size() const { return parent_.elements_; }
     inline __attribute__((always_inline)) byte_size_type byteSize() const { return parent_.byteSize_; }
-    inline __attribute__((always_inline)) byte_size_type alignment() const { return SoAPositionTemplate::alignment; }
+    inline __attribute__((always_inline)) byte_size_type alignment() const { return SoATemplate::alignment; }
     inline __attribute__((always_inline)) std::byte* data() { return parent_.mem_; }
     inline __attribute__((always_inline)) const std::byte* data() const { return parent_.mem_; }
     inline __attribute__((always_inline)) std::byte* nextByte() const { return parent_.mem_ + parent_.byteSize_; }
-    inline __attribute__((always_inline)) SoAPositionTemplate cloneToNewAddress(std::byte* _soa_impl_addr) const {
-      return SoAPositionTemplate(_soa_impl_addr, parent_.elements_);
+    inline __attribute__((always_inline)) SoATemplate cloneToNewAddress(std::byte* _soa_impl_addr) const {
+      return SoATemplate(_soa_impl_addr, parent_.elements_);
     }
-    using ParametersTypeOf_x = cms::soa::SoAParameters_ColumnType<cms::soa::SoAColumnType::column>::DataType<float>;
+    using ParametersTypeOf_x = cms::soa::SoAParameters_ColumnType<cms::soa::SoAColumnType::column>::DataType<double>;
     inline __attribute__((always_inline)) ParametersTypeOf_x parametersOf_x() const {
       return ParametersTypeOf_x(parent_.x_, parent_.metadata().size());
     }
-    inline __attribute__((always_inline)) float const* addressOf_x() const {
+    inline __attribute__((always_inline)) double const* addressOf_x() const {
       return parent_.metadata().parametersOf_x().addr_;
     }
-    inline __attribute__((always_inline)) float* addressOf_x() { return parent_.metadata().parametersOf_x().addr_; }
+    inline __attribute__((always_inline)) double* addressOf_x() { return parent_.metadata().parametersOf_x().addr_; }
     inline __attribute__((always_inline)) byte_size_type xPitch() const {
-      return cms::soa::alignSize(parent_.elements_ * sizeof(float), ParentClass::alignment);
+      return cms::soa::alignSize(parent_.elements_ * sizeof(double), ParentClass::alignment);
     }
-    using TypeOf_x = float;
+    using TypeOf_x = double;
     constexpr static cms::soa::SoAColumnType ColumnTypeOf_x = cms::soa::SoAColumnType::column;
-    using ParametersTypeOf_y = cms::soa::SoAParameters_ColumnType<cms::soa::SoAColumnType::column>::DataType<float>;
+    using ParametersTypeOf_y = cms::soa::SoAParameters_ColumnType<cms::soa::SoAColumnType::column>::DataType<double>;
     inline __attribute__((always_inline)) ParametersTypeOf_y parametersOf_y() const {
       return ParametersTypeOf_y(parent_.y_, parent_.metadata().size());
     }
-    inline __attribute__((always_inline)) float const* addressOf_y() const {
+    inline __attribute__((always_inline)) double const* addressOf_y() const {
       return parent_.metadata().parametersOf_y().addr_;
     }
-    inline __attribute__((always_inline)) float* addressOf_y() { return parent_.metadata().parametersOf_y().addr_; }
+    inline __attribute__((always_inline)) double* addressOf_y() { return parent_.metadata().parametersOf_y().addr_; }
     inline __attribute__((always_inline)) byte_size_type yPitch() const {
-      return cms::soa::alignSize(parent_.elements_ * sizeof(float), ParentClass::alignment);
+      return cms::soa::alignSize(parent_.elements_ * sizeof(double), ParentClass::alignment);
     }
-    using TypeOf_y = float;
+    using TypeOf_y = double;
     constexpr static cms::soa::SoAColumnType ColumnTypeOf_y = cms::soa::SoAColumnType::column;
-    using ParametersTypeOf_z = cms::soa::SoAParameters_ColumnType<cms::soa::SoAColumnType::column>::DataType<float>;
+    using ParametersTypeOf_z = cms::soa::SoAParameters_ColumnType<cms::soa::SoAColumnType::column>::DataType<double>;
     inline __attribute__((always_inline)) ParametersTypeOf_z parametersOf_z() const {
       return ParametersTypeOf_z(parent_.z_, parent_.metadata().size());
     }
-    inline __attribute__((always_inline)) float const* addressOf_z() const {
+    inline __attribute__((always_inline)) double const* addressOf_z() const {
       return parent_.metadata().parametersOf_z().addr_;
     }
-    inline __attribute__((always_inline)) float* addressOf_z() { return parent_.metadata().parametersOf_z().addr_; }
+    inline __attribute__((always_inline)) double* addressOf_z() { return parent_.metadata().parametersOf_z().addr_; }
     inline __attribute__((always_inline)) byte_size_type zPitch() const {
-      return cms::soa::alignSize(parent_.elements_ * sizeof(float), ParentClass::alignment);
+      return cms::soa::alignSize(parent_.elements_ * sizeof(double), ParentClass::alignment);
     }
-    using TypeOf_z = float;
+    using TypeOf_z = double;
     constexpr static cms::soa::SoAColumnType ColumnTypeOf_z = cms::soa::SoAColumnType::column;
-    byte_size_type detectorTypePitch() const { return cms::soa::alignSize(sizeof(int), ParentClass::alignment); }
-    using TypeOf_detectorType = int;
-    constexpr static cms::soa::SoAColumnType ColumnTypeOf_detectorType = cms::soa::SoAColumnType::scalar;
-    inline __attribute__((always_inline)) int const* addressOf_detectorType() const {
-      return parent_.metadata().parametersOf_detectorType().addr_;
+    using ParametersTypeOf_a =
+        cms::soa::SoAParameters_ColumnType<cms::soa::SoAColumnType::eigen>::DataType<Eigen::Vector3d>;
+    inline __attribute__((always_inline)) ParametersTypeOf_a parametersOf_a() const {
+      return ParametersTypeOf_a(parent_.a_, parent_.aStride_, parent_.metadata().size());
     }
-    using ParametersTypeOf_detectorType =
-        cms::soa::SoAParameters_ColumnType<cms::soa::SoAColumnType::scalar>::DataType<int>;
-    inline __attribute__((always_inline)) ParametersTypeOf_detectorType parametersOf_detectorType() const {
-      return ParametersTypeOf_detectorType(parent_.detectorType_, parent_.metadata().size());
+    inline __attribute__((always_inline)) byte_size_type aPitch() const {
+      return cms::soa::alignSize(parent_.elements_ * sizeof(Eigen::Vector3d::Scalar), ParentClass::alignment) *
+             Eigen::Vector3d::RowsAtCompileTime * Eigen::Vector3d::ColsAtCompileTime;
     }
-    inline __attribute__((always_inline)) int* addressOf_detectorType() {
-      return parent_.metadata().parametersOf_detectorType().addr_;
+    using TypeOf_a = Eigen::Vector3d;
+    constexpr static cms::soa::SoAColumnType ColumnTypeOf_a = cms::soa::SoAColumnType::eigen;
+    inline __attribute__((always_inline)) Eigen::Vector3d::Scalar const* addressOf_a() const {
+      return parent_.metadata().parametersOf_a().addr_;
+    }
+    inline __attribute__((always_inline)) Eigen::Vector3d::Scalar* addressOf_a() {
+      return parent_.metadata().parametersOf_a().addr_;
     }
     struct value_element {
-      inline __attribute__((always_inline)) value_element(float x, float y, float z) : x{x}, y{y}, z{z} {}
-      float x;
-      float y;
-      float z;
+      inline __attribute__((always_inline)) value_element(double x, double y, double z, Eigen::Vector3d a)
+          : x{x}, y{y}, z{z}, a{a} {}
+      double x;
+      double y;
+      double z;
+      Eigen::Vector3d a;
     };
     Metadata& operator=(const Metadata&) = delete;
     Metadata(const Metadata&) = delete;
 
   private:
-    inline __attribute__((always_inline)) Metadata(const SoAPositionTemplate& _soa_impl_parent)
-        : parent_(_soa_impl_parent) {}
-    const SoAPositionTemplate& parent_;
-    using ParentClass = SoAPositionTemplate;
+    inline __attribute__((always_inline)) Metadata(const SoATemplate& _soa_impl_parent) : parent_(_soa_impl_parent) {}
+    const SoATemplate& parent_;
+    using ParentClass = SoATemplate;
   };
   friend Metadata;
   inline __attribute__((always_inline)) const Metadata metadata() const { return Metadata(*this); }
@@ -49180,7 +49408,7 @@ struct SoAPositionTemplate {
   template <std::size_t VIEW_ALIGNMENT, bool VIEW_ALIGNMENT_ENFORCEMENT, bool RESTRICT_QUALIFY, bool RANGE_CHECKING>
   struct ConstViewTemplateFreeParams {
     using self_type = ConstViewTemplateFreeParams;
-    using SoAPositionTemplate_parametrized = SoAPositionTemplate<VIEW_ALIGNMENT, VIEW_ALIGNMENT_ENFORCEMENT>;
+    using SoATemplate_parametrized = SoATemplate<VIEW_ALIGNMENT, VIEW_ALIGNMENT_ENFORCEMENT>;
     using size_type = cms::soa::size_type;
     using byte_size_type = cms::soa::byte_size_type;
     using AlignmentEnforcement = cms::soa::AlignmentEnforcement;
@@ -49202,11 +49430,10 @@ struct SoAPositionTemplate {
     struct Metadata {
       friend ConstViewTemplateFreeParams;
       inline __attribute__((always_inline)) size_type size() const { return parent_.elements_; }
-      using TypeOf_instance_SoAPositionTemplate = SoAPositionTemplate_parametrized;
-      using TypeOf_x = typename TypeOf_instance_SoAPositionTemplate::Metadata::TypeOf_x;
-      using ParametersTypeOf_x = typename TypeOf_instance_SoAPositionTemplate::Metadata::ParametersTypeOf_x;
-      constexpr static cms::soa::SoAColumnType ColumnTypeOf_x =
-          TypeOf_instance_SoAPositionTemplate::Metadata::ColumnTypeOf_x;
+      using TypeOf_instance_SoATemplate = SoATemplate_parametrized;
+      using TypeOf_x = typename TypeOf_instance_SoATemplate::Metadata::TypeOf_x;
+      using ParametersTypeOf_x = typename TypeOf_instance_SoATemplate::Metadata::ParametersTypeOf_x;
+      constexpr static cms::soa::SoAColumnType ColumnTypeOf_x = TypeOf_instance_SoATemplate::Metadata::ColumnTypeOf_x;
       using ConstAccessorOf_x = typename cms::soa::SoAAccessors<typename Metadata::TypeOf_x>::template ColumnType<
           ColumnTypeOf_x>::template AccessType<cms::soa::SoAAccessType::constAccess>::
           template Alignment<conditionalAlignment>::template RestrictQualifier<restrictQualify>;
@@ -49214,10 +49441,9 @@ struct SoAPositionTemplate {
           ColumnTypeOf_x>::template AccessType<cms::soa::SoAAccessType::mutableAccess>::
           template Alignment<conditionalAlignment>::template RestrictQualifier<restrictQualify>;
       inline __attribute__((always_inline)) const auto parametersOf_x() const { return (parent_.xParameters_); };
-      using TypeOf_y = typename TypeOf_instance_SoAPositionTemplate::Metadata::TypeOf_y;
-      using ParametersTypeOf_y = typename TypeOf_instance_SoAPositionTemplate::Metadata::ParametersTypeOf_y;
-      constexpr static cms::soa::SoAColumnType ColumnTypeOf_y =
-          TypeOf_instance_SoAPositionTemplate::Metadata::ColumnTypeOf_y;
+      using TypeOf_y = typename TypeOf_instance_SoATemplate::Metadata::TypeOf_y;
+      using ParametersTypeOf_y = typename TypeOf_instance_SoATemplate::Metadata::ParametersTypeOf_y;
+      constexpr static cms::soa::SoAColumnType ColumnTypeOf_y = TypeOf_instance_SoATemplate::Metadata::ColumnTypeOf_y;
       using ConstAccessorOf_y = typename cms::soa::SoAAccessors<typename Metadata::TypeOf_y>::template ColumnType<
           ColumnTypeOf_y>::template AccessType<cms::soa::SoAAccessType::constAccess>::
           template Alignment<conditionalAlignment>::template RestrictQualifier<restrictQualify>;
@@ -49225,10 +49451,9 @@ struct SoAPositionTemplate {
           ColumnTypeOf_y>::template AccessType<cms::soa::SoAAccessType::mutableAccess>::
           template Alignment<conditionalAlignment>::template RestrictQualifier<restrictQualify>;
       inline __attribute__((always_inline)) const auto parametersOf_y() const { return (parent_.yParameters_); };
-      using TypeOf_z = typename TypeOf_instance_SoAPositionTemplate::Metadata::TypeOf_z;
-      using ParametersTypeOf_z = typename TypeOf_instance_SoAPositionTemplate::Metadata::ParametersTypeOf_z;
-      constexpr static cms::soa::SoAColumnType ColumnTypeOf_z =
-          TypeOf_instance_SoAPositionTemplate::Metadata::ColumnTypeOf_z;
+      using TypeOf_z = typename TypeOf_instance_SoATemplate::Metadata::TypeOf_z;
+      using ParametersTypeOf_z = typename TypeOf_instance_SoATemplate::Metadata::ParametersTypeOf_z;
+      constexpr static cms::soa::SoAColumnType ColumnTypeOf_z = TypeOf_instance_SoATemplate::Metadata::ColumnTypeOf_z;
       using ConstAccessorOf_z = typename cms::soa::SoAAccessors<typename Metadata::TypeOf_z>::template ColumnType<
           ColumnTypeOf_z>::template AccessType<cms::soa::SoAAccessType::constAccess>::
           template Alignment<conditionalAlignment>::template RestrictQualifier<restrictQualify>;
@@ -49236,28 +49461,20 @@ struct SoAPositionTemplate {
           ColumnTypeOf_z>::template AccessType<cms::soa::SoAAccessType::mutableAccess>::
           template Alignment<conditionalAlignment>::template RestrictQualifier<restrictQualify>;
       inline __attribute__((always_inline)) const auto parametersOf_z() const { return (parent_.zParameters_); };
-      using TypeOf_detectorType = typename TypeOf_instance_SoAPositionTemplate::Metadata::TypeOf_detectorType;
-      using ParametersTypeOf_detectorType =
-          typename TypeOf_instance_SoAPositionTemplate::Metadata::ParametersTypeOf_detectorType;
-      constexpr static cms::soa::SoAColumnType ColumnTypeOf_detectorType =
-          TypeOf_instance_SoAPositionTemplate::Metadata::ColumnTypeOf_detectorType;
-      using ConstAccessorOf_detectorType =
-          typename cms::soa::SoAAccessors<typename Metadata::TypeOf_detectorType>::template ColumnType<
-              ColumnTypeOf_detectorType>::template AccessType<cms::soa::SoAAccessType::constAccess>::
-              template Alignment<conditionalAlignment>::template RestrictQualifier<restrictQualify>;
-      using MutableAccessorOf_detectorType =
-          typename cms::soa::SoAAccessors<typename Metadata::TypeOf_detectorType>::template ColumnType<
-              ColumnTypeOf_detectorType>::template AccessType<cms::soa::SoAAccessType::mutableAccess>::
-              template Alignment<conditionalAlignment>::template RestrictQualifier<restrictQualify>;
-      inline __attribute__((always_inline)) const auto parametersOf_detectorType() const {
-        return (parent_.detectorTypeParameters_);
-      };
+      using TypeOf_a = typename TypeOf_instance_SoATemplate::Metadata::TypeOf_a;
+      using ParametersTypeOf_a = typename TypeOf_instance_SoATemplate::Metadata::ParametersTypeOf_a;
+      constexpr static cms::soa::SoAColumnType ColumnTypeOf_a = TypeOf_instance_SoATemplate::Metadata::ColumnTypeOf_a;
+      using ConstAccessorOf_a = typename cms::soa::SoAAccessors<typename Metadata::TypeOf_a>::template ColumnType<
+          ColumnTypeOf_a>::template AccessType<cms::soa::SoAAccessType::constAccess>::
+          template Alignment<conditionalAlignment>::template RestrictQualifier<restrictQualify>;
+      using MutableAccessorOf_a = typename cms::soa::SoAAccessors<typename Metadata::TypeOf_a>::template ColumnType<
+          ColumnTypeOf_a>::template AccessType<cms::soa::SoAAccessType::mutableAccess>::
+          template Alignment<conditionalAlignment>::template RestrictQualifier<restrictQualify>;
+      inline __attribute__((always_inline)) const auto parametersOf_a() const { return (parent_.aParameters_); };
       inline __attribute__((always_inline)) auto const* addressOf_x() const { return parametersOf_x().addr_; };
       inline __attribute__((always_inline)) auto const* addressOf_y() const { return parametersOf_y().addr_; };
       inline __attribute__((always_inline)) auto const* addressOf_z() const { return parametersOf_z().addr_; };
-      inline __attribute__((always_inline)) auto const* addressOf_detectorType() const {
-        return parametersOf_detectorType().addr_;
-      };
+      inline __attribute__((always_inline)) auto const* addressOf_a() const { return parametersOf_a().addr_; };
       Metadata& operator=(const Metadata&) = delete;
       Metadata(const Metadata&) = delete;
 
@@ -49274,37 +49491,37 @@ struct SoAPositionTemplate {
             x_{parent_.metadata().parametersOf_x()},
             y_{parent_.metadata().parametersOf_y()},
             z_{parent_.metadata().parametersOf_z()},
-            detectorType_{parent_.metadata().parametersOf_detectorType()} {}
+            a_{parent_.metadata().parametersOf_a()} {}
       const typename Metadata::ParametersTypeOf_x::ConstType& x() const { return x_; }
       const typename Metadata::ParametersTypeOf_y::ConstType& y() const { return y_; }
       const typename Metadata::ParametersTypeOf_z::ConstType& z() const { return z_; }
-      const typename Metadata::ParametersTypeOf_detectorType::ConstType& detectorType() const { return detectorType_; }
+      const typename Metadata::ParametersTypeOf_a::ConstType& a() const { return a_; }
 
     private:
       const ConstViewTemplateFreeParams& parent_;
       typename Metadata::ParametersTypeOf_x::ConstType x_;
       typename Metadata::ParametersTypeOf_y::ConstType y_;
       typename Metadata::ParametersTypeOf_z::ConstType z_;
-      typename Metadata::ParametersTypeOf_detectorType::ConstType detectorType_;
+      typename Metadata::ParametersTypeOf_a::ConstType a_;
     };
     inline __attribute__((always_inline)) const Metadata metadata() const { return Metadata(*this); }
     inline __attribute__((always_inline)) const Metarecords records() const { return Metarecords(*this); }
     ConstViewTemplateFreeParams() = default;
-    ConstViewTemplateFreeParams(const SoAPositionTemplate_parametrized& instance_SoAPositionTemplate)
+    ConstViewTemplateFreeParams(const SoATemplate_parametrized& instance_SoATemplate)
         : elements_([&]() -> size_type {
             bool set = false;
             size_type ret = 0;
             if (set) {
-              if (ret != instance_SoAPositionTemplate.metadata().size())
+              if (ret != instance_SoATemplate.metadata().size())
                 throw std::runtime_error("In constructor by layout: different sizes from layouts.");
             } else {
-              ret = instance_SoAPositionTemplate.metadata().size();
+              ret = instance_SoATemplate.metadata().size();
               set = true;
             }
             return ret;
           }()),
           xParameters_([&]() -> auto {
-            auto params = instance_SoAPositionTemplate.metadata().parametersOf_x();
+            auto params = instance_SoATemplate.metadata().parametersOf_x();
             if constexpr (alignmentEnforcement == AlignmentEnforcement::enforced)
               if (reinterpret_cast<intptr_t>(params.addr_) % alignment)
                 throw std::runtime_error(
@@ -49313,7 +49530,7 @@ struct SoAPositionTemplate {
             return params;
           }()),
           yParameters_([&]() -> auto {
-            auto params = instance_SoAPositionTemplate.metadata().parametersOf_y();
+            auto params = instance_SoATemplate.metadata().parametersOf_y();
             if constexpr (alignmentEnforcement == AlignmentEnforcement::enforced)
               if (reinterpret_cast<intptr_t>(params.addr_) % alignment)
                 throw std::runtime_error(
@@ -49322,7 +49539,7 @@ struct SoAPositionTemplate {
             return params;
           }()),
           zParameters_([&]() -> auto {
-            auto params = instance_SoAPositionTemplate.metadata().parametersOf_z();
+            auto params = instance_SoATemplate.metadata().parametersOf_z();
             if constexpr (alignmentEnforcement == AlignmentEnforcement::enforced)
               if (reinterpret_cast<intptr_t>(params.addr_) % alignment)
                 throw std::runtime_error(
@@ -49330,20 +49547,20 @@ struct SoAPositionTemplate {
                     "z");
             return params;
           }()),
-          detectorTypeParameters_([&]() -> auto {
-            auto params = instance_SoAPositionTemplate.metadata().parametersOf_detectorType();
+          aParameters_([&]() -> auto {
+            auto params = instance_SoATemplate.metadata().parametersOf_a();
             if constexpr (alignmentEnforcement == AlignmentEnforcement::enforced)
               if (reinterpret_cast<intptr_t>(params.addr_) % alignment)
                 throw std::runtime_error(
                     "In constructor by layout: misaligned column: "
-                    "detectorType");
+                    "a");
             return params;
           }()) {}
     ConstViewTemplateFreeParams(size_type _soa_impl_elements,
                                 const typename Metadata::ParametersTypeOf_x::TupleOrPointerType x,
                                 const typename Metadata::ParametersTypeOf_y::TupleOrPointerType y,
                                 const typename Metadata::ParametersTypeOf_z::TupleOrPointerType z,
-                                const typename Metadata::ParametersTypeOf_detectorType::TupleOrPointerType detectorType)
+                                const typename Metadata::ParametersTypeOf_a::TupleOrPointerType a)
         : elements_(_soa_impl_elements),
           xParameters_([&]() -> auto {
             if constexpr (alignmentEnforcement == AlignmentEnforcement::enforced)
@@ -49369,18 +49586,18 @@ struct SoAPositionTemplate {
                     "z");
             return z;
           }()),
-          detectorTypeParameters_([&]() -> auto {
+          aParameters_([&]() -> auto {
             if constexpr (alignmentEnforcement == AlignmentEnforcement::enforced)
-              if (Metadata::ParametersTypeOf_detectorType::checkAlignment(detectorType, alignment))
+              if (Metadata::ParametersTypeOf_a::checkAlignment(a, alignment))
                 throw std::runtime_error(
                     "In constructor by column: misaligned column: "
-                    "detectorType");
-            return detectorType;
+                    "a");
+            return a;
           }()) {}
     ConstViewTemplateFreeParams(typename Metadata::ParametersTypeOf_x::ConstType x,
                                 typename Metadata::ParametersTypeOf_y::ConstType y,
                                 typename Metadata::ParametersTypeOf_z::ConstType z,
-                                typename Metadata::ParametersTypeOf_detectorType::ConstType detectorType) {
+                                typename Metadata::ParametersTypeOf_a::ConstType a) {
       bool readyToSet = false;
       if (not readyToSet) {
         elements_ = x.size_;
@@ -49434,22 +49651,22 @@ struct SoAPositionTemplate {
       }();
       zParameters_ = z_tmp;
       if (not readyToSet) {
-        elements_ = detectorType.size_;
+        elements_ = a.size_;
         readyToSet = true;
       }
-      auto detectorType_tmp = [&]() -> auto {
-        if (elements_ != detectorType.size_)
+      auto a_tmp = [&]() -> auto {
+        if (elements_ != a.size_)
           throw std::runtime_error(
               "In constructor by column pointers: number of elements not equal for every column: "
-              "detectorType");
+              "a");
         if constexpr (alignmentEnforcement == AlignmentEnforcement::enforced)
-          if (Metadata::ParametersTypeOf_detectorType::checkAlignment(detectorType, alignment))
+          if (Metadata::ParametersTypeOf_a::checkAlignment(a, alignment))
             throw std::runtime_error(
                 "In constructor by column: misaligned column: "
-                "detectorType");
-        return detectorType;
+                "a");
+        return a;
       }();
-      detectorTypeParameters_ = detectorType_tmp;
+      aParameters_ = a_tmp;
     }
     ConstViewTemplateFreeParams(ConstViewTemplateFreeParams const&) = default;
     ConstViewTemplateFreeParams& operator=(ConstViewTemplateFreeParams const&) = default;
@@ -49465,7 +49682,7 @@ struct SoAPositionTemplate {
                                       const_cast_SoAParametersImpl(other.xParameters_).tupleOrPointer(),
                                       const_cast_SoAParametersImpl(other.yParameters_).tupleOrPointer(),
                                       const_cast_SoAParametersImpl(other.zParameters_).tupleOrPointer(),
-                                      const_cast_SoAParametersImpl(other.detectorTypeParameters_).tupleOrPointer()} {}
+                                      const_cast_SoAParametersImpl(other.aParameters_).tupleOrPointer()} {}
     template <std::size_t OTHER_VIEW_ALIGNMENT,
               bool OTHER_VIEW_ALIGNMENT_ENFORCEMENT,
               bool OTHER_RESTRICT_QUALIFY,
@@ -49480,16 +49697,12 @@ struct SoAPositionTemplate {
     ConstViewTemplateFreeParams& operator=(ConstViewTemplateFreeParams&&) = default;
     ~ConstViewTemplateFreeParams() = default;
     struct const_element {
-      inline __attribute__((always_inline)) const_element(
-          size_type _soa_impl_index,
-          const typename Metadata::ParametersTypeOf_x::ConstType x,
-          const typename Metadata::ParametersTypeOf_y::ConstType y,
-          const typename Metadata::ParametersTypeOf_z::ConstType z,
-          const typename Metadata::ParametersTypeOf_detectorType::ConstType detectorType)
-          : x_(_soa_impl_index, x),
-            y_(_soa_impl_index, y),
-            z_(_soa_impl_index, z),
-            detectorType_(_soa_impl_index, detectorType) {}
+      inline __attribute__((always_inline)) const_element(size_type _soa_impl_index,
+                                                          const typename Metadata::ParametersTypeOf_x::ConstType x,
+                                                          const typename Metadata::ParametersTypeOf_y::ConstType y,
+                                                          const typename Metadata::ParametersTypeOf_z::ConstType z,
+                                                          const typename Metadata::ParametersTypeOf_a::ConstType a)
+          : x_(_soa_impl_index, x), y_(_soa_impl_index, y), z_(_soa_impl_index, z), a_(_soa_impl_index, a) {}
       inline __attribute__((always_inline))
       const typename SoAConstValueWithConf<Metadata::ColumnTypeOf_x, const typename Metadata::TypeOf_x>::RefToConst
       x() const {
@@ -49506,10 +49719,9 @@ struct SoAPositionTemplate {
         return z_();
       }
       inline __attribute__((always_inline))
-      const typename SoAConstValueWithConf<Metadata::ColumnTypeOf_detectorType,
-                                           const typename Metadata::TypeOf_detectorType>::RefToConst
-      detectorType() const {
-        return detectorType_();
+      const typename SoAConstValueWithConf<Metadata::ColumnTypeOf_a, const typename Metadata::TypeOf_a>::RefToConst
+      a() const {
+        return a_();
       }
 
     private:
@@ -49522,10 +49734,9 @@ struct SoAPositionTemplate {
       const cms::soa::ConstValueTraits<SoAConstValueWithConf<Metadata::ColumnTypeOf_z, typename Metadata::TypeOf_z>,
                                        Metadata::ColumnTypeOf_z>
           z_;
-      const cms::soa::ConstValueTraits<
-          SoAConstValueWithConf<Metadata::ColumnTypeOf_detectorType, typename Metadata::TypeOf_detectorType>,
-          Metadata::ColumnTypeOf_detectorType>
-          detectorType_;
+      const cms::soa::ConstValueTraits<SoAConstValueWithConf<Metadata::ColumnTypeOf_a, typename Metadata::TypeOf_a>,
+                                       Metadata::ColumnTypeOf_a>
+          a_;
     };
     inline __attribute__((always_inline)) const_element operator[](size_type _soa_impl_index) const {
       if constexpr (rangeChecking == cms::soa::RangeChecking::enabled) {
@@ -49536,7 +49747,7 @@ struct SoAPositionTemplate {
               "::operator[]");
         }
       }
-      return const_element{_soa_impl_index, xParameters_, yParameters_, zParameters_, detectorTypeParameters_};
+      return const_element{_soa_impl_index, xParameters_, yParameters_, zParameters_, aParameters_};
     }
     inline __attribute__((always_inline))
     typename cms::soa::SoAAccessors<typename Metadata::TypeOf_x>::template ColumnType<Metadata::ColumnTypeOf_x>::
@@ -49620,32 +49831,31 @@ struct SoAPositionTemplate {
                   conditionalAlignment>::template RestrictQualifier<restrictQualify>(zParameters_)(_soa_impl_index);
     }
     inline __attribute__((always_inline))
-    typename cms::soa::SoAAccessors<typename Metadata::TypeOf_detectorType>::template ColumnType<
-        Metadata::ColumnTypeOf_detectorType>::template AccessType<cms::soa::SoAAccessType::constAccess>::
-        template Alignment<conditionalAlignment>::template RestrictQualifier<restrictQualify>::NoParamReturnType
-        detectorType() const {
-      return typename cms::soa::SoAAccessors<typename Metadata::TypeOf_detectorType>::template ColumnType<
-          Metadata::ColumnTypeOf_detectorType>::template AccessType<cms::soa::SoAAccessType::constAccess>::
-          template Alignment<conditionalAlignment>::template RestrictQualifier<restrictQualify>(
-              detectorTypeParameters_)();
+    typename cms::soa::SoAAccessors<typename Metadata::TypeOf_a>::template ColumnType<Metadata::ColumnTypeOf_a>::
+        template AccessType<cms::soa::SoAAccessType::constAccess>::template Alignment<
+            conditionalAlignment>::template RestrictQualifier<restrictQualify>::NoParamReturnType
+        a() const {
+      return typename cms::soa::SoAAccessors<typename Metadata::TypeOf_a>::template ColumnType<
+          Metadata::ColumnTypeOf_a>::template AccessType<cms::soa::SoAAccessType::constAccess>::
+          template Alignment<conditionalAlignment>::template RestrictQualifier<restrictQualify>(aParameters_)();
     }
     inline __attribute__((always_inline))
-    typename cms::soa::SoAAccessors<typename Metadata::TypeOf_detectorType>::template ColumnType<
-        Metadata::ColumnTypeOf_detectorType>::template AccessType<cms::soa::SoAAccessType::constAccess>::
-        template Alignment<conditionalAlignment>::template RestrictQualifier<restrictQualify>::ParamReturnType
-        detectorType(size_type _soa_impl_index) const {
+    typename cms::soa::SoAAccessors<typename Metadata::TypeOf_a>::template ColumnType<Metadata::ColumnTypeOf_a>::
+        template AccessType<cms::soa::SoAAccessType::constAccess>::template Alignment<
+            conditionalAlignment>::template RestrictQualifier<restrictQualify>::ParamReturnType
+        a(size_type _soa_impl_index) const {
       if constexpr (rangeChecking == cms::soa::RangeChecking::enabled) {
         if (_soa_impl_index >= elements_ or _soa_impl_index < 0) {
           throw std::out_of_range(
               "Out of range index in const "
-              "detectorType"
+              "a"
               "(size_type index)");
         }
       }
-      return typename cms::soa::SoAAccessors<typename Metadata::TypeOf_detectorType>::template ColumnType<
-          Metadata::ColumnTypeOf_detectorType>::template AccessType<cms::soa::SoAAccessType::constAccess>::
-          template Alignment<conditionalAlignment>::template RestrictQualifier<restrictQualify>(
-              detectorTypeParameters_)(_soa_impl_index);
+      return
+          typename cms::soa::SoAAccessors<typename Metadata::TypeOf_a>::template ColumnType<Metadata::ColumnTypeOf_a>::
+              template AccessType<cms::soa::SoAAccessType::constAccess>::template Alignment<
+                  conditionalAlignment>::template RestrictQualifier<restrictQualify>(aParameters_)(_soa_impl_index);
     }
     template <typename T>
     friend void dump();
@@ -49655,7 +49865,7 @@ struct SoAPositionTemplate {
     typename Metadata::ParametersTypeOf_x::ConstType xParameters_;
     typename Metadata::ParametersTypeOf_y::ConstType yParameters_;
     typename Metadata::ParametersTypeOf_z::ConstType zParameters_;
-    typename Metadata::ParametersTypeOf_detectorType::ConstType detectorTypeParameters_;
+    typename Metadata::ParametersTypeOf_a::ConstType aParameters_;
   };
   template <bool RESTRICT_QUALIFY, bool RANGE_CHECKING>
   using ConstViewTemplate =
@@ -49667,7 +49877,7 @@ struct SoAPositionTemplate {
     using self_type = ViewTemplateFreeParams;
     using base_type =
         ConstViewTemplateFreeParams<VIEW_ALIGNMENT, VIEW_ALIGNMENT_ENFORCEMENT, RESTRICT_QUALIFY, RANGE_CHECKING>;
-    using SoAPositionTemplate_parametrized = SoAPositionTemplate<VIEW_ALIGNMENT, VIEW_ALIGNMENT_ENFORCEMENT>;
+    using SoATemplate_parametrized = SoATemplate<VIEW_ALIGNMENT, VIEW_ALIGNMENT_ENFORCEMENT>;
     using size_type = cms::soa::size_type;
     using byte_size_type = cms::soa::byte_size_type;
     using AlignmentEnforcement = cms::soa::AlignmentEnforcement;
@@ -49687,11 +49897,10 @@ struct SoAPositionTemplate {
     struct Metadata {
       friend ViewTemplateFreeParams;
       inline __attribute__((always_inline)) size_type size() const { return parent_.elements_; }
-      using TypeOf_instance_SoAPositionTemplate = SoAPositionTemplate_parametrized;
-      using TypeOf_x = typename TypeOf_instance_SoAPositionTemplate::Metadata::TypeOf_x;
-      using ParametersTypeOf_x = typename TypeOf_instance_SoAPositionTemplate::Metadata::ParametersTypeOf_x;
-      constexpr static cms::soa::SoAColumnType ColumnTypeOf_x =
-          TypeOf_instance_SoAPositionTemplate::Metadata::ColumnTypeOf_x;
+      using TypeOf_instance_SoATemplate = SoATemplate_parametrized;
+      using TypeOf_x = typename TypeOf_instance_SoATemplate::Metadata::TypeOf_x;
+      using ParametersTypeOf_x = typename TypeOf_instance_SoATemplate::Metadata::ParametersTypeOf_x;
+      constexpr static cms::soa::SoAColumnType ColumnTypeOf_x = TypeOf_instance_SoATemplate::Metadata::ColumnTypeOf_x;
       using ConstAccessorOf_x = typename cms::soa::SoAAccessors<typename Metadata::TypeOf_x>::template ColumnType<
           ColumnTypeOf_x>::template AccessType<cms::soa::SoAAccessType::constAccess>::
           template Alignment<conditionalAlignment>::template RestrictQualifier<restrictQualify>;
@@ -49701,10 +49910,9 @@ struct SoAPositionTemplate {
       inline __attribute__((always_inline)) const auto parametersOf_x() const {
         return const_cast_SoAParametersImpl(parent_.xParameters_);
       };
-      using TypeOf_y = typename TypeOf_instance_SoAPositionTemplate::Metadata::TypeOf_y;
-      using ParametersTypeOf_y = typename TypeOf_instance_SoAPositionTemplate::Metadata::ParametersTypeOf_y;
-      constexpr static cms::soa::SoAColumnType ColumnTypeOf_y =
-          TypeOf_instance_SoAPositionTemplate::Metadata::ColumnTypeOf_y;
+      using TypeOf_y = typename TypeOf_instance_SoATemplate::Metadata::TypeOf_y;
+      using ParametersTypeOf_y = typename TypeOf_instance_SoATemplate::Metadata::ParametersTypeOf_y;
+      constexpr static cms::soa::SoAColumnType ColumnTypeOf_y = TypeOf_instance_SoATemplate::Metadata::ColumnTypeOf_y;
       using ConstAccessorOf_y = typename cms::soa::SoAAccessors<typename Metadata::TypeOf_y>::template ColumnType<
           ColumnTypeOf_y>::template AccessType<cms::soa::SoAAccessType::constAccess>::
           template Alignment<conditionalAlignment>::template RestrictQualifier<restrictQualify>;
@@ -49714,10 +49922,9 @@ struct SoAPositionTemplate {
       inline __attribute__((always_inline)) const auto parametersOf_y() const {
         return const_cast_SoAParametersImpl(parent_.yParameters_);
       };
-      using TypeOf_z = typename TypeOf_instance_SoAPositionTemplate::Metadata::TypeOf_z;
-      using ParametersTypeOf_z = typename TypeOf_instance_SoAPositionTemplate::Metadata::ParametersTypeOf_z;
-      constexpr static cms::soa::SoAColumnType ColumnTypeOf_z =
-          TypeOf_instance_SoAPositionTemplate::Metadata::ColumnTypeOf_z;
+      using TypeOf_z = typename TypeOf_instance_SoATemplate::Metadata::TypeOf_z;
+      using ParametersTypeOf_z = typename TypeOf_instance_SoATemplate::Metadata::ParametersTypeOf_z;
+      constexpr static cms::soa::SoAColumnType ColumnTypeOf_z = TypeOf_instance_SoATemplate::Metadata::ColumnTypeOf_z;
       using ConstAccessorOf_z = typename cms::soa::SoAAccessors<typename Metadata::TypeOf_z>::template ColumnType<
           ColumnTypeOf_z>::template AccessType<cms::soa::SoAAccessType::constAccess>::
           template Alignment<conditionalAlignment>::template RestrictQualifier<restrictQualify>;
@@ -49727,34 +49934,26 @@ struct SoAPositionTemplate {
       inline __attribute__((always_inline)) const auto parametersOf_z() const {
         return const_cast_SoAParametersImpl(parent_.zParameters_);
       };
-      using TypeOf_detectorType = typename TypeOf_instance_SoAPositionTemplate::Metadata::TypeOf_detectorType;
-      using ParametersTypeOf_detectorType =
-          typename TypeOf_instance_SoAPositionTemplate::Metadata::ParametersTypeOf_detectorType;
-      constexpr static cms::soa::SoAColumnType ColumnTypeOf_detectorType =
-          TypeOf_instance_SoAPositionTemplate::Metadata::ColumnTypeOf_detectorType;
-      using ConstAccessorOf_detectorType =
-          typename cms::soa::SoAAccessors<typename Metadata::TypeOf_detectorType>::template ColumnType<
-              ColumnTypeOf_detectorType>::template AccessType<cms::soa::SoAAccessType::constAccess>::
-              template Alignment<conditionalAlignment>::template RestrictQualifier<restrictQualify>;
-      using MutableAccessorOf_detectorType =
-          typename cms::soa::SoAAccessors<typename Metadata::TypeOf_detectorType>::template ColumnType<
-              ColumnTypeOf_detectorType>::template AccessType<cms::soa::SoAAccessType::mutableAccess>::
-              template Alignment<conditionalAlignment>::template RestrictQualifier<restrictQualify>;
-      inline __attribute__((always_inline)) const auto parametersOf_detectorType() const {
-        return const_cast_SoAParametersImpl(parent_.detectorTypeParameters_);
+      using TypeOf_a = typename TypeOf_instance_SoATemplate::Metadata::TypeOf_a;
+      using ParametersTypeOf_a = typename TypeOf_instance_SoATemplate::Metadata::ParametersTypeOf_a;
+      constexpr static cms::soa::SoAColumnType ColumnTypeOf_a = TypeOf_instance_SoATemplate::Metadata::ColumnTypeOf_a;
+      using ConstAccessorOf_a = typename cms::soa::SoAAccessors<typename Metadata::TypeOf_a>::template ColumnType<
+          ColumnTypeOf_a>::template AccessType<cms::soa::SoAAccessType::constAccess>::
+          template Alignment<conditionalAlignment>::template RestrictQualifier<restrictQualify>;
+      using MutableAccessorOf_a = typename cms::soa::SoAAccessors<typename Metadata::TypeOf_a>::template ColumnType<
+          ColumnTypeOf_a>::template AccessType<cms::soa::SoAAccessType::mutableAccess>::
+          template Alignment<conditionalAlignment>::template RestrictQualifier<restrictQualify>;
+      inline __attribute__((always_inline)) const auto parametersOf_a() const {
+        return const_cast_SoAParametersImpl(parent_.aParameters_);
       };
       inline __attribute__((always_inline)) auto* addressOf_x() { return parametersOf_x().addr_; };
       inline __attribute__((always_inline)) auto* addressOf_y() { return parametersOf_y().addr_; };
       inline __attribute__((always_inline)) auto* addressOf_z() { return parametersOf_z().addr_; };
-      inline __attribute__((always_inline)) auto* addressOf_detectorType() {
-        return parametersOf_detectorType().addr_;
-      };
+      inline __attribute__((always_inline)) auto* addressOf_a() { return parametersOf_a().addr_; };
       inline __attribute__((always_inline)) auto const* addressOf_x() const { return parametersOf_x().addr_; };
       inline __attribute__((always_inline)) auto const* addressOf_y() const { return parametersOf_y().addr_; };
       inline __attribute__((always_inline)) auto const* addressOf_z() const { return parametersOf_z().addr_; };
-      inline __attribute__((always_inline)) auto const* addressOf_detectorType() const {
-        return parametersOf_detectorType().addr_;
-      };
+      inline __attribute__((always_inline)) auto const* addressOf_a() const { return parametersOf_a().addr_; };
       Metadata& operator=(const Metadata&) = delete;
       Metadata(const Metadata&) = delete;
 
@@ -49771,36 +49970,35 @@ struct SoAPositionTemplate {
             x_{parent_.metadata().parametersOf_x()},
             y_{parent_.metadata().parametersOf_y()},
             z_{parent_.metadata().parametersOf_z()},
-            detectorType_{parent_.metadata().parametersOf_detectorType()} {}
+            a_{parent_.metadata().parametersOf_a()} {}
       const typename Metadata::ParametersTypeOf_x& x() const { return x_; }
       const typename Metadata::ParametersTypeOf_y& y() const { return y_; }
       const typename Metadata::ParametersTypeOf_z& z() const { return z_; }
-      const typename Metadata::ParametersTypeOf_detectorType& detectorType() const { return detectorType_; }
+      const typename Metadata::ParametersTypeOf_a& a() const { return a_; }
 
     private:
       const ViewTemplateFreeParams& parent_;
       typename Metadata::ParametersTypeOf_x x_;
       typename Metadata::ParametersTypeOf_y y_;
       typename Metadata::ParametersTypeOf_z z_;
-      typename Metadata::ParametersTypeOf_detectorType detectorType_;
+      typename Metadata::ParametersTypeOf_a a_;
     };
     inline __attribute__((always_inline)) const Metadata metadata() const { return Metadata(*this); }
     inline __attribute__((always_inline)) Metadata metadata() { return Metadata(*this); }
     inline __attribute__((always_inline)) const Metarecords records() const { return Metarecords(*this); }
     inline __attribute__((always_inline)) Metarecords records() { return Metarecords(*this); }
     ViewTemplateFreeParams() = default;
-    ViewTemplateFreeParams(SoAPositionTemplate_parametrized& instance_SoAPositionTemplate)
-        : base_type{instance_SoAPositionTemplate} {}
+    ViewTemplateFreeParams(SoATemplate_parametrized& instance_SoATemplate) : base_type{instance_SoATemplate} {}
     ViewTemplateFreeParams(size_type _soa_impl_elements,
                            typename Metadata::ParametersTypeOf_x::TupleOrPointerType x,
                            typename Metadata::ParametersTypeOf_y::TupleOrPointerType y,
                            typename Metadata::ParametersTypeOf_z::TupleOrPointerType z,
-                           typename Metadata::ParametersTypeOf_detectorType::TupleOrPointerType detectorType)
-        : base_type{_soa_impl_elements, x, y, z, detectorType} {}
+                           typename Metadata::ParametersTypeOf_a::TupleOrPointerType a)
+        : base_type{_soa_impl_elements, x, y, z, a} {}
     ViewTemplateFreeParams(typename Metadata::ParametersTypeOf_x x,
                            typename Metadata::ParametersTypeOf_y y,
                            typename Metadata::ParametersTypeOf_z z,
-                           typename Metadata::ParametersTypeOf_detectorType detectorType) {
+                           typename Metadata::ParametersTypeOf_a a) {
       bool readyToSet = false;
       if (not readyToSet) {
         base_type::elements_ = x.size_;
@@ -49854,22 +50052,22 @@ struct SoAPositionTemplate {
       }();
       base_type::zParameters_ = z_tmp;
       if (not readyToSet) {
-        base_type::elements_ = detectorType.size_;
+        base_type::elements_ = a.size_;
         readyToSet = true;
       }
-      auto detectorType_tmp = [&]() -> auto {
-        if (base_type::elements_ != detectorType.size_)
+      auto a_tmp = [&]() -> auto {
+        if (base_type::elements_ != a.size_)
           throw std::runtime_error(
               "In constructor by column pointers: number of elements not equal for every column: "
-              "detectorType");
+              "a");
         if constexpr (alignmentEnforcement == AlignmentEnforcement::enforced)
-          if (Metadata::ParametersTypeOf_detectorType::checkAlignment(detectorType, alignment))
+          if (Metadata::ParametersTypeOf_a::checkAlignment(a, alignment))
             throw std::runtime_error(
                 "In constructor by column: misaligned column: "
-                "detectorType");
-        return detectorType;
+                "a");
+        return a;
       }();
-      base_type::detectorTypeParameters_ = detectorType_tmp;
+      base_type::aParameters_ = a_tmp;
     }
     ViewTemplateFreeParams(ViewTemplateFreeParams const&) = default;
     ViewTemplateFreeParams& operator=(ViewTemplateFreeParams const&) = default;
@@ -49885,7 +50083,7 @@ struct SoAPositionTemplate {
                     const_cast_SoAParametersImpl(other.xParameters_).tupleOrPointer(),
                     const_cast_SoAParametersImpl(other.yParameters_).tupleOrPointer(),
                     const_cast_SoAParametersImpl(other.zParameters_).tupleOrPointer(),
-                    const_cast_SoAParametersImpl(other.detectorTypeParameters_).tupleOrPointer()} {}
+                    const_cast_SoAParametersImpl(other.aParameters_).tupleOrPointer()} {}
     template <std::size_t OTHER_VIEW_ALIGNMENT,
               bool OTHER_VIEW_ALIGNMENT_ENFORCEMENT,
               bool OTHER_RESTRICT_QUALIFY,
@@ -49906,11 +50104,8 @@ struct SoAPositionTemplate {
                                                     typename Metadata::ParametersTypeOf_x x,
                                                     typename Metadata::ParametersTypeOf_y y,
                                                     typename Metadata::ParametersTypeOf_z z,
-                                                    typename Metadata::ParametersTypeOf_detectorType detectorType)
-          : x(_soa_impl_index, x),
-            y(_soa_impl_index, y),
-            z(_soa_impl_index, z),
-            detectorType(_soa_impl_index, detectorType) {}
+                                                    typename Metadata::ParametersTypeOf_a a)
+          : x(_soa_impl_index, x), y(_soa_impl_index, y), z(_soa_impl_index, z), a(_soa_impl_index, a) {}
       inline __attribute__((always_inline)) element& operator=(const element& _soa_impl_other) {
         if constexpr (Metadata::ColumnTypeOf_x != cms::soa::SoAColumnType::scalar)
           x() = _soa_impl_other.x();
@@ -49918,8 +50113,8 @@ struct SoAPositionTemplate {
           y() = _soa_impl_other.y();
         if constexpr (Metadata::ColumnTypeOf_z != cms::soa::SoAColumnType::scalar)
           z() = _soa_impl_other.z();
-        if constexpr (Metadata::ColumnTypeOf_detectorType != cms::soa::SoAColumnType::scalar)
-          detectorType() = _soa_impl_other.detectorType();
+        if constexpr (Metadata::ColumnTypeOf_a != cms::soa::SoAColumnType::scalar)
+          a() = _soa_impl_other.a();
         return *this;
       }
       inline __attribute__((always_inline)) element& operator=(const const_element& _soa_impl_other) {
@@ -49929,21 +50124,22 @@ struct SoAPositionTemplate {
           y() = _soa_impl_other.y();
         if constexpr (Metadata::ColumnTypeOf_z != cms::soa::SoAColumnType::scalar)
           z() = _soa_impl_other.z();
-        if constexpr (Metadata::ColumnTypeOf_detectorType != cms::soa::SoAColumnType::scalar)
-          detectorType() = _soa_impl_other.detectorType();
+        if constexpr (Metadata::ColumnTypeOf_a != cms::soa::SoAColumnType::scalar)
+          a() = _soa_impl_other.a();
         return *this;
       }
       inline __attribute__((always_inline)) constexpr element& operator=(
-          const typename SoAPositionTemplate_parametrized::Metadata::value_element _soa_impl_value) {
+          const typename SoATemplate_parametrized::Metadata::value_element _soa_impl_value) {
         x() = _soa_impl_value.x;
         y() = _soa_impl_value.y;
         z() = _soa_impl_value.z;
+        a() = _soa_impl_value.a;
         return *this;
       }
       SoAValueWithConf<Metadata::ColumnTypeOf_x, typename Metadata::TypeOf_x> x;
       SoAValueWithConf<Metadata::ColumnTypeOf_y, typename Metadata::TypeOf_y> y;
       SoAValueWithConf<Metadata::ColumnTypeOf_z, typename Metadata::TypeOf_z> z;
-      SoAValueWithConf<Metadata::ColumnTypeOf_detectorType, typename Metadata::TypeOf_detectorType> detectorType;
+      SoAValueWithConf<Metadata::ColumnTypeOf_a, typename Metadata::TypeOf_a> a;
     };
     inline __attribute__((always_inline)) element operator[](size_type _soa_impl_index) {
       if constexpr (rangeChecking == cms::soa::RangeChecking::enabled) {
@@ -49958,7 +50154,7 @@ struct SoAPositionTemplate {
                      const_cast_SoAParametersImpl(base_type::xParameters_),
                      const_cast_SoAParametersImpl(base_type::yParameters_),
                      const_cast_SoAParametersImpl(base_type::zParameters_),
-                     const_cast_SoAParametersImpl(base_type::detectorTypeParameters_)};
+                     const_cast_SoAParametersImpl(base_type::aParameters_)};
     }
     inline __attribute__((always_inline))
     typename cms::soa::SoAAccessors<typename Metadata::TypeOf_x>::template ColumnType<Metadata::ColumnTypeOf_x>::
@@ -50045,32 +50241,32 @@ struct SoAPositionTemplate {
               const_cast_SoAParametersImpl(base_type::zParameters_))(_soa_impl_index);
     }
     inline __attribute__((always_inline))
-    typename cms::soa::SoAAccessors<typename Metadata::TypeOf_detectorType>::template ColumnType<
-        Metadata::ColumnTypeOf_detectorType>::template AccessType<cms::soa::SoAAccessType::mutableAccess>::
-        template Alignment<conditionalAlignment>::template RestrictQualifier<restrictQualify>::NoParamReturnType
-        detectorType() {
-      return typename cms::soa::SoAAccessors<typename Metadata::TypeOf_detectorType>::template ColumnType<
-          Metadata::ColumnTypeOf_detectorType>::template AccessType<cms::soa::SoAAccessType::mutableAccess>::
+    typename cms::soa::SoAAccessors<typename Metadata::TypeOf_a>::template ColumnType<Metadata::ColumnTypeOf_a>::
+        template AccessType<cms::soa::SoAAccessType::mutableAccess>::template Alignment<
+            conditionalAlignment>::template RestrictQualifier<restrictQualify>::NoParamReturnType
+        a() {
+      return typename cms::soa::SoAAccessors<typename Metadata::TypeOf_a>::template ColumnType<
+          Metadata::ColumnTypeOf_a>::template AccessType<cms::soa::SoAAccessType::mutableAccess>::
           template Alignment<conditionalAlignment>::template RestrictQualifier<restrictQualify>(
-              const_cast_SoAParametersImpl(base_type::detectorTypeParameters_))();
+              const_cast_SoAParametersImpl(base_type::aParameters_))();
     }
     inline __attribute__((always_inline))
-    typename cms::soa::SoAAccessors<typename Metadata::TypeOf_detectorType>::template ColumnType<
-        Metadata::ColumnTypeOf_detectorType>::template AccessType<cms::soa::SoAAccessType::mutableAccess>::
-        template Alignment<conditionalAlignment>::template RestrictQualifier<restrictQualify>::ParamReturnType
-        detectorType(size_type _soa_impl_index) {
+    typename cms::soa::SoAAccessors<typename Metadata::TypeOf_a>::template ColumnType<Metadata::ColumnTypeOf_a>::
+        template AccessType<cms::soa::SoAAccessType::mutableAccess>::template Alignment<
+            conditionalAlignment>::template RestrictQualifier<restrictQualify>::ParamReturnType
+        a(size_type _soa_impl_index) {
       if constexpr (rangeChecking == cms::soa::RangeChecking::enabled) {
         if (_soa_impl_index >= base_type::elements_ or _soa_impl_index < 0) {
           throw std::out_of_range(
               "Out of range index in mutable "
-              "detectorType"
+              "a"
               "(size_type index)");
         }
       }
-      return typename cms::soa::SoAAccessors<typename Metadata::TypeOf_detectorType>::template ColumnType<
-          Metadata::ColumnTypeOf_detectorType>::template AccessType<cms::soa::SoAAccessType::mutableAccess>::
+      return typename cms::soa::SoAAccessors<typename Metadata::TypeOf_a>::template ColumnType<
+          Metadata::ColumnTypeOf_a>::template AccessType<cms::soa::SoAAccessType::mutableAccess>::
           template Alignment<conditionalAlignment>::template RestrictQualifier<restrictQualify>(
-              const_cast_SoAParametersImpl(base_type::detectorTypeParameters_))(_soa_impl_index);
+              const_cast_SoAParametersImpl(base_type::aParameters_))(_soa_impl_index);
     }
     template <typename T>
     friend void dump();
@@ -50078,2895 +50274,39 @@ struct SoAPositionTemplate {
   template <bool RESTRICT_QUALIFY, bool RANGE_CHECKING>
   using ViewTemplate = ViewTemplateFreeParams<ALIGNMENT, ALIGNMENT_ENFORCEMENT, RESTRICT_QUALIFY, RANGE_CHECKING>;
   using View = ViewTemplate<cms::soa::RestrictQualify::Default, cms::soa::RangeChecking::Default>;
-  SoAPositionTemplate()
-      : mem_(nullptr), elements_(0), byteSize_(0), x_(nullptr), y_(nullptr), z_(nullptr), detectorType_(nullptr) {}
-  SoAPositionTemplate(std::byte* mem, size_type elements) : mem_(mem), elements_(elements), byteSize_(0) {
-    organizeColumnsFromBuffer();
-  }
-  SoAPositionTemplate(SoAPositionTemplate const& _soa_impl_other)
-      : mem_(_soa_impl_other.mem_),
-        elements_(_soa_impl_other.elements_),
-        byteSize_(_soa_impl_other.byteSize_),
-        x_{_soa_impl_other.x_},
-        y_{_soa_impl_other.y_},
-        z_{_soa_impl_other.z_},
-        detectorType_{_soa_impl_other.detectorType_} {}
-  SoAPositionTemplate& operator=(SoAPositionTemplate const& _soa_impl_other) {
-    mem_ = _soa_impl_other.mem_;
-    elements_ = _soa_impl_other.elements_;
-    byteSize_ = _soa_impl_other.byteSize_;
-    x_ = _soa_impl_other.x_;
-    y_ = _soa_impl_other.y_;
-    z_ = _soa_impl_other.z_;
-    detectorType_ = _soa_impl_other.detectorType_;
-    return *this;
-  }
-  void aggregate(ConstView const& view) {
-    if (elements_ < view.metadata().size())
-      throw std::runtime_error("In aggregate method: number of elements mismatch ");
-    memcpy(this->metadata().addressOf_x(),
-           view.metadata().addressOf_x(),
-           cms::soa::alignSize(this->elements_ * sizeof(float), alignment));
-    memcpy(this->metadata().addressOf_y(),
-           view.metadata().addressOf_y(),
-           cms::soa::alignSize(this->elements_ * sizeof(float), alignment));
-    memcpy(this->metadata().addressOf_z(),
-           view.metadata().addressOf_z(),
-           cms::soa::alignSize(this->elements_ * sizeof(float), alignment));
-    memcpy(this->metadata().addressOf_detectorType(),
-           view.metadata().addressOf_detectorType(),
-           cms::soa::alignSize(sizeof(int), alignment));
-  }
-  AoS_SoAPositionTemplate<ALIGNMENT, ALIGNMENT_ENFORCEMENT> transpose() {
-    AoS_SoAPositionTemplate aos(elements_);
-    for (size_type i = 0; i < elements_; i++) {
-      aos[i].x = *(this->metadata().addressOf_x() + i);
-      aos[i].y = *(this->metadata().addressOf_y() + i);
-      aos[i].z = *(this->metadata().addressOf_z() + i);
-    }
-    return aos;
-  }
-  template <typename T>
-  void ROOTReadStreamer(T& onfile) {
-    memcpy(x_, onfile.x_, sizeof(float) * onfile.elements_);
-    memcpy(y_, onfile.y_, sizeof(float) * onfile.elements_);
-    memcpy(z_, onfile.z_, sizeof(float) * onfile.elements_);
-    memcpy(detectorType_, onfile.detectorType_, sizeof(int));
-  }
-  void ROOTStreamerCleaner() {
-    delete[] x_;
-    x_ = nullptr;
-    delete[] y_;
-    y_ = nullptr;
-    delete[] z_;
-    z_ = nullptr;
-    delete[] detectorType_;
-    detectorType_ = nullptr;
-  }
-  template <typename T>
-  friend void dump();
-
-private:
-  void organizeColumnsFromBuffer() {
-    if constexpr (alignmentEnforcement == cms::soa::AlignmentEnforcement::enforced)
-      if (reinterpret_cast<intptr_t>(mem_) % alignment)
-        throw std::runtime_error(
-            "In "
-            "SoAPositionTemplate"
-            "::"
-            "SoAPositionTemplate"
-            ": misaligned buffer");
-    auto _soa_impl_curMem = mem_;
-    x_ = reinterpret_cast<float*>(_soa_impl_curMem);
-    _soa_impl_curMem += cms::soa::alignSize(elements_ * sizeof(float), alignment);
-    if constexpr (alignmentEnforcement == AlignmentEnforcement::enforced)
-      if (reinterpret_cast<intptr_t>(x_) % alignment)
-        throw std::runtime_error(
-            "In layout constructor: misaligned column: "
-            "x");
-    y_ = reinterpret_cast<float*>(_soa_impl_curMem);
-    _soa_impl_curMem += cms::soa::alignSize(elements_ * sizeof(float), alignment);
-    if constexpr (alignmentEnforcement == AlignmentEnforcement::enforced)
-      if (reinterpret_cast<intptr_t>(y_) % alignment)
-        throw std::runtime_error(
-            "In layout constructor: misaligned column: "
-            "y");
-    z_ = reinterpret_cast<float*>(_soa_impl_curMem);
-    _soa_impl_curMem += cms::soa::alignSize(elements_ * sizeof(float), alignment);
-    if constexpr (alignmentEnforcement == AlignmentEnforcement::enforced)
-      if (reinterpret_cast<intptr_t>(z_) % alignment)
-        throw std::runtime_error(
-            "In layout constructor: misaligned column: "
-            "z");
-    detectorType_ = reinterpret_cast<int*>(_soa_impl_curMem);
-    _soa_impl_curMem += cms::soa::alignSize(sizeof(int), alignment);
-    if constexpr (alignmentEnforcement == AlignmentEnforcement::enforced)
-      if (reinterpret_cast<intptr_t>(detectorType_) % alignment)
-        throw std::runtime_error(
-            "In layout constructor: misaligned column: "
-            "detectorType");
-    byteSize_ = computeDataSize(elements_);
-    if (mem_ + byteSize_ != _soa_impl_curMem)
-      throw std::runtime_error(
-          "In "
-          "SoAPositionTemplate"
-          "::"
-          "SoAPositionTemplate"
-          ": unexpected end pointer.");
-  }
-  std::byte* mem_;
-  size_type elements_;
-  size_type const scalar_ = 1;
-  byte_size_type byteSize_;
-  float* x_ = nullptr;
-  float* y_ = nullptr;
-  float* z_ = nullptr;
-  int* detectorType_ = nullptr;
-};
-using SoAPosition = SoAPositionTemplate<>;
-using SoAPositionView = SoAPosition::View;
-using SoAPositionConstView = SoAPosition::ConstView;
-template <std::size_t ALIGNMENT = cms::soa::CacheLineSize::defaultSize,
-          bool ALIGNMENT_ENFORCEMENT = cms::soa::AlignmentEnforcement::relaxed>
-struct AoS_SoAPCATemplate {
-  using size_type = cms::soa::size_type;
-  using byte_size_type = cms::soa::byte_size_type;
-  constexpr static byte_size_type defaultAlignment = 128;
-  constexpr static byte_size_type alignment = ALIGNMENT;
-  constexpr static bool alignmentEnforcement = ALIGNMENT_ENFORCEMENT;
-  constexpr static byte_size_type conditionalAlignment =
-      alignmentEnforcement == cms::soa::AlignmentEnforcement::enforced ? alignment : 0;
-  template <cms::soa::SoAColumnType COLUMN_TYPE, class C>
-  using SoAValueWithConf = cms::soa::SoAValue<COLUMN_TYPE, C, conditionalAlignment>;
-  using ParametersTypeOf_eigenvalues =
-      cms::soa::SoAParameters_ColumnType<cms::soa::SoAColumnType::column>::DataType<float>;
-  using TypeOf_eigenvalues = float;
-  constexpr static cms::soa::SoAColumnType ColumnTypeOf_eigenvalues = cms::soa::SoAColumnType::column;
-  using ParametersTypeOf_eigenvector_1 =
-      cms::soa::SoAParameters_ColumnType<cms::soa::SoAColumnType::column>::DataType<float>;
-  using TypeOf_eigenvector_1 = float;
-  constexpr static cms::soa::SoAColumnType ColumnTypeOf_eigenvector_1 = cms::soa::SoAColumnType::column;
-  using ParametersTypeOf_eigenvector_2 =
-      cms::soa::SoAParameters_ColumnType<cms::soa::SoAColumnType::column>::DataType<float>;
-  using TypeOf_eigenvector_2 = float;
-  constexpr static cms::soa::SoAColumnType ColumnTypeOf_eigenvector_2 = cms::soa::SoAColumnType::column;
-  using ParametersTypeOf_eigenvector_3 =
-      cms::soa::SoAParameters_ColumnType<cms::soa::SoAColumnType::column>::DataType<float>;
-  using TypeOf_eigenvector_3 = float;
-  constexpr static cms::soa::SoAColumnType ColumnTypeOf_eigenvector_3 = cms::soa::SoAColumnType::column;
-  using ParametersTypeOf_candidateDirection =
-      cms::soa::SoAParameters_ColumnType<cms::soa::SoAColumnType::eigen>::DataType<Eigen::Vector3d>;
-  using TypeOf_candidateDirection = Eigen::Vector3d;
-  constexpr static cms::soa::SoAColumnType ColumnTypeOf_candidateDirection = cms::soa::SoAColumnType::eigen;
-  struct Element {
-    BOOST_PP_DEFER(_DEFINE_AOS_ELEMENT_MEMBERS_IMPL)
-    BOOST_PP_OBSTRUCT()(1, float, eigenvalues, ~) BOOST_PP_DEFER(_DEFINE_AOS_ELEMENT_MEMBERS_IMPL)
-        BOOST_PP_OBSTRUCT()(1, float, eigenvector_1, ~) BOOST_PP_DEFER(_DEFINE_AOS_ELEMENT_MEMBERS_IMPL)
-            BOOST_PP_OBSTRUCT()(1, float, eigenvector_2, ~) BOOST_PP_DEFER(_DEFINE_AOS_ELEMENT_MEMBERS_IMPL)
-                BOOST_PP_OBSTRUCT()(1, float, eigenvector_3, ~) BOOST_PP_DEFER(_DEFINE_AOS_ELEMENT_MEMBERS_IMPL)
-                    BOOST_PP_OBSTRUCT()(2, Eigen::Vector3d, candidateDirection, ~) struct scalar {};
-    static constexpr byte_size_type element_size() {
-      byte_size_type _aos_impl_ret = 0;
-      _aos_impl_ret += sizeof(float);
-      _aos_impl_ret += sizeof(float);
-      _aos_impl_ret += sizeof(float);
-      _aos_impl_ret += sizeof(float);
-      _aos_impl_ret +=
-          sizeof(Eigen::Vector3d::Scalar) * Eigen::Vector3d::RowsAtCompileTime * Eigen::Vector3d::ColsAtCompileTime;
-      return _aos_impl_ret;
-    }
-  };
-  AoS_SoAPCATemplate() : elem(nullptr), elements_(0) {}
-  AoS_SoAPCATemplate(size_type elements) : elements_(elements) { elem = std::make_unique<Element[]>(elements); }
-  Element& operator[](size_type i) { return elem[i]; }
-  const Element& operator[](size_type i) const { return elem[i]; }
-
-private:
-  std::unique_ptr<Element[]> elem;
-  size_type elements_;
-};
-template <std::size_t ALIGNMENT = cms::soa::CacheLineSize::defaultSize,
-          bool ALIGNMENT_ENFORCEMENT = cms::soa::AlignmentEnforcement::relaxed>
-struct SoAPCATemplate {
-  using self_type = SoAPCATemplate;
-  using AlignmentEnforcement = cms::soa::AlignmentEnforcement;
-  using size_type = cms::soa::size_type;
-  using byte_size_type = cms::soa::byte_size_type;
-  constexpr static byte_size_type defaultAlignment = 128;
-  constexpr static byte_size_type alignment = ALIGNMENT;
-  constexpr static bool alignmentEnforcement = ALIGNMENT_ENFORCEMENT;
-  constexpr static byte_size_type conditionalAlignment =
-      alignmentEnforcement == cms::soa::AlignmentEnforcement::enforced ? alignment : 0;
-  template <cms::soa::SoAColumnType COLUMN_TYPE, class C>
-  using SoAValueWithConf = cms::soa::SoAValue<COLUMN_TYPE, C, conditionalAlignment>;
-  template <cms::soa::SoAColumnType COLUMN_TYPE, class C>
-  using SoAConstValueWithConf = cms::soa::SoAConstValue<COLUMN_TYPE, C, conditionalAlignment>;
-  template <std::size_t VIEW_ALIGNMENT = cms::soa::CacheLineSize::defaultSize,
-            bool VIEW_ALIGNMENT_ENFORCEMENT = cms::soa::AlignmentEnforcement::relaxed,
-            bool RESTRICT_QUALIFY = cms::soa::RestrictQualify::Default,
-            bool RANGE_CHECKING = cms::soa::RangeChecking::Default>
-  struct ViewTemplateFreeParams;
-  static constexpr std::pair<size_type, size_type> computeMethodsNumber() {
-    size_type _soa_methods_count = 0;
-    size_type _soa_const_methods_count = 0;
-    return {_soa_methods_count, _soa_const_methods_count};
-  }
-  static_assert(computeMethodsNumber().first <= 1,
-                "There can be at most one SOA_METHODS macro. Please declare all your methods inside the same macro.");
-  static_assert(
-      computeMethodsNumber().second <= 1,
-      "There can be at most one SOA_CONST_METHODS macro. Please declare all your methods inside the same macro.");
-  void soaToStreamInternal(std::ostream& _soa_impl_os) const {
-    _soa_impl_os << "SoAPCATemplate"
-                    "("
-                 << elements_ << " elements, byte alignement= " << alignment << ", @" << mem_ << "): " << std::endl;
-    _soa_impl_os << "  sizeof("
-                    "SoAPCATemplate"
-                    "): "
-                 << sizeof(SoAPCATemplate) << std::endl;
-    byte_size_type _soa_impl_offset = 0;
-    _soa_impl_os << " Column "
-                    "eigenvalues"
-                    " at offset "
-                 << _soa_impl_offset << " has size " << sizeof(float) * elements_ << " and padding "
-                 << cms::soa::alignSize(elements_ * sizeof(float), alignment) - (elements_ * sizeof(float))
-                 << std::endl;
-    _soa_impl_offset += cms::soa::alignSize(elements_ * sizeof(float), alignment);
-    _soa_impl_os << " Column "
-                    "eigenvector_1"
-                    " at offset "
-                 << _soa_impl_offset << " has size " << sizeof(float) * elements_ << " and padding "
-                 << cms::soa::alignSize(elements_ * sizeof(float), alignment) - (elements_ * sizeof(float))
-                 << std::endl;
-    _soa_impl_offset += cms::soa::alignSize(elements_ * sizeof(float), alignment);
-    _soa_impl_os << " Column "
-                    "eigenvector_2"
-                    " at offset "
-                 << _soa_impl_offset << " has size " << sizeof(float) * elements_ << " and padding "
-                 << cms::soa::alignSize(elements_ * sizeof(float), alignment) - (elements_ * sizeof(float))
-                 << std::endl;
-    _soa_impl_offset += cms::soa::alignSize(elements_ * sizeof(float), alignment);
-    _soa_impl_os << " Column "
-                    "eigenvector_3"
-                    " at offset "
-                 << _soa_impl_offset << " has size " << sizeof(float) * elements_ << " and padding "
-                 << cms::soa::alignSize(elements_ * sizeof(float), alignment) - (elements_ * sizeof(float))
-                 << std::endl;
-    _soa_impl_offset += cms::soa::alignSize(elements_ * sizeof(float), alignment);
-    _soa_impl_os << " Eigen value "
-                    "candidateDirection"
-                    " at offset "
-                 << _soa_impl_offset << " has dimension "
-                 << "(" << Eigen::Vector3d::RowsAtCompileTime << " x " << Eigen::Vector3d::ColsAtCompileTime << ")"
-                 << " and per column size " << sizeof(Eigen::Vector3d::Scalar) * elements_ << " and padding "
-                 << cms::soa::alignSize(elements_ * sizeof(Eigen::Vector3d::Scalar), alignment) -
-                        (elements_ * sizeof(Eigen::Vector3d::Scalar))
-                 << std::endl;
-    _soa_impl_offset += cms::soa::alignSize(elements_ * sizeof(Eigen::Vector3d::Scalar), alignment) *
-                        Eigen::Vector3d::RowsAtCompileTime * Eigen::Vector3d::ColsAtCompileTime;
-    _soa_impl_os << "Final offset = " << _soa_impl_offset << " computeDataSize(...): " << computeDataSize(elements_)
-                 << std::endl;
-    _soa_impl_os << std::endl;
-  }
-  static constexpr byte_size_type computeDataSize(size_type elements) {
-    byte_size_type _soa_impl_ret = 0;
-    _soa_impl_ret += cms::soa::alignSize(elements * sizeof(float), alignment);
-    _soa_impl_ret += cms::soa::alignSize(elements * sizeof(float), alignment);
-    _soa_impl_ret += cms::soa::alignSize(elements * sizeof(float), alignment);
-    _soa_impl_ret += cms::soa::alignSize(elements * sizeof(float), alignment);
-    _soa_impl_ret += cms::soa::alignSize(elements * sizeof(Eigen::Vector3d::Scalar), alignment) *
-                     Eigen::Vector3d::RowsAtCompileTime * Eigen::Vector3d::ColsAtCompileTime;
-    return _soa_impl_ret;
-  }
-  struct Metadata {
-    friend SoAPCATemplate;
-    inline __attribute__((always_inline)) size_type size() const { return parent_.elements_; }
-    inline __attribute__((always_inline)) byte_size_type byteSize() const { return parent_.byteSize_; }
-    inline __attribute__((always_inline)) byte_size_type alignment() const { return SoAPCATemplate::alignment; }
-    inline __attribute__((always_inline)) std::byte* data() { return parent_.mem_; }
-    inline __attribute__((always_inline)) const std::byte* data() const { return parent_.mem_; }
-    inline __attribute__((always_inline)) std::byte* nextByte() const { return parent_.mem_ + parent_.byteSize_; }
-    inline __attribute__((always_inline)) SoAPCATemplate cloneToNewAddress(std::byte* _soa_impl_addr) const {
-      return SoAPCATemplate(_soa_impl_addr, parent_.elements_);
-    }
-    using ParametersTypeOf_eigenvalues =
-        cms::soa::SoAParameters_ColumnType<cms::soa::SoAColumnType::column>::DataType<float>;
-    inline __attribute__((always_inline)) ParametersTypeOf_eigenvalues parametersOf_eigenvalues() const {
-      return ParametersTypeOf_eigenvalues(parent_.eigenvalues_, parent_.metadata().size());
-    }
-    inline __attribute__((always_inline)) float const* addressOf_eigenvalues() const {
-      return parent_.metadata().parametersOf_eigenvalues().addr_;
-    }
-    inline __attribute__((always_inline)) float* addressOf_eigenvalues() {
-      return parent_.metadata().parametersOf_eigenvalues().addr_;
-    }
-    inline __attribute__((always_inline)) byte_size_type eigenvaluesPitch() const {
-      return cms::soa::alignSize(parent_.elements_ * sizeof(float), ParentClass::alignment);
-    }
-    using TypeOf_eigenvalues = float;
-    constexpr static cms::soa::SoAColumnType ColumnTypeOf_eigenvalues = cms::soa::SoAColumnType::column;
-    using ParametersTypeOf_eigenvector_1 =
-        cms::soa::SoAParameters_ColumnType<cms::soa::SoAColumnType::column>::DataType<float>;
-    inline __attribute__((always_inline)) ParametersTypeOf_eigenvector_1 parametersOf_eigenvector_1() const {
-      return ParametersTypeOf_eigenvector_1(parent_.eigenvector_1_, parent_.metadata().size());
-    }
-    inline __attribute__((always_inline)) float const* addressOf_eigenvector_1() const {
-      return parent_.metadata().parametersOf_eigenvector_1().addr_;
-    }
-    inline __attribute__((always_inline)) float* addressOf_eigenvector_1() {
-      return parent_.metadata().parametersOf_eigenvector_1().addr_;
-    }
-    inline __attribute__((always_inline)) byte_size_type eigenvector_1Pitch() const {
-      return cms::soa::alignSize(parent_.elements_ * sizeof(float), ParentClass::alignment);
-    }
-    using TypeOf_eigenvector_1 = float;
-    constexpr static cms::soa::SoAColumnType ColumnTypeOf_eigenvector_1 = cms::soa::SoAColumnType::column;
-    using ParametersTypeOf_eigenvector_2 =
-        cms::soa::SoAParameters_ColumnType<cms::soa::SoAColumnType::column>::DataType<float>;
-    inline __attribute__((always_inline)) ParametersTypeOf_eigenvector_2 parametersOf_eigenvector_2() const {
-      return ParametersTypeOf_eigenvector_2(parent_.eigenvector_2_, parent_.metadata().size());
-    }
-    inline __attribute__((always_inline)) float const* addressOf_eigenvector_2() const {
-      return parent_.metadata().parametersOf_eigenvector_2().addr_;
-    }
-    inline __attribute__((always_inline)) float* addressOf_eigenvector_2() {
-      return parent_.metadata().parametersOf_eigenvector_2().addr_;
-    }
-    inline __attribute__((always_inline)) byte_size_type eigenvector_2Pitch() const {
-      return cms::soa::alignSize(parent_.elements_ * sizeof(float), ParentClass::alignment);
-    }
-    using TypeOf_eigenvector_2 = float;
-    constexpr static cms::soa::SoAColumnType ColumnTypeOf_eigenvector_2 = cms::soa::SoAColumnType::column;
-    using ParametersTypeOf_eigenvector_3 =
-        cms::soa::SoAParameters_ColumnType<cms::soa::SoAColumnType::column>::DataType<float>;
-    inline __attribute__((always_inline)) ParametersTypeOf_eigenvector_3 parametersOf_eigenvector_3() const {
-      return ParametersTypeOf_eigenvector_3(parent_.eigenvector_3_, parent_.metadata().size());
-    }
-    inline __attribute__((always_inline)) float const* addressOf_eigenvector_3() const {
-      return parent_.metadata().parametersOf_eigenvector_3().addr_;
-    }
-    inline __attribute__((always_inline)) float* addressOf_eigenvector_3() {
-      return parent_.metadata().parametersOf_eigenvector_3().addr_;
-    }
-    inline __attribute__((always_inline)) byte_size_type eigenvector_3Pitch() const {
-      return cms::soa::alignSize(parent_.elements_ * sizeof(float), ParentClass::alignment);
-    }
-    using TypeOf_eigenvector_3 = float;
-    constexpr static cms::soa::SoAColumnType ColumnTypeOf_eigenvector_3 = cms::soa::SoAColumnType::column;
-    using ParametersTypeOf_candidateDirection =
-        cms::soa::SoAParameters_ColumnType<cms::soa::SoAColumnType::eigen>::DataType<Eigen::Vector3d>;
-    inline __attribute__((always_inline)) ParametersTypeOf_candidateDirection parametersOf_candidateDirection() const {
-      return ParametersTypeOf_candidateDirection(
-          parent_.candidateDirection_, parent_.candidateDirectionStride_, parent_.metadata().size());
-    }
-    inline __attribute__((always_inline)) byte_size_type candidateDirectionPitch() const {
-      return cms::soa::alignSize(parent_.elements_ * sizeof(Eigen::Vector3d::Scalar), ParentClass::alignment) *
-             Eigen::Vector3d::RowsAtCompileTime * Eigen::Vector3d::ColsAtCompileTime;
-    }
-    using TypeOf_candidateDirection = Eigen::Vector3d;
-    constexpr static cms::soa::SoAColumnType ColumnTypeOf_candidateDirection = cms::soa::SoAColumnType::eigen;
-    inline __attribute__((always_inline)) Eigen::Vector3d::Scalar const* addressOf_candidateDirection() const {
-      return parent_.metadata().parametersOf_candidateDirection().addr_;
-    }
-    inline __attribute__((always_inline)) Eigen::Vector3d::Scalar* addressOf_candidateDirection() {
-      return parent_.metadata().parametersOf_candidateDirection().addr_;
-    }
-    struct value_element {
-      inline __attribute__((always_inline)) value_element(float eigenvalues,
-                                                          float eigenvector_1,
-                                                          float eigenvector_2,
-                                                          float eigenvector_3,
-                                                          Eigen::Vector3d candidateDirection)
-          : eigenvalues{eigenvalues},
-            eigenvector_1{eigenvector_1},
-            eigenvector_2{eigenvector_2},
-            eigenvector_3{eigenvector_3},
-            candidateDirection{candidateDirection} {}
-      float eigenvalues;
-      float eigenvector_1;
-      float eigenvector_2;
-      float eigenvector_3;
-      Eigen::Vector3d candidateDirection;
-    };
-    Metadata& operator=(const Metadata&) = delete;
-    Metadata(const Metadata&) = delete;
-
-  private:
-    inline __attribute__((always_inline)) Metadata(const SoAPCATemplate& _soa_impl_parent)
-        : parent_(_soa_impl_parent) {}
-    const SoAPCATemplate& parent_;
-    using ParentClass = SoAPCATemplate;
-  };
-  friend Metadata;
-  inline __attribute__((always_inline)) const Metadata metadata() const { return Metadata(*this); }
-  inline __attribute__((always_inline)) Metadata metadata() { return Metadata(*this); }
-  template <std::size_t VIEW_ALIGNMENT, bool VIEW_ALIGNMENT_ENFORCEMENT, bool RESTRICT_QUALIFY, bool RANGE_CHECKING>
-  struct ConstViewTemplateFreeParams {
-    using self_type = ConstViewTemplateFreeParams;
-    using SoAPCATemplate_parametrized = SoAPCATemplate<VIEW_ALIGNMENT, VIEW_ALIGNMENT_ENFORCEMENT>;
-    using size_type = cms::soa::size_type;
-    using byte_size_type = cms::soa::byte_size_type;
-    using AlignmentEnforcement = cms::soa::AlignmentEnforcement;
-    template <std::size_t, bool, bool, bool>
-    friend struct ViewTemplateFreeParams;
-    template <std::size_t, bool, bool, bool>
-    friend struct ConstViewTemplateFreeParams;
-    constexpr static byte_size_type defaultAlignment = cms::soa::CacheLineSize::defaultSize;
-    constexpr static byte_size_type alignment = VIEW_ALIGNMENT;
-    constexpr static bool alignmentEnforcement = VIEW_ALIGNMENT_ENFORCEMENT;
-    constexpr static byte_size_type conditionalAlignment =
-        alignmentEnforcement == AlignmentEnforcement::enforced ? alignment : 0;
-    constexpr static bool restrictQualify = RESTRICT_QUALIFY;
-    constexpr static bool rangeChecking = RANGE_CHECKING;
-    template <cms::soa::SoAColumnType COLUMN_TYPE, class C>
-    using SoAValueWithConf = cms::soa::SoAValue<COLUMN_TYPE, C, conditionalAlignment, restrictQualify>;
-    template <cms::soa::SoAColumnType COLUMN_TYPE, class C>
-    using SoAConstValueWithConf = cms::soa::SoAConstValue<COLUMN_TYPE, C, conditionalAlignment, restrictQualify>;
-    struct Metadata {
-      friend ConstViewTemplateFreeParams;
-      inline __attribute__((always_inline)) size_type size() const { return parent_.elements_; }
-      using TypeOf_instance_SoAPCATemplate = SoAPCATemplate_parametrized;
-      using TypeOf_eigenvalues = typename TypeOf_instance_SoAPCATemplate::Metadata::TypeOf_eigenvalues;
-      using ParametersTypeOf_eigenvalues =
-          typename TypeOf_instance_SoAPCATemplate::Metadata::ParametersTypeOf_eigenvalues;
-      constexpr static cms::soa::SoAColumnType ColumnTypeOf_eigenvalues =
-          TypeOf_instance_SoAPCATemplate::Metadata::ColumnTypeOf_eigenvalues;
-      using ConstAccessorOf_eigenvalues =
-          typename cms::soa::SoAAccessors<typename Metadata::TypeOf_eigenvalues>::template ColumnType<
-              ColumnTypeOf_eigenvalues>::template AccessType<cms::soa::SoAAccessType::constAccess>::
-              template Alignment<conditionalAlignment>::template RestrictQualifier<restrictQualify>;
-      using MutableAccessorOf_eigenvalues =
-          typename cms::soa::SoAAccessors<typename Metadata::TypeOf_eigenvalues>::template ColumnType<
-              ColumnTypeOf_eigenvalues>::template AccessType<cms::soa::SoAAccessType::mutableAccess>::
-              template Alignment<conditionalAlignment>::template RestrictQualifier<restrictQualify>;
-      inline __attribute__((always_inline)) const auto parametersOf_eigenvalues() const {
-        return (parent_.eigenvaluesParameters_);
-      };
-      using TypeOf_eigenvector_1 = typename TypeOf_instance_SoAPCATemplate::Metadata::TypeOf_eigenvector_1;
-      using ParametersTypeOf_eigenvector_1 =
-          typename TypeOf_instance_SoAPCATemplate::Metadata::ParametersTypeOf_eigenvector_1;
-      constexpr static cms::soa::SoAColumnType ColumnTypeOf_eigenvector_1 =
-          TypeOf_instance_SoAPCATemplate::Metadata::ColumnTypeOf_eigenvector_1;
-      using ConstAccessorOf_eigenvector_1 =
-          typename cms::soa::SoAAccessors<typename Metadata::TypeOf_eigenvector_1>::template ColumnType<
-              ColumnTypeOf_eigenvector_1>::template AccessType<cms::soa::SoAAccessType::constAccess>::
-              template Alignment<conditionalAlignment>::template RestrictQualifier<restrictQualify>;
-      using MutableAccessorOf_eigenvector_1 =
-          typename cms::soa::SoAAccessors<typename Metadata::TypeOf_eigenvector_1>::template ColumnType<
-              ColumnTypeOf_eigenvector_1>::template AccessType<cms::soa::SoAAccessType::mutableAccess>::
-              template Alignment<conditionalAlignment>::template RestrictQualifier<restrictQualify>;
-      inline __attribute__((always_inline)) const auto parametersOf_eigenvector_1() const {
-        return (parent_.eigenvector_1Parameters_);
-      };
-      using TypeOf_eigenvector_2 = typename TypeOf_instance_SoAPCATemplate::Metadata::TypeOf_eigenvector_2;
-      using ParametersTypeOf_eigenvector_2 =
-          typename TypeOf_instance_SoAPCATemplate::Metadata::ParametersTypeOf_eigenvector_2;
-      constexpr static cms::soa::SoAColumnType ColumnTypeOf_eigenvector_2 =
-          TypeOf_instance_SoAPCATemplate::Metadata::ColumnTypeOf_eigenvector_2;
-      using ConstAccessorOf_eigenvector_2 =
-          typename cms::soa::SoAAccessors<typename Metadata::TypeOf_eigenvector_2>::template ColumnType<
-              ColumnTypeOf_eigenvector_2>::template AccessType<cms::soa::SoAAccessType::constAccess>::
-              template Alignment<conditionalAlignment>::template RestrictQualifier<restrictQualify>;
-      using MutableAccessorOf_eigenvector_2 =
-          typename cms::soa::SoAAccessors<typename Metadata::TypeOf_eigenvector_2>::template ColumnType<
-              ColumnTypeOf_eigenvector_2>::template AccessType<cms::soa::SoAAccessType::mutableAccess>::
-              template Alignment<conditionalAlignment>::template RestrictQualifier<restrictQualify>;
-      inline __attribute__((always_inline)) const auto parametersOf_eigenvector_2() const {
-        return (parent_.eigenvector_2Parameters_);
-      };
-      using TypeOf_eigenvector_3 = typename TypeOf_instance_SoAPCATemplate::Metadata::TypeOf_eigenvector_3;
-      using ParametersTypeOf_eigenvector_3 =
-          typename TypeOf_instance_SoAPCATemplate::Metadata::ParametersTypeOf_eigenvector_3;
-      constexpr static cms::soa::SoAColumnType ColumnTypeOf_eigenvector_3 =
-          TypeOf_instance_SoAPCATemplate::Metadata::ColumnTypeOf_eigenvector_3;
-      using ConstAccessorOf_eigenvector_3 =
-          typename cms::soa::SoAAccessors<typename Metadata::TypeOf_eigenvector_3>::template ColumnType<
-              ColumnTypeOf_eigenvector_3>::template AccessType<cms::soa::SoAAccessType::constAccess>::
-              template Alignment<conditionalAlignment>::template RestrictQualifier<restrictQualify>;
-      using MutableAccessorOf_eigenvector_3 =
-          typename cms::soa::SoAAccessors<typename Metadata::TypeOf_eigenvector_3>::template ColumnType<
-              ColumnTypeOf_eigenvector_3>::template AccessType<cms::soa::SoAAccessType::mutableAccess>::
-              template Alignment<conditionalAlignment>::template RestrictQualifier<restrictQualify>;
-      inline __attribute__((always_inline)) const auto parametersOf_eigenvector_3() const {
-        return (parent_.eigenvector_3Parameters_);
-      };
-      using TypeOf_candidateDirection = typename TypeOf_instance_SoAPCATemplate::Metadata::TypeOf_candidateDirection;
-      using ParametersTypeOf_candidateDirection =
-          typename TypeOf_instance_SoAPCATemplate::Metadata::ParametersTypeOf_candidateDirection;
-      constexpr static cms::soa::SoAColumnType ColumnTypeOf_candidateDirection =
-          TypeOf_instance_SoAPCATemplate::Metadata::ColumnTypeOf_candidateDirection;
-      using ConstAccessorOf_candidateDirection =
-          typename cms::soa::SoAAccessors<typename Metadata::TypeOf_candidateDirection>::template ColumnType<
-              ColumnTypeOf_candidateDirection>::template AccessType<cms::soa::SoAAccessType::constAccess>::
-              template Alignment<conditionalAlignment>::template RestrictQualifier<restrictQualify>;
-      using MutableAccessorOf_candidateDirection =
-          typename cms::soa::SoAAccessors<typename Metadata::TypeOf_candidateDirection>::template ColumnType<
-              ColumnTypeOf_candidateDirection>::template AccessType<cms::soa::SoAAccessType::mutableAccess>::
-              template Alignment<conditionalAlignment>::template RestrictQualifier<restrictQualify>;
-      inline __attribute__((always_inline)) const auto parametersOf_candidateDirection() const {
-        return (parent_.candidateDirectionParameters_);
-      };
-      inline __attribute__((always_inline)) auto const* addressOf_eigenvalues() const {
-        return parametersOf_eigenvalues().addr_;
-      };
-      inline __attribute__((always_inline)) auto const* addressOf_eigenvector_1() const {
-        return parametersOf_eigenvector_1().addr_;
-      };
-      inline __attribute__((always_inline)) auto const* addressOf_eigenvector_2() const {
-        return parametersOf_eigenvector_2().addr_;
-      };
-      inline __attribute__((always_inline)) auto const* addressOf_eigenvector_3() const {
-        return parametersOf_eigenvector_3().addr_;
-      };
-      inline __attribute__((always_inline)) auto const* addressOf_candidateDirection() const {
-        return parametersOf_candidateDirection().addr_;
-      };
-      Metadata& operator=(const Metadata&) = delete;
-      Metadata(const Metadata&) = delete;
-
-    private:
-      inline __attribute__((always_inline)) Metadata(const ConstViewTemplateFreeParams& _soa_impl_parent)
-          : parent_(_soa_impl_parent) {}
-      const ConstViewTemplateFreeParams& parent_;
-    };
-    friend Metadata;
-    struct Metarecords {
-      friend ConstViewTemplateFreeParams;
-      Metarecords(const ConstViewTemplateFreeParams& _soa_impl_parent)
-          : parent_(_soa_impl_parent),
-            eigenvalues_{parent_.metadata().parametersOf_eigenvalues()},
-            eigenvector_1_{parent_.metadata().parametersOf_eigenvector_1()},
-            eigenvector_2_{parent_.metadata().parametersOf_eigenvector_2()},
-            eigenvector_3_{parent_.metadata().parametersOf_eigenvector_3()},
-            candidateDirection_{parent_.metadata().parametersOf_candidateDirection()} {}
-      const typename Metadata::ParametersTypeOf_eigenvalues::ConstType& eigenvalues() const { return eigenvalues_; }
-      const typename Metadata::ParametersTypeOf_eigenvector_1::ConstType& eigenvector_1() const {
-        return eigenvector_1_;
-      }
-      const typename Metadata::ParametersTypeOf_eigenvector_2::ConstType& eigenvector_2() const {
-        return eigenvector_2_;
-      }
-      const typename Metadata::ParametersTypeOf_eigenvector_3::ConstType& eigenvector_3() const {
-        return eigenvector_3_;
-      }
-      const typename Metadata::ParametersTypeOf_candidateDirection::ConstType& candidateDirection() const {
-        return candidateDirection_;
-      }
-
-    private:
-      const ConstViewTemplateFreeParams& parent_;
-      typename Metadata::ParametersTypeOf_eigenvalues::ConstType eigenvalues_;
-      typename Metadata::ParametersTypeOf_eigenvector_1::ConstType eigenvector_1_;
-      typename Metadata::ParametersTypeOf_eigenvector_2::ConstType eigenvector_2_;
-      typename Metadata::ParametersTypeOf_eigenvector_3::ConstType eigenvector_3_;
-      typename Metadata::ParametersTypeOf_candidateDirection::ConstType candidateDirection_;
-    };
-    inline __attribute__((always_inline)) const Metadata metadata() const { return Metadata(*this); }
-    inline __attribute__((always_inline)) const Metarecords records() const { return Metarecords(*this); }
-    ConstViewTemplateFreeParams() = default;
-    ConstViewTemplateFreeParams(const SoAPCATemplate_parametrized& instance_SoAPCATemplate)
-        : elements_([&]() -> size_type {
-            bool set = false;
-            size_type ret = 0;
-            if (set) {
-              if (ret != instance_SoAPCATemplate.metadata().size())
-                throw std::runtime_error("In constructor by layout: different sizes from layouts.");
-            } else {
-              ret = instance_SoAPCATemplate.metadata().size();
-              set = true;
-            }
-            return ret;
-          }()),
-          eigenvaluesParameters_([&]() -> auto {
-            auto params = instance_SoAPCATemplate.metadata().parametersOf_eigenvalues();
-            if constexpr (alignmentEnforcement == AlignmentEnforcement::enforced)
-              if (reinterpret_cast<intptr_t>(params.addr_) % alignment)
-                throw std::runtime_error(
-                    "In constructor by layout: misaligned column: "
-                    "eigenvalues");
-            return params;
-          }()),
-          eigenvector_1Parameters_([&]() -> auto {
-            auto params = instance_SoAPCATemplate.metadata().parametersOf_eigenvector_1();
-            if constexpr (alignmentEnforcement == AlignmentEnforcement::enforced)
-              if (reinterpret_cast<intptr_t>(params.addr_) % alignment)
-                throw std::runtime_error(
-                    "In constructor by layout: misaligned column: "
-                    "eigenvector_1");
-            return params;
-          }()),
-          eigenvector_2Parameters_([&]() -> auto {
-            auto params = instance_SoAPCATemplate.metadata().parametersOf_eigenvector_2();
-            if constexpr (alignmentEnforcement == AlignmentEnforcement::enforced)
-              if (reinterpret_cast<intptr_t>(params.addr_) % alignment)
-                throw std::runtime_error(
-                    "In constructor by layout: misaligned column: "
-                    "eigenvector_2");
-            return params;
-          }()),
-          eigenvector_3Parameters_([&]() -> auto {
-            auto params = instance_SoAPCATemplate.metadata().parametersOf_eigenvector_3();
-            if constexpr (alignmentEnforcement == AlignmentEnforcement::enforced)
-              if (reinterpret_cast<intptr_t>(params.addr_) % alignment)
-                throw std::runtime_error(
-                    "In constructor by layout: misaligned column: "
-                    "eigenvector_3");
-            return params;
-          }()),
-          candidateDirectionParameters_([&]() -> auto {
-            auto params = instance_SoAPCATemplate.metadata().parametersOf_candidateDirection();
-            if constexpr (alignmentEnforcement == AlignmentEnforcement::enforced)
-              if (reinterpret_cast<intptr_t>(params.addr_) % alignment)
-                throw std::runtime_error(
-                    "In constructor by layout: misaligned column: "
-                    "candidateDirection");
-            return params;
-          }()) {}
-    ConstViewTemplateFreeParams(
-        size_type _soa_impl_elements,
-        const typename Metadata::ParametersTypeOf_eigenvalues::TupleOrPointerType eigenvalues,
-        const typename Metadata::ParametersTypeOf_eigenvector_1::TupleOrPointerType eigenvector_1,
-        const typename Metadata::ParametersTypeOf_eigenvector_2::TupleOrPointerType eigenvector_2,
-        const typename Metadata::ParametersTypeOf_eigenvector_3::TupleOrPointerType eigenvector_3,
-        const typename Metadata::ParametersTypeOf_candidateDirection::TupleOrPointerType candidateDirection)
-        : elements_(_soa_impl_elements),
-          eigenvaluesParameters_([&]() -> auto {
-            if constexpr (alignmentEnforcement == AlignmentEnforcement::enforced)
-              if (Metadata::ParametersTypeOf_eigenvalues::checkAlignment(eigenvalues, alignment))
-                throw std::runtime_error(
-                    "In constructor by column: misaligned column: "
-                    "eigenvalues");
-            return eigenvalues;
-          }()),
-          eigenvector_1Parameters_([&]() -> auto {
-            if constexpr (alignmentEnforcement == AlignmentEnforcement::enforced)
-              if (Metadata::ParametersTypeOf_eigenvector_1::checkAlignment(eigenvector_1, alignment))
-                throw std::runtime_error(
-                    "In constructor by column: misaligned column: "
-                    "eigenvector_1");
-            return eigenvector_1;
-          }()),
-          eigenvector_2Parameters_([&]() -> auto {
-            if constexpr (alignmentEnforcement == AlignmentEnforcement::enforced)
-              if (Metadata::ParametersTypeOf_eigenvector_2::checkAlignment(eigenvector_2, alignment))
-                throw std::runtime_error(
-                    "In constructor by column: misaligned column: "
-                    "eigenvector_2");
-            return eigenvector_2;
-          }()),
-          eigenvector_3Parameters_([&]() -> auto {
-            if constexpr (alignmentEnforcement == AlignmentEnforcement::enforced)
-              if (Metadata::ParametersTypeOf_eigenvector_3::checkAlignment(eigenvector_3, alignment))
-                throw std::runtime_error(
-                    "In constructor by column: misaligned column: "
-                    "eigenvector_3");
-            return eigenvector_3;
-          }()),
-          candidateDirectionParameters_([&]() -> auto {
-            if constexpr (alignmentEnforcement == AlignmentEnforcement::enforced)
-              if (Metadata::ParametersTypeOf_candidateDirection::checkAlignment(candidateDirection, alignment))
-                throw std::runtime_error(
-                    "In constructor by column: misaligned column: "
-                    "candidateDirection");
-            return candidateDirection;
-          }()) {}
-    ConstViewTemplateFreeParams(typename Metadata::ParametersTypeOf_eigenvalues::ConstType eigenvalues,
-                                typename Metadata::ParametersTypeOf_eigenvector_1::ConstType eigenvector_1,
-                                typename Metadata::ParametersTypeOf_eigenvector_2::ConstType eigenvector_2,
-                                typename Metadata::ParametersTypeOf_eigenvector_3::ConstType eigenvector_3,
-                                typename Metadata::ParametersTypeOf_candidateDirection::ConstType candidateDirection) {
-      bool readyToSet = false;
-      if (not readyToSet) {
-        elements_ = eigenvalues.size_;
-        readyToSet = true;
-      }
-      auto eigenvalues_tmp = [&]() -> auto {
-        if (elements_ != eigenvalues.size_)
-          throw std::runtime_error(
-              "In constructor by column pointers: number of elements not equal for every column: "
-              "eigenvalues");
-        if constexpr (alignmentEnforcement == AlignmentEnforcement::enforced)
-          if (Metadata::ParametersTypeOf_eigenvalues::checkAlignment(eigenvalues, alignment))
-            throw std::runtime_error(
-                "In constructor by column: misaligned column: "
-                "eigenvalues");
-        return eigenvalues;
-      }();
-      eigenvaluesParameters_ = eigenvalues_tmp;
-      if (not readyToSet) {
-        elements_ = eigenvector_1.size_;
-        readyToSet = true;
-      }
-      auto eigenvector_1_tmp = [&]() -> auto {
-        if (elements_ != eigenvector_1.size_)
-          throw std::runtime_error(
-              "In constructor by column pointers: number of elements not equal for every column: "
-              "eigenvector_1");
-        if constexpr (alignmentEnforcement == AlignmentEnforcement::enforced)
-          if (Metadata::ParametersTypeOf_eigenvector_1::checkAlignment(eigenvector_1, alignment))
-            throw std::runtime_error(
-                "In constructor by column: misaligned column: "
-                "eigenvector_1");
-        return eigenvector_1;
-      }();
-      eigenvector_1Parameters_ = eigenvector_1_tmp;
-      if (not readyToSet) {
-        elements_ = eigenvector_2.size_;
-        readyToSet = true;
-      }
-      auto eigenvector_2_tmp = [&]() -> auto {
-        if (elements_ != eigenvector_2.size_)
-          throw std::runtime_error(
-              "In constructor by column pointers: number of elements not equal for every column: "
-              "eigenvector_2");
-        if constexpr (alignmentEnforcement == AlignmentEnforcement::enforced)
-          if (Metadata::ParametersTypeOf_eigenvector_2::checkAlignment(eigenvector_2, alignment))
-            throw std::runtime_error(
-                "In constructor by column: misaligned column: "
-                "eigenvector_2");
-        return eigenvector_2;
-      }();
-      eigenvector_2Parameters_ = eigenvector_2_tmp;
-      if (not readyToSet) {
-        elements_ = eigenvector_3.size_;
-        readyToSet = true;
-      }
-      auto eigenvector_3_tmp = [&]() -> auto {
-        if (elements_ != eigenvector_3.size_)
-          throw std::runtime_error(
-              "In constructor by column pointers: number of elements not equal for every column: "
-              "eigenvector_3");
-        if constexpr (alignmentEnforcement == AlignmentEnforcement::enforced)
-          if (Metadata::ParametersTypeOf_eigenvector_3::checkAlignment(eigenvector_3, alignment))
-            throw std::runtime_error(
-                "In constructor by column: misaligned column: "
-                "eigenvector_3");
-        return eigenvector_3;
-      }();
-      eigenvector_3Parameters_ = eigenvector_3_tmp;
-      if (not readyToSet) {
-        elements_ = candidateDirection.size_;
-        readyToSet = true;
-      }
-      auto candidateDirection_tmp = [&]() -> auto {
-        if (elements_ != candidateDirection.size_)
-          throw std::runtime_error(
-              "In constructor by column pointers: number of elements not equal for every column: "
-              "candidateDirection");
-        if constexpr (alignmentEnforcement == AlignmentEnforcement::enforced)
-          if (Metadata::ParametersTypeOf_candidateDirection::checkAlignment(candidateDirection, alignment))
-            throw std::runtime_error(
-                "In constructor by column: misaligned column: "
-                "candidateDirection");
-        return candidateDirection;
-      }();
-      candidateDirectionParameters_ = candidateDirection_tmp;
-    }
-    ConstViewTemplateFreeParams(ConstViewTemplateFreeParams const&) = default;
-    ConstViewTemplateFreeParams& operator=(ConstViewTemplateFreeParams const&) = default;
-    template <std::size_t OTHER_VIEW_ALIGNMENT,
-              bool OTHER_VIEW_ALIGNMENT_ENFORCEMENT,
-              bool OTHER_RESTRICT_QUALIFY,
-              bool OTHER_RANGE_CHECKING>
-    ConstViewTemplateFreeParams(ConstViewTemplateFreeParams<OTHER_VIEW_ALIGNMENT,
-                                                            OTHER_VIEW_ALIGNMENT_ENFORCEMENT,
-                                                            OTHER_RESTRICT_QUALIFY,
-                                                            OTHER_RANGE_CHECKING> const& other)
-        : ConstViewTemplateFreeParams{
-              other.elements_,
-              const_cast_SoAParametersImpl(other.eigenvaluesParameters_).tupleOrPointer(),
-              const_cast_SoAParametersImpl(other.eigenvector_1Parameters_).tupleOrPointer(),
-              const_cast_SoAParametersImpl(other.eigenvector_2Parameters_).tupleOrPointer(),
-              const_cast_SoAParametersImpl(other.eigenvector_3Parameters_).tupleOrPointer(),
-              const_cast_SoAParametersImpl(other.candidateDirectionParameters_).tupleOrPointer()} {}
-    template <std::size_t OTHER_VIEW_ALIGNMENT,
-              bool OTHER_VIEW_ALIGNMENT_ENFORCEMENT,
-              bool OTHER_RESTRICT_QUALIFY,
-              bool OTHER_RANGE_CHECKING>
-    ConstViewTemplateFreeParams& operator=(ConstViewTemplateFreeParams<OTHER_VIEW_ALIGNMENT,
-                                                                       OTHER_VIEW_ALIGNMENT_ENFORCEMENT,
-                                                                       OTHER_RESTRICT_QUALIFY,
-                                                                       OTHER_RANGE_CHECKING> const& other) {
-      *this = other;
-    }
-    ConstViewTemplateFreeParams(ConstViewTemplateFreeParams&&) = default;
-    ConstViewTemplateFreeParams& operator=(ConstViewTemplateFreeParams&&) = default;
-    ~ConstViewTemplateFreeParams() = default;
-    struct const_element {
-      inline __attribute__((always_inline)) const_element(
-          size_type _soa_impl_index,
-          const typename Metadata::ParametersTypeOf_eigenvalues::ConstType eigenvalues,
-          const typename Metadata::ParametersTypeOf_eigenvector_1::ConstType eigenvector_1,
-          const typename Metadata::ParametersTypeOf_eigenvector_2::ConstType eigenvector_2,
-          const typename Metadata::ParametersTypeOf_eigenvector_3::ConstType eigenvector_3,
-          const typename Metadata::ParametersTypeOf_candidateDirection::ConstType candidateDirection)
-          : eigenvalues_(_soa_impl_index, eigenvalues),
-            eigenvector_1_(_soa_impl_index, eigenvector_1),
-            eigenvector_2_(_soa_impl_index, eigenvector_2),
-            eigenvector_3_(_soa_impl_index, eigenvector_3),
-            candidateDirection_(_soa_impl_index, candidateDirection) {}
-      inline __attribute__((always_inline))
-      const typename SoAConstValueWithConf<Metadata::ColumnTypeOf_eigenvalues,
-                                           const typename Metadata::TypeOf_eigenvalues>::RefToConst
-      eigenvalues() const {
-        return eigenvalues_();
-      }
-      inline __attribute__((always_inline))
-      const typename SoAConstValueWithConf<Metadata::ColumnTypeOf_eigenvector_1,
-                                           const typename Metadata::TypeOf_eigenvector_1>::RefToConst
-      eigenvector_1() const {
-        return eigenvector_1_();
-      }
-      inline __attribute__((always_inline))
-      const typename SoAConstValueWithConf<Metadata::ColumnTypeOf_eigenvector_2,
-                                           const typename Metadata::TypeOf_eigenvector_2>::RefToConst
-      eigenvector_2() const {
-        return eigenvector_2_();
-      }
-      inline __attribute__((always_inline))
-      const typename SoAConstValueWithConf<Metadata::ColumnTypeOf_eigenvector_3,
-                                           const typename Metadata::TypeOf_eigenvector_3>::RefToConst
-      eigenvector_3() const {
-        return eigenvector_3_();
-      }
-      inline __attribute__((always_inline))
-      const typename SoAConstValueWithConf<Metadata::ColumnTypeOf_candidateDirection,
-                                           const typename Metadata::TypeOf_candidateDirection>::RefToConst
-      candidateDirection() const {
-        return candidateDirection_();
-      }
-
-    private:
-      const cms::soa::ConstValueTraits<
-          SoAConstValueWithConf<Metadata::ColumnTypeOf_eigenvalues, typename Metadata::TypeOf_eigenvalues>,
-          Metadata::ColumnTypeOf_eigenvalues>
-          eigenvalues_;
-      const cms::soa::ConstValueTraits<
-          SoAConstValueWithConf<Metadata::ColumnTypeOf_eigenvector_1, typename Metadata::TypeOf_eigenvector_1>,
-          Metadata::ColumnTypeOf_eigenvector_1>
-          eigenvector_1_;
-      const cms::soa::ConstValueTraits<
-          SoAConstValueWithConf<Metadata::ColumnTypeOf_eigenvector_2, typename Metadata::TypeOf_eigenvector_2>,
-          Metadata::ColumnTypeOf_eigenvector_2>
-          eigenvector_2_;
-      const cms::soa::ConstValueTraits<
-          SoAConstValueWithConf<Metadata::ColumnTypeOf_eigenvector_3, typename Metadata::TypeOf_eigenvector_3>,
-          Metadata::ColumnTypeOf_eigenvector_3>
-          eigenvector_3_;
-      const cms::soa::ConstValueTraits<
-          SoAConstValueWithConf<Metadata::ColumnTypeOf_candidateDirection, typename Metadata::TypeOf_candidateDirection>,
-          Metadata::ColumnTypeOf_candidateDirection>
-          candidateDirection_;
-    };
-    inline __attribute__((always_inline)) const_element operator[](size_type _soa_impl_index) const {
-      if constexpr (rangeChecking == cms::soa::RangeChecking::enabled) {
-        if (_soa_impl_index >= elements_ or _soa_impl_index < 0) {
-          throw std::out_of_range(
-              "Out of range index in "
-              "ConstViewTemplateFreeParams"
-              "::operator[]");
-        }
-      }
-      return const_element{_soa_impl_index,
-                           eigenvaluesParameters_,
-                           eigenvector_1Parameters_,
-                           eigenvector_2Parameters_,
-                           eigenvector_3Parameters_,
-                           candidateDirectionParameters_};
-    }
-    inline __attribute__((always_inline))
-    typename cms::soa::SoAAccessors<typename Metadata::TypeOf_eigenvalues>::template ColumnType<
-        Metadata::ColumnTypeOf_eigenvalues>::template AccessType<cms::soa::SoAAccessType::constAccess>::
-        template Alignment<conditionalAlignment>::template RestrictQualifier<restrictQualify>::NoParamReturnType
-        eigenvalues() const {
-      return typename cms::soa::SoAAccessors<typename Metadata::TypeOf_eigenvalues>::template ColumnType<
-          Metadata::ColumnTypeOf_eigenvalues>::template AccessType<cms::soa::SoAAccessType::constAccess>::
-          template Alignment<conditionalAlignment>::template RestrictQualifier<restrictQualify>(
-              eigenvaluesParameters_)();
-    }
-    inline __attribute__((always_inline))
-    typename cms::soa::SoAAccessors<typename Metadata::TypeOf_eigenvalues>::template ColumnType<
-        Metadata::ColumnTypeOf_eigenvalues>::template AccessType<cms::soa::SoAAccessType::constAccess>::
-        template Alignment<conditionalAlignment>::template RestrictQualifier<restrictQualify>::ParamReturnType
-        eigenvalues(size_type _soa_impl_index) const {
-      if constexpr (rangeChecking == cms::soa::RangeChecking::enabled) {
-        if (_soa_impl_index >= elements_ or _soa_impl_index < 0) {
-          throw std::out_of_range(
-              "Out of range index in const "
-              "eigenvalues"
-              "(size_type index)");
-        }
-      }
-      return typename cms::soa::SoAAccessors<typename Metadata::TypeOf_eigenvalues>::template ColumnType<
-          Metadata::ColumnTypeOf_eigenvalues>::template AccessType<cms::soa::SoAAccessType::constAccess>::
-          template Alignment<conditionalAlignment>::template RestrictQualifier<restrictQualify>(eigenvaluesParameters_)(
-              _soa_impl_index);
-    }
-    inline __attribute__((always_inline))
-    typename cms::soa::SoAAccessors<typename Metadata::TypeOf_eigenvector_1>::template ColumnType<
-        Metadata::ColumnTypeOf_eigenvector_1>::template AccessType<cms::soa::SoAAccessType::constAccess>::
-        template Alignment<conditionalAlignment>::template RestrictQualifier<restrictQualify>::NoParamReturnType
-        eigenvector_1() const {
-      return typename cms::soa::SoAAccessors<typename Metadata::TypeOf_eigenvector_1>::template ColumnType<
-          Metadata::ColumnTypeOf_eigenvector_1>::template AccessType<cms::soa::SoAAccessType::constAccess>::
-          template Alignment<conditionalAlignment>::template RestrictQualifier<restrictQualify>(
-              eigenvector_1Parameters_)();
-    }
-    inline __attribute__((always_inline))
-    typename cms::soa::SoAAccessors<typename Metadata::TypeOf_eigenvector_1>::template ColumnType<
-        Metadata::ColumnTypeOf_eigenvector_1>::template AccessType<cms::soa::SoAAccessType::constAccess>::
-        template Alignment<conditionalAlignment>::template RestrictQualifier<restrictQualify>::ParamReturnType
-        eigenvector_1(size_type _soa_impl_index) const {
-      if constexpr (rangeChecking == cms::soa::RangeChecking::enabled) {
-        if (_soa_impl_index >= elements_ or _soa_impl_index < 0) {
-          throw std::out_of_range(
-              "Out of range index in const "
-              "eigenvector_1"
-              "(size_type index)");
-        }
-      }
-      return typename cms::soa::SoAAccessors<typename Metadata::TypeOf_eigenvector_1>::template ColumnType<
-          Metadata::ColumnTypeOf_eigenvector_1>::template AccessType<cms::soa::SoAAccessType::constAccess>::
-          template Alignment<conditionalAlignment>::template RestrictQualifier<restrictQualify>(
-              eigenvector_1Parameters_)(_soa_impl_index);
-    }
-    inline __attribute__((always_inline))
-    typename cms::soa::SoAAccessors<typename Metadata::TypeOf_eigenvector_2>::template ColumnType<
-        Metadata::ColumnTypeOf_eigenvector_2>::template AccessType<cms::soa::SoAAccessType::constAccess>::
-        template Alignment<conditionalAlignment>::template RestrictQualifier<restrictQualify>::NoParamReturnType
-        eigenvector_2() const {
-      return typename cms::soa::SoAAccessors<typename Metadata::TypeOf_eigenvector_2>::template ColumnType<
-          Metadata::ColumnTypeOf_eigenvector_2>::template AccessType<cms::soa::SoAAccessType::constAccess>::
-          template Alignment<conditionalAlignment>::template RestrictQualifier<restrictQualify>(
-              eigenvector_2Parameters_)();
-    }
-    inline __attribute__((always_inline))
-    typename cms::soa::SoAAccessors<typename Metadata::TypeOf_eigenvector_2>::template ColumnType<
-        Metadata::ColumnTypeOf_eigenvector_2>::template AccessType<cms::soa::SoAAccessType::constAccess>::
-        template Alignment<conditionalAlignment>::template RestrictQualifier<restrictQualify>::ParamReturnType
-        eigenvector_2(size_type _soa_impl_index) const {
-      if constexpr (rangeChecking == cms::soa::RangeChecking::enabled) {
-        if (_soa_impl_index >= elements_ or _soa_impl_index < 0) {
-          throw std::out_of_range(
-              "Out of range index in const "
-              "eigenvector_2"
-              "(size_type index)");
-        }
-      }
-      return typename cms::soa::SoAAccessors<typename Metadata::TypeOf_eigenvector_2>::template ColumnType<
-          Metadata::ColumnTypeOf_eigenvector_2>::template AccessType<cms::soa::SoAAccessType::constAccess>::
-          template Alignment<conditionalAlignment>::template RestrictQualifier<restrictQualify>(
-              eigenvector_2Parameters_)(_soa_impl_index);
-    }
-    inline __attribute__((always_inline))
-    typename cms::soa::SoAAccessors<typename Metadata::TypeOf_eigenvector_3>::template ColumnType<
-        Metadata::ColumnTypeOf_eigenvector_3>::template AccessType<cms::soa::SoAAccessType::constAccess>::
-        template Alignment<conditionalAlignment>::template RestrictQualifier<restrictQualify>::NoParamReturnType
-        eigenvector_3() const {
-      return typename cms::soa::SoAAccessors<typename Metadata::TypeOf_eigenvector_3>::template ColumnType<
-          Metadata::ColumnTypeOf_eigenvector_3>::template AccessType<cms::soa::SoAAccessType::constAccess>::
-          template Alignment<conditionalAlignment>::template RestrictQualifier<restrictQualify>(
-              eigenvector_3Parameters_)();
-    }
-    inline __attribute__((always_inline))
-    typename cms::soa::SoAAccessors<typename Metadata::TypeOf_eigenvector_3>::template ColumnType<
-        Metadata::ColumnTypeOf_eigenvector_3>::template AccessType<cms::soa::SoAAccessType::constAccess>::
-        template Alignment<conditionalAlignment>::template RestrictQualifier<restrictQualify>::ParamReturnType
-        eigenvector_3(size_type _soa_impl_index) const {
-      if constexpr (rangeChecking == cms::soa::RangeChecking::enabled) {
-        if (_soa_impl_index >= elements_ or _soa_impl_index < 0) {
-          throw std::out_of_range(
-              "Out of range index in const "
-              "eigenvector_3"
-              "(size_type index)");
-        }
-      }
-      return typename cms::soa::SoAAccessors<typename Metadata::TypeOf_eigenvector_3>::template ColumnType<
-          Metadata::ColumnTypeOf_eigenvector_3>::template AccessType<cms::soa::SoAAccessType::constAccess>::
-          template Alignment<conditionalAlignment>::template RestrictQualifier<restrictQualify>(
-              eigenvector_3Parameters_)(_soa_impl_index);
-    }
-    inline __attribute__((always_inline))
-    typename cms::soa::SoAAccessors<typename Metadata::TypeOf_candidateDirection>::template ColumnType<
-        Metadata::ColumnTypeOf_candidateDirection>::template AccessType<cms::soa::SoAAccessType::constAccess>::
-        template Alignment<conditionalAlignment>::template RestrictQualifier<restrictQualify>::NoParamReturnType
-        candidateDirection() const {
-      return typename cms::soa::SoAAccessors<typename Metadata::TypeOf_candidateDirection>::template ColumnType<
-          Metadata::ColumnTypeOf_candidateDirection>::template AccessType<cms::soa::SoAAccessType::constAccess>::
-          template Alignment<conditionalAlignment>::template RestrictQualifier<restrictQualify>(
-              candidateDirectionParameters_)();
-    }
-    inline __attribute__((always_inline))
-    typename cms::soa::SoAAccessors<typename Metadata::TypeOf_candidateDirection>::template ColumnType<
-        Metadata::ColumnTypeOf_candidateDirection>::template AccessType<cms::soa::SoAAccessType::constAccess>::
-        template Alignment<conditionalAlignment>::template RestrictQualifier<restrictQualify>::ParamReturnType
-        candidateDirection(size_type _soa_impl_index) const {
-      if constexpr (rangeChecking == cms::soa::RangeChecking::enabled) {
-        if (_soa_impl_index >= elements_ or _soa_impl_index < 0) {
-          throw std::out_of_range(
-              "Out of range index in const "
-              "candidateDirection"
-              "(size_type index)");
-        }
-      }
-      return typename cms::soa::SoAAccessors<typename Metadata::TypeOf_candidateDirection>::template ColumnType<
-          Metadata::ColumnTypeOf_candidateDirection>::template AccessType<cms::soa::SoAAccessType::constAccess>::
-          template Alignment<conditionalAlignment>::template RestrictQualifier<restrictQualify>(
-              candidateDirectionParameters_)(_soa_impl_index);
-    }
-    template <typename T>
-    friend void dump();
-
-  private:
-    size_type elements_ = 0;
-    typename Metadata::ParametersTypeOf_eigenvalues::ConstType eigenvaluesParameters_;
-    typename Metadata::ParametersTypeOf_eigenvector_1::ConstType eigenvector_1Parameters_;
-    typename Metadata::ParametersTypeOf_eigenvector_2::ConstType eigenvector_2Parameters_;
-    typename Metadata::ParametersTypeOf_eigenvector_3::ConstType eigenvector_3Parameters_;
-    typename Metadata::ParametersTypeOf_candidateDirection::ConstType candidateDirectionParameters_;
-  };
-  template <bool RESTRICT_QUALIFY, bool RANGE_CHECKING>
-  using ConstViewTemplate =
-      ConstViewTemplateFreeParams<ALIGNMENT, ALIGNMENT_ENFORCEMENT, RESTRICT_QUALIFY, RANGE_CHECKING>;
-  using ConstView = ConstViewTemplate<cms::soa::RestrictQualify::Default, cms::soa::RangeChecking::Default>;
-  template <std::size_t VIEW_ALIGNMENT, bool VIEW_ALIGNMENT_ENFORCEMENT, bool RESTRICT_QUALIFY, bool RANGE_CHECKING>
-  struct ViewTemplateFreeParams
-      : public ConstViewTemplateFreeParams<VIEW_ALIGNMENT, VIEW_ALIGNMENT_ENFORCEMENT, RESTRICT_QUALIFY, RANGE_CHECKING> {
-    using self_type = ViewTemplateFreeParams;
-    using base_type =
-        ConstViewTemplateFreeParams<VIEW_ALIGNMENT, VIEW_ALIGNMENT_ENFORCEMENT, RESTRICT_QUALIFY, RANGE_CHECKING>;
-    using SoAPCATemplate_parametrized = SoAPCATemplate<VIEW_ALIGNMENT, VIEW_ALIGNMENT_ENFORCEMENT>;
-    using size_type = cms::soa::size_type;
-    using byte_size_type = cms::soa::byte_size_type;
-    using AlignmentEnforcement = cms::soa::AlignmentEnforcement;
-    constexpr static byte_size_type defaultAlignment = cms::soa::CacheLineSize::defaultSize;
-    constexpr static byte_size_type alignment = VIEW_ALIGNMENT;
-    constexpr static bool alignmentEnforcement = VIEW_ALIGNMENT_ENFORCEMENT;
-    constexpr static byte_size_type conditionalAlignment =
-        alignmentEnforcement == AlignmentEnforcement::enforced ? alignment : 0;
-    constexpr static bool restrictQualify = RESTRICT_QUALIFY;
-    constexpr static bool rangeChecking = RANGE_CHECKING;
-    template <cms::soa::SoAColumnType COLUMN_TYPE, class C>
-    using SoAValueWithConf = cms::soa::SoAValue<COLUMN_TYPE, C, conditionalAlignment, restrictQualify>;
-    template <cms::soa::SoAColumnType COLUMN_TYPE, class C>
-    using SoAConstValueWithConf = cms::soa::SoAConstValue<COLUMN_TYPE, C, conditionalAlignment, restrictQualify>;
-    template <std::size_t, bool, bool, bool>
-    friend struct ViewTemplateFreeParams;
-    struct Metadata {
-      friend ViewTemplateFreeParams;
-      inline __attribute__((always_inline)) size_type size() const { return parent_.elements_; }
-      using TypeOf_instance_SoAPCATemplate = SoAPCATemplate_parametrized;
-      using TypeOf_eigenvalues = typename TypeOf_instance_SoAPCATemplate::Metadata::TypeOf_eigenvalues;
-      using ParametersTypeOf_eigenvalues =
-          typename TypeOf_instance_SoAPCATemplate::Metadata::ParametersTypeOf_eigenvalues;
-      constexpr static cms::soa::SoAColumnType ColumnTypeOf_eigenvalues =
-          TypeOf_instance_SoAPCATemplate::Metadata::ColumnTypeOf_eigenvalues;
-      using ConstAccessorOf_eigenvalues =
-          typename cms::soa::SoAAccessors<typename Metadata::TypeOf_eigenvalues>::template ColumnType<
-              ColumnTypeOf_eigenvalues>::template AccessType<cms::soa::SoAAccessType::constAccess>::
-              template Alignment<conditionalAlignment>::template RestrictQualifier<restrictQualify>;
-      using MutableAccessorOf_eigenvalues =
-          typename cms::soa::SoAAccessors<typename Metadata::TypeOf_eigenvalues>::template ColumnType<
-              ColumnTypeOf_eigenvalues>::template AccessType<cms::soa::SoAAccessType::mutableAccess>::
-              template Alignment<conditionalAlignment>::template RestrictQualifier<restrictQualify>;
-      inline __attribute__((always_inline)) const auto parametersOf_eigenvalues() const {
-        return const_cast_SoAParametersImpl(parent_.eigenvaluesParameters_);
-      };
-      using TypeOf_eigenvector_1 = typename TypeOf_instance_SoAPCATemplate::Metadata::TypeOf_eigenvector_1;
-      using ParametersTypeOf_eigenvector_1 =
-          typename TypeOf_instance_SoAPCATemplate::Metadata::ParametersTypeOf_eigenvector_1;
-      constexpr static cms::soa::SoAColumnType ColumnTypeOf_eigenvector_1 =
-          TypeOf_instance_SoAPCATemplate::Metadata::ColumnTypeOf_eigenvector_1;
-      using ConstAccessorOf_eigenvector_1 =
-          typename cms::soa::SoAAccessors<typename Metadata::TypeOf_eigenvector_1>::template ColumnType<
-              ColumnTypeOf_eigenvector_1>::template AccessType<cms::soa::SoAAccessType::constAccess>::
-              template Alignment<conditionalAlignment>::template RestrictQualifier<restrictQualify>;
-      using MutableAccessorOf_eigenvector_1 =
-          typename cms::soa::SoAAccessors<typename Metadata::TypeOf_eigenvector_1>::template ColumnType<
-              ColumnTypeOf_eigenvector_1>::template AccessType<cms::soa::SoAAccessType::mutableAccess>::
-              template Alignment<conditionalAlignment>::template RestrictQualifier<restrictQualify>;
-      inline __attribute__((always_inline)) const auto parametersOf_eigenvector_1() const {
-        return const_cast_SoAParametersImpl(parent_.eigenvector_1Parameters_);
-      };
-      using TypeOf_eigenvector_2 = typename TypeOf_instance_SoAPCATemplate::Metadata::TypeOf_eigenvector_2;
-      using ParametersTypeOf_eigenvector_2 =
-          typename TypeOf_instance_SoAPCATemplate::Metadata::ParametersTypeOf_eigenvector_2;
-      constexpr static cms::soa::SoAColumnType ColumnTypeOf_eigenvector_2 =
-          TypeOf_instance_SoAPCATemplate::Metadata::ColumnTypeOf_eigenvector_2;
-      using ConstAccessorOf_eigenvector_2 =
-          typename cms::soa::SoAAccessors<typename Metadata::TypeOf_eigenvector_2>::template ColumnType<
-              ColumnTypeOf_eigenvector_2>::template AccessType<cms::soa::SoAAccessType::constAccess>::
-              template Alignment<conditionalAlignment>::template RestrictQualifier<restrictQualify>;
-      using MutableAccessorOf_eigenvector_2 =
-          typename cms::soa::SoAAccessors<typename Metadata::TypeOf_eigenvector_2>::template ColumnType<
-              ColumnTypeOf_eigenvector_2>::template AccessType<cms::soa::SoAAccessType::mutableAccess>::
-              template Alignment<conditionalAlignment>::template RestrictQualifier<restrictQualify>;
-      inline __attribute__((always_inline)) const auto parametersOf_eigenvector_2() const {
-        return const_cast_SoAParametersImpl(parent_.eigenvector_2Parameters_);
-      };
-      using TypeOf_eigenvector_3 = typename TypeOf_instance_SoAPCATemplate::Metadata::TypeOf_eigenvector_3;
-      using ParametersTypeOf_eigenvector_3 =
-          typename TypeOf_instance_SoAPCATemplate::Metadata::ParametersTypeOf_eigenvector_3;
-      constexpr static cms::soa::SoAColumnType ColumnTypeOf_eigenvector_3 =
-          TypeOf_instance_SoAPCATemplate::Metadata::ColumnTypeOf_eigenvector_3;
-      using ConstAccessorOf_eigenvector_3 =
-          typename cms::soa::SoAAccessors<typename Metadata::TypeOf_eigenvector_3>::template ColumnType<
-              ColumnTypeOf_eigenvector_3>::template AccessType<cms::soa::SoAAccessType::constAccess>::
-              template Alignment<conditionalAlignment>::template RestrictQualifier<restrictQualify>;
-      using MutableAccessorOf_eigenvector_3 =
-          typename cms::soa::SoAAccessors<typename Metadata::TypeOf_eigenvector_3>::template ColumnType<
-              ColumnTypeOf_eigenvector_3>::template AccessType<cms::soa::SoAAccessType::mutableAccess>::
-              template Alignment<conditionalAlignment>::template RestrictQualifier<restrictQualify>;
-      inline __attribute__((always_inline)) const auto parametersOf_eigenvector_3() const {
-        return const_cast_SoAParametersImpl(parent_.eigenvector_3Parameters_);
-      };
-      using TypeOf_candidateDirection = typename TypeOf_instance_SoAPCATemplate::Metadata::TypeOf_candidateDirection;
-      using ParametersTypeOf_candidateDirection =
-          typename TypeOf_instance_SoAPCATemplate::Metadata::ParametersTypeOf_candidateDirection;
-      constexpr static cms::soa::SoAColumnType ColumnTypeOf_candidateDirection =
-          TypeOf_instance_SoAPCATemplate::Metadata::ColumnTypeOf_candidateDirection;
-      using ConstAccessorOf_candidateDirection =
-          typename cms::soa::SoAAccessors<typename Metadata::TypeOf_candidateDirection>::template ColumnType<
-              ColumnTypeOf_candidateDirection>::template AccessType<cms::soa::SoAAccessType::constAccess>::
-              template Alignment<conditionalAlignment>::template RestrictQualifier<restrictQualify>;
-      using MutableAccessorOf_candidateDirection =
-          typename cms::soa::SoAAccessors<typename Metadata::TypeOf_candidateDirection>::template ColumnType<
-              ColumnTypeOf_candidateDirection>::template AccessType<cms::soa::SoAAccessType::mutableAccess>::
-              template Alignment<conditionalAlignment>::template RestrictQualifier<restrictQualify>;
-      inline __attribute__((always_inline)) const auto parametersOf_candidateDirection() const {
-        return const_cast_SoAParametersImpl(parent_.candidateDirectionParameters_);
-      };
-      inline __attribute__((always_inline)) auto* addressOf_eigenvalues() { return parametersOf_eigenvalues().addr_; };
-      inline __attribute__((always_inline)) auto* addressOf_eigenvector_1() {
-        return parametersOf_eigenvector_1().addr_;
-      };
-      inline __attribute__((always_inline)) auto* addressOf_eigenvector_2() {
-        return parametersOf_eigenvector_2().addr_;
-      };
-      inline __attribute__((always_inline)) auto* addressOf_eigenvector_3() {
-        return parametersOf_eigenvector_3().addr_;
-      };
-      inline __attribute__((always_inline)) auto* addressOf_candidateDirection() {
-        return parametersOf_candidateDirection().addr_;
-      };
-      inline __attribute__((always_inline)) auto const* addressOf_eigenvalues() const {
-        return parametersOf_eigenvalues().addr_;
-      };
-      inline __attribute__((always_inline)) auto const* addressOf_eigenvector_1() const {
-        return parametersOf_eigenvector_1().addr_;
-      };
-      inline __attribute__((always_inline)) auto const* addressOf_eigenvector_2() const {
-        return parametersOf_eigenvector_2().addr_;
-      };
-      inline __attribute__((always_inline)) auto const* addressOf_eigenvector_3() const {
-        return parametersOf_eigenvector_3().addr_;
-      };
-      inline __attribute__((always_inline)) auto const* addressOf_candidateDirection() const {
-        return parametersOf_candidateDirection().addr_;
-      };
-      Metadata& operator=(const Metadata&) = delete;
-      Metadata(const Metadata&) = delete;
-
-    private:
-      inline __attribute__((always_inline)) Metadata(const ViewTemplateFreeParams& _soa_impl_parent)
-          : parent_(_soa_impl_parent) {}
-      const ViewTemplateFreeParams& parent_;
-    };
-    friend Metadata;
-    struct Metarecords {
-      friend ViewTemplateFreeParams;
-      Metarecords(const ViewTemplateFreeParams& _soa_impl_parent)
-          : parent_(_soa_impl_parent),
-            eigenvalues_{parent_.metadata().parametersOf_eigenvalues()},
-            eigenvector_1_{parent_.metadata().parametersOf_eigenvector_1()},
-            eigenvector_2_{parent_.metadata().parametersOf_eigenvector_2()},
-            eigenvector_3_{parent_.metadata().parametersOf_eigenvector_3()},
-            candidateDirection_{parent_.metadata().parametersOf_candidateDirection()} {}
-      const typename Metadata::ParametersTypeOf_eigenvalues& eigenvalues() const { return eigenvalues_; }
-      const typename Metadata::ParametersTypeOf_eigenvector_1& eigenvector_1() const { return eigenvector_1_; }
-      const typename Metadata::ParametersTypeOf_eigenvector_2& eigenvector_2() const { return eigenvector_2_; }
-      const typename Metadata::ParametersTypeOf_eigenvector_3& eigenvector_3() const { return eigenvector_3_; }
-      const typename Metadata::ParametersTypeOf_candidateDirection& candidateDirection() const {
-        return candidateDirection_;
-      }
-
-    private:
-      const ViewTemplateFreeParams& parent_;
-      typename Metadata::ParametersTypeOf_eigenvalues eigenvalues_;
-      typename Metadata::ParametersTypeOf_eigenvector_1 eigenvector_1_;
-      typename Metadata::ParametersTypeOf_eigenvector_2 eigenvector_2_;
-      typename Metadata::ParametersTypeOf_eigenvector_3 eigenvector_3_;
-      typename Metadata::ParametersTypeOf_candidateDirection candidateDirection_;
-    };
-    inline __attribute__((always_inline)) const Metadata metadata() const { return Metadata(*this); }
-    inline __attribute__((always_inline)) Metadata metadata() { return Metadata(*this); }
-    inline __attribute__((always_inline)) const Metarecords records() const { return Metarecords(*this); }
-    inline __attribute__((always_inline)) Metarecords records() { return Metarecords(*this); }
-    ViewTemplateFreeParams() = default;
-    ViewTemplateFreeParams(SoAPCATemplate_parametrized& instance_SoAPCATemplate) : base_type{instance_SoAPCATemplate} {}
-    ViewTemplateFreeParams(size_type _soa_impl_elements,
-                           typename Metadata::ParametersTypeOf_eigenvalues::TupleOrPointerType eigenvalues,
-                           typename Metadata::ParametersTypeOf_eigenvector_1::TupleOrPointerType eigenvector_1,
-                           typename Metadata::ParametersTypeOf_eigenvector_2::TupleOrPointerType eigenvector_2,
-                           typename Metadata::ParametersTypeOf_eigenvector_3::TupleOrPointerType eigenvector_3,
-                           typename Metadata::ParametersTypeOf_candidateDirection::TupleOrPointerType candidateDirection)
-        : base_type{_soa_impl_elements, eigenvalues, eigenvector_1, eigenvector_2, eigenvector_3, candidateDirection} {}
-    ViewTemplateFreeParams(typename Metadata::ParametersTypeOf_eigenvalues eigenvalues,
-                           typename Metadata::ParametersTypeOf_eigenvector_1 eigenvector_1,
-                           typename Metadata::ParametersTypeOf_eigenvector_2 eigenvector_2,
-                           typename Metadata::ParametersTypeOf_eigenvector_3 eigenvector_3,
-                           typename Metadata::ParametersTypeOf_candidateDirection candidateDirection) {
-      bool readyToSet = false;
-      if (not readyToSet) {
-        base_type::elements_ = eigenvalues.size_;
-        readyToSet = true;
-      }
-      auto eigenvalues_tmp = [&]() -> auto {
-        if (base_type::elements_ != eigenvalues.size_)
-          throw std::runtime_error(
-              "In constructor by column pointers: number of elements not equal for every column: "
-              "eigenvalues");
-        if constexpr (alignmentEnforcement == AlignmentEnforcement::enforced)
-          if (Metadata::ParametersTypeOf_eigenvalues::checkAlignment(eigenvalues, alignment))
-            throw std::runtime_error(
-                "In constructor by column: misaligned column: "
-                "eigenvalues");
-        return eigenvalues;
-      }();
-      base_type::eigenvaluesParameters_ = eigenvalues_tmp;
-      if (not readyToSet) {
-        base_type::elements_ = eigenvector_1.size_;
-        readyToSet = true;
-      }
-      auto eigenvector_1_tmp = [&]() -> auto {
-        if (base_type::elements_ != eigenvector_1.size_)
-          throw std::runtime_error(
-              "In constructor by column pointers: number of elements not equal for every column: "
-              "eigenvector_1");
-        if constexpr (alignmentEnforcement == AlignmentEnforcement::enforced)
-          if (Metadata::ParametersTypeOf_eigenvector_1::checkAlignment(eigenvector_1, alignment))
-            throw std::runtime_error(
-                "In constructor by column: misaligned column: "
-                "eigenvector_1");
-        return eigenvector_1;
-      }();
-      base_type::eigenvector_1Parameters_ = eigenvector_1_tmp;
-      if (not readyToSet) {
-        base_type::elements_ = eigenvector_2.size_;
-        readyToSet = true;
-      }
-      auto eigenvector_2_tmp = [&]() -> auto {
-        if (base_type::elements_ != eigenvector_2.size_)
-          throw std::runtime_error(
-              "In constructor by column pointers: number of elements not equal for every column: "
-              "eigenvector_2");
-        if constexpr (alignmentEnforcement == AlignmentEnforcement::enforced)
-          if (Metadata::ParametersTypeOf_eigenvector_2::checkAlignment(eigenvector_2, alignment))
-            throw std::runtime_error(
-                "In constructor by column: misaligned column: "
-                "eigenvector_2");
-        return eigenvector_2;
-      }();
-      base_type::eigenvector_2Parameters_ = eigenvector_2_tmp;
-      if (not readyToSet) {
-        base_type::elements_ = eigenvector_3.size_;
-        readyToSet = true;
-      }
-      auto eigenvector_3_tmp = [&]() -> auto {
-        if (base_type::elements_ != eigenvector_3.size_)
-          throw std::runtime_error(
-              "In constructor by column pointers: number of elements not equal for every column: "
-              "eigenvector_3");
-        if constexpr (alignmentEnforcement == AlignmentEnforcement::enforced)
-          if (Metadata::ParametersTypeOf_eigenvector_3::checkAlignment(eigenvector_3, alignment))
-            throw std::runtime_error(
-                "In constructor by column: misaligned column: "
-                "eigenvector_3");
-        return eigenvector_3;
-      }();
-      base_type::eigenvector_3Parameters_ = eigenvector_3_tmp;
-      if (not readyToSet) {
-        base_type::elements_ = candidateDirection.size_;
-        readyToSet = true;
-      }
-      auto candidateDirection_tmp = [&]() -> auto {
-        if (base_type::elements_ != candidateDirection.size_)
-          throw std::runtime_error(
-              "In constructor by column pointers: number of elements not equal for every column: "
-              "candidateDirection");
-        if constexpr (alignmentEnforcement == AlignmentEnforcement::enforced)
-          if (Metadata::ParametersTypeOf_candidateDirection::checkAlignment(candidateDirection, alignment))
-            throw std::runtime_error(
-                "In constructor by column: misaligned column: "
-                "candidateDirection");
-        return candidateDirection;
-      }();
-      base_type::candidateDirectionParameters_ = candidateDirection_tmp;
-    }
-    ViewTemplateFreeParams(ViewTemplateFreeParams const&) = default;
-    ViewTemplateFreeParams& operator=(ViewTemplateFreeParams const&) = default;
-    template <std::size_t OTHER_VIEW_ALIGNMENT,
-              bool OTHER_VIEW_ALIGNMENT_ENFORCEMENT,
-              bool OTHER_RESTRICT_QUALIFY,
-              bool OTHER_RANGE_CHECKING>
-    ViewTemplateFreeParams(ViewTemplateFreeParams<OTHER_VIEW_ALIGNMENT,
-                                                  OTHER_VIEW_ALIGNMENT_ENFORCEMENT,
-                                                  OTHER_RESTRICT_QUALIFY,
-                                                  OTHER_RANGE_CHECKING> const& other)
-        : base_type{other.elements_,
-                    const_cast_SoAParametersImpl(other.eigenvaluesParameters_).tupleOrPointer(),
-                    const_cast_SoAParametersImpl(other.eigenvector_1Parameters_).tupleOrPointer(),
-                    const_cast_SoAParametersImpl(other.eigenvector_2Parameters_).tupleOrPointer(),
-                    const_cast_SoAParametersImpl(other.eigenvector_3Parameters_).tupleOrPointer(),
-                    const_cast_SoAParametersImpl(other.candidateDirectionParameters_).tupleOrPointer()} {}
-    template <std::size_t OTHER_VIEW_ALIGNMENT,
-              bool OTHER_VIEW_ALIGNMENT_ENFORCEMENT,
-              bool OTHER_RESTRICT_QUALIFY,
-              bool OTHER_RANGE_CHECKING>
-    ViewTemplateFreeParams& operator=(ViewTemplateFreeParams<OTHER_VIEW_ALIGNMENT,
-                                                             OTHER_VIEW_ALIGNMENT_ENFORCEMENT,
-                                                             OTHER_RESTRICT_QUALIFY,
-                                                             OTHER_RANGE_CHECKING> const& other) {
-      static_cast<base_type>(*this) = static_cast<base_type>(other);
-    }
-    ViewTemplateFreeParams(ViewTemplateFreeParams&&) = default;
-    ViewTemplateFreeParams& operator=(ViewTemplateFreeParams&&) = default;
-    ~ViewTemplateFreeParams() = default;
-    using const_element = typename base_type::const_element;
-    using base_type::operator[];
-    struct element {
-      inline __attribute__((always_inline)) element(
-          size_type _soa_impl_index,
-          typename Metadata::ParametersTypeOf_eigenvalues eigenvalues,
-          typename Metadata::ParametersTypeOf_eigenvector_1 eigenvector_1,
-          typename Metadata::ParametersTypeOf_eigenvector_2 eigenvector_2,
-          typename Metadata::ParametersTypeOf_eigenvector_3 eigenvector_3,
-          typename Metadata::ParametersTypeOf_candidateDirection candidateDirection)
-          : eigenvalues(_soa_impl_index, eigenvalues),
-            eigenvector_1(_soa_impl_index, eigenvector_1),
-            eigenvector_2(_soa_impl_index, eigenvector_2),
-            eigenvector_3(_soa_impl_index, eigenvector_3),
-            candidateDirection(_soa_impl_index, candidateDirection) {}
-      inline __attribute__((always_inline)) element& operator=(const element& _soa_impl_other) {
-        if constexpr (Metadata::ColumnTypeOf_eigenvalues != cms::soa::SoAColumnType::scalar)
-          eigenvalues() = _soa_impl_other.eigenvalues();
-        if constexpr (Metadata::ColumnTypeOf_eigenvector_1 != cms::soa::SoAColumnType::scalar)
-          eigenvector_1() = _soa_impl_other.eigenvector_1();
-        if constexpr (Metadata::ColumnTypeOf_eigenvector_2 != cms::soa::SoAColumnType::scalar)
-          eigenvector_2() = _soa_impl_other.eigenvector_2();
-        if constexpr (Metadata::ColumnTypeOf_eigenvector_3 != cms::soa::SoAColumnType::scalar)
-          eigenvector_3() = _soa_impl_other.eigenvector_3();
-        if constexpr (Metadata::ColumnTypeOf_candidateDirection != cms::soa::SoAColumnType::scalar)
-          candidateDirection() = _soa_impl_other.candidateDirection();
-        return *this;
-      }
-      inline __attribute__((always_inline)) element& operator=(const const_element& _soa_impl_other) {
-        if constexpr (Metadata::ColumnTypeOf_eigenvalues != cms::soa::SoAColumnType::scalar)
-          eigenvalues() = _soa_impl_other.eigenvalues();
-        if constexpr (Metadata::ColumnTypeOf_eigenvector_1 != cms::soa::SoAColumnType::scalar)
-          eigenvector_1() = _soa_impl_other.eigenvector_1();
-        if constexpr (Metadata::ColumnTypeOf_eigenvector_2 != cms::soa::SoAColumnType::scalar)
-          eigenvector_2() = _soa_impl_other.eigenvector_2();
-        if constexpr (Metadata::ColumnTypeOf_eigenvector_3 != cms::soa::SoAColumnType::scalar)
-          eigenvector_3() = _soa_impl_other.eigenvector_3();
-        if constexpr (Metadata::ColumnTypeOf_candidateDirection != cms::soa::SoAColumnType::scalar)
-          candidateDirection() = _soa_impl_other.candidateDirection();
-        return *this;
-      }
-      inline __attribute__((always_inline)) constexpr element& operator=(
-          const typename SoAPCATemplate_parametrized::Metadata::value_element _soa_impl_value) {
-        eigenvalues() = _soa_impl_value.eigenvalues;
-        eigenvector_1() = _soa_impl_value.eigenvector_1;
-        eigenvector_2() = _soa_impl_value.eigenvector_2;
-        eigenvector_3() = _soa_impl_value.eigenvector_3;
-        candidateDirection() = _soa_impl_value.candidateDirection;
-        return *this;
-      }
-      SoAValueWithConf<Metadata::ColumnTypeOf_eigenvalues, typename Metadata::TypeOf_eigenvalues> eigenvalues;
-      SoAValueWithConf<Metadata::ColumnTypeOf_eigenvector_1, typename Metadata::TypeOf_eigenvector_1> eigenvector_1;
-      SoAValueWithConf<Metadata::ColumnTypeOf_eigenvector_2, typename Metadata::TypeOf_eigenvector_2> eigenvector_2;
-      SoAValueWithConf<Metadata::ColumnTypeOf_eigenvector_3, typename Metadata::TypeOf_eigenvector_3> eigenvector_3;
-      SoAValueWithConf<Metadata::ColumnTypeOf_candidateDirection, typename Metadata::TypeOf_candidateDirection>
-          candidateDirection;
-    };
-    inline __attribute__((always_inline)) element operator[](size_type _soa_impl_index) {
-      if constexpr (rangeChecking == cms::soa::RangeChecking::enabled) {
-        if (_soa_impl_index >= base_type::elements_ or _soa_impl_index < 0) {
-          throw std::out_of_range(
-              "Out of range index in "
-              "ViewTemplateFreeParams"
-              "::operator[]");
-        }
-      }
-      return element{_soa_impl_index,
-                     const_cast_SoAParametersImpl(base_type::eigenvaluesParameters_),
-                     const_cast_SoAParametersImpl(base_type::eigenvector_1Parameters_),
-                     const_cast_SoAParametersImpl(base_type::eigenvector_2Parameters_),
-                     const_cast_SoAParametersImpl(base_type::eigenvector_3Parameters_),
-                     const_cast_SoAParametersImpl(base_type::candidateDirectionParameters_)};
-    }
-    inline __attribute__((always_inline))
-    typename cms::soa::SoAAccessors<typename Metadata::TypeOf_eigenvalues>::template ColumnType<
-        Metadata::ColumnTypeOf_eigenvalues>::template AccessType<cms::soa::SoAAccessType::mutableAccess>::
-        template Alignment<conditionalAlignment>::template RestrictQualifier<restrictQualify>::NoParamReturnType
-        eigenvalues() {
-      return typename cms::soa::SoAAccessors<typename Metadata::TypeOf_eigenvalues>::template ColumnType<
-          Metadata::ColumnTypeOf_eigenvalues>::template AccessType<cms::soa::SoAAccessType::mutableAccess>::
-          template Alignment<conditionalAlignment>::template RestrictQualifier<restrictQualify>(
-              const_cast_SoAParametersImpl(base_type::eigenvaluesParameters_))();
-    }
-    inline __attribute__((always_inline))
-    typename cms::soa::SoAAccessors<typename Metadata::TypeOf_eigenvalues>::template ColumnType<
-        Metadata::ColumnTypeOf_eigenvalues>::template AccessType<cms::soa::SoAAccessType::mutableAccess>::
-        template Alignment<conditionalAlignment>::template RestrictQualifier<restrictQualify>::ParamReturnType
-        eigenvalues(size_type _soa_impl_index) {
-      if constexpr (rangeChecking == cms::soa::RangeChecking::enabled) {
-        if (_soa_impl_index >= base_type::elements_ or _soa_impl_index < 0) {
-          throw std::out_of_range(
-              "Out of range index in mutable "
-              "eigenvalues"
-              "(size_type index)");
-        }
-      }
-      return typename cms::soa::SoAAccessors<typename Metadata::TypeOf_eigenvalues>::template ColumnType<
-          Metadata::ColumnTypeOf_eigenvalues>::template AccessType<cms::soa::SoAAccessType::mutableAccess>::
-          template Alignment<conditionalAlignment>::template RestrictQualifier<restrictQualify>(
-              const_cast_SoAParametersImpl(base_type::eigenvaluesParameters_))(_soa_impl_index);
-    }
-    inline __attribute__((always_inline))
-    typename cms::soa::SoAAccessors<typename Metadata::TypeOf_eigenvector_1>::template ColumnType<
-        Metadata::ColumnTypeOf_eigenvector_1>::template AccessType<cms::soa::SoAAccessType::mutableAccess>::
-        template Alignment<conditionalAlignment>::template RestrictQualifier<restrictQualify>::NoParamReturnType
-        eigenvector_1() {
-      return typename cms::soa::SoAAccessors<typename Metadata::TypeOf_eigenvector_1>::template ColumnType<
-          Metadata::ColumnTypeOf_eigenvector_1>::template AccessType<cms::soa::SoAAccessType::mutableAccess>::
-          template Alignment<conditionalAlignment>::template RestrictQualifier<restrictQualify>(
-              const_cast_SoAParametersImpl(base_type::eigenvector_1Parameters_))();
-    }
-    inline __attribute__((always_inline))
-    typename cms::soa::SoAAccessors<typename Metadata::TypeOf_eigenvector_1>::template ColumnType<
-        Metadata::ColumnTypeOf_eigenvector_1>::template AccessType<cms::soa::SoAAccessType::mutableAccess>::
-        template Alignment<conditionalAlignment>::template RestrictQualifier<restrictQualify>::ParamReturnType
-        eigenvector_1(size_type _soa_impl_index) {
-      if constexpr (rangeChecking == cms::soa::RangeChecking::enabled) {
-        if (_soa_impl_index >= base_type::elements_ or _soa_impl_index < 0) {
-          throw std::out_of_range(
-              "Out of range index in mutable "
-              "eigenvector_1"
-              "(size_type index)");
-        }
-      }
-      return typename cms::soa::SoAAccessors<typename Metadata::TypeOf_eigenvector_1>::template ColumnType<
-          Metadata::ColumnTypeOf_eigenvector_1>::template AccessType<cms::soa::SoAAccessType::mutableAccess>::
-          template Alignment<conditionalAlignment>::template RestrictQualifier<restrictQualify>(
-              const_cast_SoAParametersImpl(base_type::eigenvector_1Parameters_))(_soa_impl_index);
-    }
-    inline __attribute__((always_inline))
-    typename cms::soa::SoAAccessors<typename Metadata::TypeOf_eigenvector_2>::template ColumnType<
-        Metadata::ColumnTypeOf_eigenvector_2>::template AccessType<cms::soa::SoAAccessType::mutableAccess>::
-        template Alignment<conditionalAlignment>::template RestrictQualifier<restrictQualify>::NoParamReturnType
-        eigenvector_2() {
-      return typename cms::soa::SoAAccessors<typename Metadata::TypeOf_eigenvector_2>::template ColumnType<
-          Metadata::ColumnTypeOf_eigenvector_2>::template AccessType<cms::soa::SoAAccessType::mutableAccess>::
-          template Alignment<conditionalAlignment>::template RestrictQualifier<restrictQualify>(
-              const_cast_SoAParametersImpl(base_type::eigenvector_2Parameters_))();
-    }
-    inline __attribute__((always_inline))
-    typename cms::soa::SoAAccessors<typename Metadata::TypeOf_eigenvector_2>::template ColumnType<
-        Metadata::ColumnTypeOf_eigenvector_2>::template AccessType<cms::soa::SoAAccessType::mutableAccess>::
-        template Alignment<conditionalAlignment>::template RestrictQualifier<restrictQualify>::ParamReturnType
-        eigenvector_2(size_type _soa_impl_index) {
-      if constexpr (rangeChecking == cms::soa::RangeChecking::enabled) {
-        if (_soa_impl_index >= base_type::elements_ or _soa_impl_index < 0) {
-          throw std::out_of_range(
-              "Out of range index in mutable "
-              "eigenvector_2"
-              "(size_type index)");
-        }
-      }
-      return typename cms::soa::SoAAccessors<typename Metadata::TypeOf_eigenvector_2>::template ColumnType<
-          Metadata::ColumnTypeOf_eigenvector_2>::template AccessType<cms::soa::SoAAccessType::mutableAccess>::
-          template Alignment<conditionalAlignment>::template RestrictQualifier<restrictQualify>(
-              const_cast_SoAParametersImpl(base_type::eigenvector_2Parameters_))(_soa_impl_index);
-    }
-    inline __attribute__((always_inline))
-    typename cms::soa::SoAAccessors<typename Metadata::TypeOf_eigenvector_3>::template ColumnType<
-        Metadata::ColumnTypeOf_eigenvector_3>::template AccessType<cms::soa::SoAAccessType::mutableAccess>::
-        template Alignment<conditionalAlignment>::template RestrictQualifier<restrictQualify>::NoParamReturnType
-        eigenvector_3() {
-      return typename cms::soa::SoAAccessors<typename Metadata::TypeOf_eigenvector_3>::template ColumnType<
-          Metadata::ColumnTypeOf_eigenvector_3>::template AccessType<cms::soa::SoAAccessType::mutableAccess>::
-          template Alignment<conditionalAlignment>::template RestrictQualifier<restrictQualify>(
-              const_cast_SoAParametersImpl(base_type::eigenvector_3Parameters_))();
-    }
-    inline __attribute__((always_inline))
-    typename cms::soa::SoAAccessors<typename Metadata::TypeOf_eigenvector_3>::template ColumnType<
-        Metadata::ColumnTypeOf_eigenvector_3>::template AccessType<cms::soa::SoAAccessType::mutableAccess>::
-        template Alignment<conditionalAlignment>::template RestrictQualifier<restrictQualify>::ParamReturnType
-        eigenvector_3(size_type _soa_impl_index) {
-      if constexpr (rangeChecking == cms::soa::RangeChecking::enabled) {
-        if (_soa_impl_index >= base_type::elements_ or _soa_impl_index < 0) {
-          throw std::out_of_range(
-              "Out of range index in mutable "
-              "eigenvector_3"
-              "(size_type index)");
-        }
-      }
-      return typename cms::soa::SoAAccessors<typename Metadata::TypeOf_eigenvector_3>::template ColumnType<
-          Metadata::ColumnTypeOf_eigenvector_3>::template AccessType<cms::soa::SoAAccessType::mutableAccess>::
-          template Alignment<conditionalAlignment>::template RestrictQualifier<restrictQualify>(
-              const_cast_SoAParametersImpl(base_type::eigenvector_3Parameters_))(_soa_impl_index);
-    }
-    inline __attribute__((always_inline))
-    typename cms::soa::SoAAccessors<typename Metadata::TypeOf_candidateDirection>::template ColumnType<
-        Metadata::ColumnTypeOf_candidateDirection>::template AccessType<cms::soa::SoAAccessType::mutableAccess>::
-        template Alignment<conditionalAlignment>::template RestrictQualifier<restrictQualify>::NoParamReturnType
-        candidateDirection() {
-      return typename cms::soa::SoAAccessors<typename Metadata::TypeOf_candidateDirection>::template ColumnType<
-          Metadata::ColumnTypeOf_candidateDirection>::template AccessType<cms::soa::SoAAccessType::mutableAccess>::
-          template Alignment<conditionalAlignment>::template RestrictQualifier<restrictQualify>(
-              const_cast_SoAParametersImpl(base_type::candidateDirectionParameters_))();
-    }
-    inline __attribute__((always_inline))
-    typename cms::soa::SoAAccessors<typename Metadata::TypeOf_candidateDirection>::template ColumnType<
-        Metadata::ColumnTypeOf_candidateDirection>::template AccessType<cms::soa::SoAAccessType::mutableAccess>::
-        template Alignment<conditionalAlignment>::template RestrictQualifier<restrictQualify>::ParamReturnType
-        candidateDirection(size_type _soa_impl_index) {
-      if constexpr (rangeChecking == cms::soa::RangeChecking::enabled) {
-        if (_soa_impl_index >= base_type::elements_ or _soa_impl_index < 0) {
-          throw std::out_of_range(
-              "Out of range index in mutable "
-              "candidateDirection"
-              "(size_type index)");
-        }
-      }
-      return typename cms::soa::SoAAccessors<typename Metadata::TypeOf_candidateDirection>::template ColumnType<
-          Metadata::ColumnTypeOf_candidateDirection>::template AccessType<cms::soa::SoAAccessType::mutableAccess>::
-          template Alignment<conditionalAlignment>::template RestrictQualifier<restrictQualify>(
-              const_cast_SoAParametersImpl(base_type::candidateDirectionParameters_))(_soa_impl_index);
-    }
-    template <typename T>
-    friend void dump();
-  };
-  template <bool RESTRICT_QUALIFY, bool RANGE_CHECKING>
-  using ViewTemplate = ViewTemplateFreeParams<ALIGNMENT, ALIGNMENT_ENFORCEMENT, RESTRICT_QUALIFY, RANGE_CHECKING>;
-  using View = ViewTemplate<cms::soa::RestrictQualify::Default, cms::soa::RangeChecking::Default>;
-  SoAPCATemplate()
-      : mem_(nullptr),
-        elements_(0),
-        byteSize_(0),
-        eigenvalues_(nullptr),
-        eigenvector_1_(nullptr),
-        eigenvector_2_(nullptr),
-        eigenvector_3_(nullptr),
-        candidateDirectionStride_(0),
-        candidateDirectionElementsWithPadding_(0),
-        candidateDirection_(nullptr) {}
-  SoAPCATemplate(std::byte* mem, size_type elements) : mem_(mem), elements_(elements), byteSize_(0) {
-    organizeColumnsFromBuffer();
-  }
-  SoAPCATemplate(SoAPCATemplate const& _soa_impl_other)
-      : mem_(_soa_impl_other.mem_),
-        elements_(_soa_impl_other.elements_),
-        byteSize_(_soa_impl_other.byteSize_),
-        eigenvalues_{_soa_impl_other.eigenvalues_},
-        eigenvector_1_{_soa_impl_other.eigenvector_1_},
-        eigenvector_2_{_soa_impl_other.eigenvector_2_},
-        eigenvector_3_{_soa_impl_other.eigenvector_3_},
-        candidateDirectionStride_{_soa_impl_other.candidateDirectionStride_},
-        candidateDirectionElementsWithPadding_{_soa_impl_other.candidateDirectionElementsWithPadding_},
-        candidateDirection_{_soa_impl_other.candidateDirection_} {}
-  SoAPCATemplate& operator=(SoAPCATemplate const& _soa_impl_other) {
-    mem_ = _soa_impl_other.mem_;
-    elements_ = _soa_impl_other.elements_;
-    byteSize_ = _soa_impl_other.byteSize_;
-    eigenvalues_ = _soa_impl_other.eigenvalues_;
-    eigenvector_1_ = _soa_impl_other.eigenvector_1_;
-    eigenvector_2_ = _soa_impl_other.eigenvector_2_;
-    eigenvector_3_ = _soa_impl_other.eigenvector_3_;
-    candidateDirectionElementsWithPadding_ = _soa_impl_other.candidateDirectionElementsWithPadding_;
-    candidateDirection_ = _soa_impl_other.candidateDirection_;
-    candidateDirectionStride_ = _soa_impl_other.candidateDirectionStride_;
-    return *this;
-  }
-  void aggregate(ConstView const& view) {
-    if (elements_ < view.metadata().size())
-      throw std::runtime_error("In aggregate method: number of elements mismatch ");
-    memcpy(this->metadata().addressOf_eigenvalues(),
-           view.metadata().addressOf_eigenvalues(),
-           cms::soa::alignSize(this->elements_ * sizeof(float), alignment));
-    memcpy(this->metadata().addressOf_eigenvector_1(),
-           view.metadata().addressOf_eigenvector_1(),
-           cms::soa::alignSize(this->elements_ * sizeof(float), alignment));
-    memcpy(this->metadata().addressOf_eigenvector_2(),
-           view.metadata().addressOf_eigenvector_2(),
-           cms::soa::alignSize(this->elements_ * sizeof(float), alignment));
-    memcpy(this->metadata().addressOf_eigenvector_3(),
-           view.metadata().addressOf_eigenvector_3(),
-           cms::soa::alignSize(this->elements_ * sizeof(float), alignment));
-    memcpy(this->metadata().addressOf_candidateDirection(),
-           view.metadata().addressOf_candidateDirection(),
-           cms::soa::alignSize(this->elements_ * sizeof(Eigen::Vector3d::Scalar), alignment) *
-               Eigen::Vector3d::RowsAtCompileTime * Eigen::Vector3d::ColsAtCompileTime);
-  }
-  AoS_SoAPCATemplate<ALIGNMENT, ALIGNMENT_ENFORCEMENT> transpose() {
-    AoS_SoAPCATemplate aos(elements_);
-    for (size_type i = 0; i < elements_; i++) {
-      aos[i].eigenvalues = *(this->metadata().addressOf_eigenvalues() + i);
-      aos[i].eigenvector_1 = *(this->metadata().addressOf_eigenvector_1() + i);
-      aos[i].eigenvector_2 = *(this->metadata().addressOf_eigenvector_2() + i);
-      aos[i].eigenvector_3 = *(this->metadata().addressOf_eigenvector_3() + i);
-    }
-    return aos;
-  }
-  template <typename T>
-  void ROOTReadStreamer(T& onfile) {
-    memcpy(eigenvalues_, onfile.eigenvalues_, sizeof(float) * onfile.elements_);
-    memcpy(eigenvector_1_, onfile.eigenvector_1_, sizeof(float) * onfile.elements_);
-    memcpy(eigenvector_2_, onfile.eigenvector_2_, sizeof(float) * onfile.elements_);
-    memcpy(eigenvector_3_, onfile.eigenvector_3_, sizeof(float) * onfile.elements_);
-    memcpy(candidateDirection_,
-           onfile.candidateDirection_,
-           sizeof(Eigen::Vector3d::Scalar) * candidateDirectionElementsWithPadding_);
-  }
-  void ROOTStreamerCleaner() {
-    delete[] eigenvalues_;
-    eigenvalues_ = nullptr;
-    delete[] eigenvector_1_;
-    eigenvector_1_ = nullptr;
-    delete[] eigenvector_2_;
-    eigenvector_2_ = nullptr;
-    delete[] eigenvector_3_;
-    eigenvector_3_ = nullptr;
-    delete[] candidateDirection_;
-    candidateDirection_ = nullptr;
-  }
-  template <typename T>
-  friend void dump();
-
-private:
-  void organizeColumnsFromBuffer() {
-    if constexpr (alignmentEnforcement == cms::soa::AlignmentEnforcement::enforced)
-      if (reinterpret_cast<intptr_t>(mem_) % alignment)
-        throw std::runtime_error(
-            "In "
-            "SoAPCATemplate"
-            "::"
-            "SoAPCATemplate"
-            ": misaligned buffer");
-    auto _soa_impl_curMem = mem_;
-    eigenvalues_ = reinterpret_cast<float*>(_soa_impl_curMem);
-    _soa_impl_curMem += cms::soa::alignSize(elements_ * sizeof(float), alignment);
-    if constexpr (alignmentEnforcement == AlignmentEnforcement::enforced)
-      if (reinterpret_cast<intptr_t>(eigenvalues_) % alignment)
-        throw std::runtime_error(
-            "In layout constructor: misaligned column: "
-            "eigenvalues");
-    eigenvector_1_ = reinterpret_cast<float*>(_soa_impl_curMem);
-    _soa_impl_curMem += cms::soa::alignSize(elements_ * sizeof(float), alignment);
-    if constexpr (alignmentEnforcement == AlignmentEnforcement::enforced)
-      if (reinterpret_cast<intptr_t>(eigenvector_1_) % alignment)
-        throw std::runtime_error(
-            "In layout constructor: misaligned column: "
-            "eigenvector_1");
-    eigenvector_2_ = reinterpret_cast<float*>(_soa_impl_curMem);
-    _soa_impl_curMem += cms::soa::alignSize(elements_ * sizeof(float), alignment);
-    if constexpr (alignmentEnforcement == AlignmentEnforcement::enforced)
-      if (reinterpret_cast<intptr_t>(eigenvector_2_) % alignment)
-        throw std::runtime_error(
-            "In layout constructor: misaligned column: "
-            "eigenvector_2");
-    eigenvector_3_ = reinterpret_cast<float*>(_soa_impl_curMem);
-    _soa_impl_curMem += cms::soa::alignSize(elements_ * sizeof(float), alignment);
-    if constexpr (alignmentEnforcement == AlignmentEnforcement::enforced)
-      if (reinterpret_cast<intptr_t>(eigenvector_3_) % alignment)
-        throw std::runtime_error(
-            "In layout constructor: misaligned column: "
-            "eigenvector_3");
-    candidateDirectionStride_ =
-        cms::soa::alignSize(elements_ * sizeof(Eigen::Vector3d::Scalar), alignment) / sizeof(Eigen::Vector3d::Scalar);
-    candidateDirectionElementsWithPadding_ =
-        candidateDirectionStride_ * Eigen::Vector3d::RowsAtCompileTime * Eigen::Vector3d::ColsAtCompileTime;
-    candidateDirection_ = reinterpret_cast<Eigen::Vector3d::Scalar*>(_soa_impl_curMem);
-    _soa_impl_curMem += cms::soa::alignSize(elements_ * sizeof(Eigen::Vector3d::Scalar), alignment) *
-                        Eigen::Vector3d::RowsAtCompileTime * Eigen::Vector3d::ColsAtCompileTime;
-    if constexpr (alignmentEnforcement == AlignmentEnforcement::enforced)
-      if (reinterpret_cast<intptr_t>(candidateDirection_) % alignment)
-        throw std::runtime_error(
-            "In layout constructor: misaligned column: "
-            "candidateDirection");
-    byteSize_ = computeDataSize(elements_);
-    if (mem_ + byteSize_ != _soa_impl_curMem)
-      throw std::runtime_error(
-          "In "
-          "SoAPCATemplate"
-          "::"
-          "SoAPCATemplate"
-          ": unexpected end pointer.");
-  }
-  std::byte* mem_;
-  size_type elements_;
-  size_type const scalar_ = 1;
-  byte_size_type byteSize_;
-  float* eigenvalues_ = nullptr;
-  float* eigenvector_1_ = nullptr;
-  float* eigenvector_2_ = nullptr;
-  float* eigenvector_3_ = nullptr;
-  byte_size_type candidateDirectionStride_ = 0;
-  size_type candidateDirectionElementsWithPadding_ = 0;
-  Eigen::Vector3d::Scalar* candidateDirection_ = nullptr;
-};
-using SoAPCA = SoAPCATemplate<>;
-using SoAPCAView = SoAPCA::View;
-using SoAPCAConstView = SoAPCA::ConstView;
-template <std::size_t ALIGNMENT = cms::soa::CacheLineSize::defaultSize,
-          bool ALIGNMENT_ENFORCEMENT = cms::soa::AlignmentEnforcement::relaxed>
-struct AoS_CustomizedSoATemplate {
-  using size_type = cms::soa::size_type;
-  using byte_size_type = cms::soa::byte_size_type;
-  constexpr static byte_size_type defaultAlignment = 128;
-  constexpr static byte_size_type alignment = ALIGNMENT;
-  constexpr static bool alignmentEnforcement = ALIGNMENT_ENFORCEMENT;
-  constexpr static byte_size_type conditionalAlignment =
-      alignmentEnforcement == cms::soa::AlignmentEnforcement::enforced ? alignment : 0;
-  template <cms::soa::SoAColumnType COLUMN_TYPE, class C>
-  using SoAValueWithConf = cms::soa::SoAValue<COLUMN_TYPE, C, conditionalAlignment>;
-  using ParametersTypeOf_x = cms::soa::SoAParameters_ColumnType<cms::soa::SoAColumnType::column>::DataType<float>;
-  using TypeOf_x = float;
-  constexpr static cms::soa::SoAColumnType ColumnTypeOf_x = cms::soa::SoAColumnType::column;
-  using ParametersTypeOf_y = cms::soa::SoAParameters_ColumnType<cms::soa::SoAColumnType::column>::DataType<float>;
-  using TypeOf_y = float;
-  constexpr static cms::soa::SoAColumnType ColumnTypeOf_y = cms::soa::SoAColumnType::column;
-  using ParametersTypeOf_z = cms::soa::SoAParameters_ColumnType<cms::soa::SoAColumnType::column>::DataType<float>;
-  using TypeOf_z = float;
-  constexpr static cms::soa::SoAColumnType ColumnTypeOf_z = cms::soa::SoAColumnType::column;
-  using ParametersTypeOf_candidateDirection =
-      cms::soa::SoAParameters_ColumnType<cms::soa::SoAColumnType::eigen>::DataType<Eigen::Vector3d>;
-  using TypeOf_candidateDirection = Eigen::Vector3d;
-  constexpr static cms::soa::SoAColumnType ColumnTypeOf_candidateDirection = cms::soa::SoAColumnType::eigen;
-  struct Element {
-    BOOST_PP_DEFER(_DEFINE_AOS_ELEMENT_MEMBERS_IMPL)
-    BOOST_PP_OBSTRUCT()(1, float, x, ~) BOOST_PP_DEFER(_DEFINE_AOS_ELEMENT_MEMBERS_IMPL)
-        BOOST_PP_OBSTRUCT()(1, float, y, ~) BOOST_PP_DEFER(_DEFINE_AOS_ELEMENT_MEMBERS_IMPL)
-            BOOST_PP_OBSTRUCT()(1, float, z, ~) BOOST_PP_DEFER(_DEFINE_AOS_ELEMENT_MEMBERS_IMPL)
-                BOOST_PP_OBSTRUCT()(2, Eigen::Vector3d, candidateDirection, ~) struct scalar {};
-    static constexpr byte_size_type element_size() {
-      byte_size_type _aos_impl_ret = 0;
-      _aos_impl_ret += sizeof(float);
-      _aos_impl_ret += sizeof(float);
-      _aos_impl_ret += sizeof(float);
-      _aos_impl_ret +=
-          sizeof(Eigen::Vector3d::Scalar) * Eigen::Vector3d::RowsAtCompileTime * Eigen::Vector3d::ColsAtCompileTime;
-      return _aos_impl_ret;
-    }
-  };
-  AoS_CustomizedSoATemplate() : elem(nullptr), elements_(0) {}
-  AoS_CustomizedSoATemplate(size_type elements) : elements_(elements) { elem = std::make_unique<Element[]>(elements); }
-  Element& operator[](size_type i) { return elem[i]; }
-  const Element& operator[](size_type i) const { return elem[i]; }
-
-private:
-  std::unique_ptr<Element[]> elem;
-  size_type elements_;
-};
-template <std::size_t ALIGNMENT = cms::soa::CacheLineSize::defaultSize,
-          bool ALIGNMENT_ENFORCEMENT = cms::soa::AlignmentEnforcement::relaxed>
-struct CustomizedSoATemplate {
-  using self_type = CustomizedSoATemplate;
-  using AlignmentEnforcement = cms::soa::AlignmentEnforcement;
-  using size_type = cms::soa::size_type;
-  using byte_size_type = cms::soa::byte_size_type;
-  constexpr static byte_size_type defaultAlignment = 128;
-  constexpr static byte_size_type alignment = ALIGNMENT;
-  constexpr static bool alignmentEnforcement = ALIGNMENT_ENFORCEMENT;
-  constexpr static byte_size_type conditionalAlignment =
-      alignmentEnforcement == cms::soa::AlignmentEnforcement::enforced ? alignment : 0;
-  template <cms::soa::SoAColumnType COLUMN_TYPE, class C>
-  using SoAValueWithConf = cms::soa::SoAValue<COLUMN_TYPE, C, conditionalAlignment>;
-  template <cms::soa::SoAColumnType COLUMN_TYPE, class C>
-  using SoAConstValueWithConf = cms::soa::SoAConstValue<COLUMN_TYPE, C, conditionalAlignment>;
-  template <std::size_t VIEW_ALIGNMENT = cms::soa::CacheLineSize::defaultSize,
-            bool VIEW_ALIGNMENT_ENFORCEMENT = cms::soa::AlignmentEnforcement::relaxed,
-            bool RESTRICT_QUALIFY = cms::soa::RestrictQualify::Default,
-            bool RANGE_CHECKING = cms::soa::RangeChecking::Default>
-  struct ViewTemplateFreeParams;
-  static constexpr std::pair<size_type, size_type> computeMethodsNumber() {
-    size_type _soa_methods_count = 0;
-    size_type _soa_const_methods_count = 0;
-    return {_soa_methods_count, _soa_const_methods_count};
-  }
-  static_assert(computeMethodsNumber().first <= 1,
-                "There can be at most one SOA_METHODS macro. Please declare all your methods inside the same macro.");
-  static_assert(
-      computeMethodsNumber().second <= 1,
-      "There can be at most one SOA_CONST_METHODS macro. Please declare all your methods inside the same macro.");
-  void soaToStreamInternal(std::ostream& _soa_impl_os) const {
-    _soa_impl_os << "CustomizedSoATemplate"
-                    "("
-                 << elements_ << " elements, byte alignement= " << alignment << ", @" << mem_ << "): " << std::endl;
-    _soa_impl_os << "  sizeof("
-                    "CustomizedSoATemplate"
-                    "): "
-                 << sizeof(CustomizedSoATemplate) << std::endl;
-    byte_size_type _soa_impl_offset = 0;
-    _soa_impl_os << " Column "
-                    "x"
-                    " at offset "
-                 << _soa_impl_offset << " has size " << sizeof(float) * elements_ << " and padding "
-                 << cms::soa::alignSize(elements_ * sizeof(float), alignment) - (elements_ * sizeof(float))
-                 << std::endl;
-    _soa_impl_offset += cms::soa::alignSize(elements_ * sizeof(float), alignment);
-    _soa_impl_os << " Column "
-                    "y"
-                    " at offset "
-                 << _soa_impl_offset << " has size " << sizeof(float) * elements_ << " and padding "
-                 << cms::soa::alignSize(elements_ * sizeof(float), alignment) - (elements_ * sizeof(float))
-                 << std::endl;
-    _soa_impl_offset += cms::soa::alignSize(elements_ * sizeof(float), alignment);
-    _soa_impl_os << " Column "
-                    "z"
-                    " at offset "
-                 << _soa_impl_offset << " has size " << sizeof(float) * elements_ << " and padding "
-                 << cms::soa::alignSize(elements_ * sizeof(float), alignment) - (elements_ * sizeof(float))
-                 << std::endl;
-    _soa_impl_offset += cms::soa::alignSize(elements_ * sizeof(float), alignment);
-    _soa_impl_os << " Eigen value "
-                    "candidateDirection"
-                    " at offset "
-                 << _soa_impl_offset << " has dimension "
-                 << "(" << Eigen::Vector3d::RowsAtCompileTime << " x " << Eigen::Vector3d::ColsAtCompileTime << ")"
-                 << " and per column size " << sizeof(Eigen::Vector3d::Scalar) * elements_ << " and padding "
-                 << cms::soa::alignSize(elements_ * sizeof(Eigen::Vector3d::Scalar), alignment) -
-                        (elements_ * sizeof(Eigen::Vector3d::Scalar))
-                 << std::endl;
-    _soa_impl_offset += cms::soa::alignSize(elements_ * sizeof(Eigen::Vector3d::Scalar), alignment) *
-                        Eigen::Vector3d::RowsAtCompileTime * Eigen::Vector3d::ColsAtCompileTime;
-    _soa_impl_os << "Final offset = " << _soa_impl_offset << " computeDataSize(...): " << computeDataSize(elements_)
-                 << std::endl;
-    _soa_impl_os << std::endl;
-  }
-  static constexpr byte_size_type computeDataSize(size_type elements) {
-    byte_size_type _soa_impl_ret = 0;
-    _soa_impl_ret += cms::soa::alignSize(elements * sizeof(float), alignment);
-    _soa_impl_ret += cms::soa::alignSize(elements * sizeof(float), alignment);
-    _soa_impl_ret += cms::soa::alignSize(elements * sizeof(float), alignment);
-    _soa_impl_ret += cms::soa::alignSize(elements * sizeof(Eigen::Vector3d::Scalar), alignment) *
-                     Eigen::Vector3d::RowsAtCompileTime * Eigen::Vector3d::ColsAtCompileTime;
-    return _soa_impl_ret;
-  }
-  struct Metadata {
-    friend CustomizedSoATemplate;
-    inline __attribute__((always_inline)) size_type size() const { return parent_.elements_; }
-    inline __attribute__((always_inline)) byte_size_type byteSize() const { return parent_.byteSize_; }
-    inline __attribute__((always_inline)) byte_size_type alignment() const { return CustomizedSoATemplate::alignment; }
-    inline __attribute__((always_inline)) std::byte* data() { return parent_.mem_; }
-    inline __attribute__((always_inline)) const std::byte* data() const { return parent_.mem_; }
-    inline __attribute__((always_inline)) std::byte* nextByte() const { return parent_.mem_ + parent_.byteSize_; }
-    inline __attribute__((always_inline)) CustomizedSoATemplate cloneToNewAddress(std::byte* _soa_impl_addr) const {
-      return CustomizedSoATemplate(_soa_impl_addr, parent_.elements_);
-    }
-    using ParametersTypeOf_x = cms::soa::SoAParameters_ColumnType<cms::soa::SoAColumnType::column>::DataType<float>;
-    inline __attribute__((always_inline)) ParametersTypeOf_x parametersOf_x() const {
-      return ParametersTypeOf_x(parent_.x_, parent_.metadata().size());
-    }
-    inline __attribute__((always_inline)) float const* addressOf_x() const {
-      return parent_.metadata().parametersOf_x().addr_;
-    }
-    inline __attribute__((always_inline)) float* addressOf_x() { return parent_.metadata().parametersOf_x().addr_; }
-    inline __attribute__((always_inline)) byte_size_type xPitch() const {
-      return cms::soa::alignSize(parent_.elements_ * sizeof(float), ParentClass::alignment);
-    }
-    using TypeOf_x = float;
-    constexpr static cms::soa::SoAColumnType ColumnTypeOf_x = cms::soa::SoAColumnType::column;
-    using ParametersTypeOf_y = cms::soa::SoAParameters_ColumnType<cms::soa::SoAColumnType::column>::DataType<float>;
-    inline __attribute__((always_inline)) ParametersTypeOf_y parametersOf_y() const {
-      return ParametersTypeOf_y(parent_.y_, parent_.metadata().size());
-    }
-    inline __attribute__((always_inline)) float const* addressOf_y() const {
-      return parent_.metadata().parametersOf_y().addr_;
-    }
-    inline __attribute__((always_inline)) float* addressOf_y() { return parent_.metadata().parametersOf_y().addr_; }
-    inline __attribute__((always_inline)) byte_size_type yPitch() const {
-      return cms::soa::alignSize(parent_.elements_ * sizeof(float), ParentClass::alignment);
-    }
-    using TypeOf_y = float;
-    constexpr static cms::soa::SoAColumnType ColumnTypeOf_y = cms::soa::SoAColumnType::column;
-    using ParametersTypeOf_z = cms::soa::SoAParameters_ColumnType<cms::soa::SoAColumnType::column>::DataType<float>;
-    inline __attribute__((always_inline)) ParametersTypeOf_z parametersOf_z() const {
-      return ParametersTypeOf_z(parent_.z_, parent_.metadata().size());
-    }
-    inline __attribute__((always_inline)) float const* addressOf_z() const {
-      return parent_.metadata().parametersOf_z().addr_;
-    }
-    inline __attribute__((always_inline)) float* addressOf_z() { return parent_.metadata().parametersOf_z().addr_; }
-    inline __attribute__((always_inline)) byte_size_type zPitch() const {
-      return cms::soa::alignSize(parent_.elements_ * sizeof(float), ParentClass::alignment);
-    }
-    using TypeOf_z = float;
-    constexpr static cms::soa::SoAColumnType ColumnTypeOf_z = cms::soa::SoAColumnType::column;
-    using ParametersTypeOf_candidateDirection =
-        cms::soa::SoAParameters_ColumnType<cms::soa::SoAColumnType::eigen>::DataType<Eigen::Vector3d>;
-    inline __attribute__((always_inline)) ParametersTypeOf_candidateDirection parametersOf_candidateDirection() const {
-      return ParametersTypeOf_candidateDirection(
-          parent_.candidateDirection_, parent_.candidateDirectionStride_, parent_.metadata().size());
-    }
-    inline __attribute__((always_inline)) byte_size_type candidateDirectionPitch() const {
-      return cms::soa::alignSize(parent_.elements_ * sizeof(Eigen::Vector3d::Scalar), ParentClass::alignment) *
-             Eigen::Vector3d::RowsAtCompileTime * Eigen::Vector3d::ColsAtCompileTime;
-    }
-    using TypeOf_candidateDirection = Eigen::Vector3d;
-    constexpr static cms::soa::SoAColumnType ColumnTypeOf_candidateDirection = cms::soa::SoAColumnType::eigen;
-    inline __attribute__((always_inline)) Eigen::Vector3d::Scalar const* addressOf_candidateDirection() const {
-      return parent_.metadata().parametersOf_candidateDirection().addr_;
-    }
-    inline __attribute__((always_inline)) Eigen::Vector3d::Scalar* addressOf_candidateDirection() {
-      return parent_.metadata().parametersOf_candidateDirection().addr_;
-    }
-    struct value_element {
-      inline __attribute__((always_inline)) value_element(float x, float y, float z, Eigen::Vector3d candidateDirection)
-          : x{x}, y{y}, z{z}, candidateDirection{candidateDirection} {}
-      float x;
-      float y;
-      float z;
-      Eigen::Vector3d candidateDirection;
-    };
-    Metadata& operator=(const Metadata&) = delete;
-    Metadata(const Metadata&) = delete;
-
-  private:
-    inline __attribute__((always_inline)) Metadata(const CustomizedSoATemplate& _soa_impl_parent)
-        : parent_(_soa_impl_parent) {}
-    const CustomizedSoATemplate& parent_;
-    using ParentClass = CustomizedSoATemplate;
-  };
-  friend Metadata;
-  inline __attribute__((always_inline)) const Metadata metadata() const { return Metadata(*this); }
-  inline __attribute__((always_inline)) Metadata metadata() { return Metadata(*this); }
-  template <std::size_t VIEW_ALIGNMENT, bool VIEW_ALIGNMENT_ENFORCEMENT, bool RESTRICT_QUALIFY, bool RANGE_CHECKING>
-  struct ConstViewTemplateFreeParams {
-    using self_type = ConstViewTemplateFreeParams;
-    using CustomizedSoATemplate_parametrized = CustomizedSoATemplate<VIEW_ALIGNMENT, VIEW_ALIGNMENT_ENFORCEMENT>;
-    using size_type = cms::soa::size_type;
-    using byte_size_type = cms::soa::byte_size_type;
-    using AlignmentEnforcement = cms::soa::AlignmentEnforcement;
-    template <std::size_t, bool, bool, bool>
-    friend struct ViewTemplateFreeParams;
-    template <std::size_t, bool, bool, bool>
-    friend struct ConstViewTemplateFreeParams;
-    constexpr static byte_size_type defaultAlignment = cms::soa::CacheLineSize::defaultSize;
-    constexpr static byte_size_type alignment = VIEW_ALIGNMENT;
-    constexpr static bool alignmentEnforcement = VIEW_ALIGNMENT_ENFORCEMENT;
-    constexpr static byte_size_type conditionalAlignment =
-        alignmentEnforcement == AlignmentEnforcement::enforced ? alignment : 0;
-    constexpr static bool restrictQualify = RESTRICT_QUALIFY;
-    constexpr static bool rangeChecking = RANGE_CHECKING;
-    template <cms::soa::SoAColumnType COLUMN_TYPE, class C>
-    using SoAValueWithConf = cms::soa::SoAValue<COLUMN_TYPE, C, conditionalAlignment, restrictQualify>;
-    template <cms::soa::SoAColumnType COLUMN_TYPE, class C>
-    using SoAConstValueWithConf = cms::soa::SoAConstValue<COLUMN_TYPE, C, conditionalAlignment, restrictQualify>;
-    struct Metadata {
-      friend ConstViewTemplateFreeParams;
-      inline __attribute__((always_inline)) size_type size() const { return parent_.elements_; }
-      using TypeOf_instance_CustomizedSoATemplate = CustomizedSoATemplate_parametrized;
-      using TypeOf_x = typename TypeOf_instance_CustomizedSoATemplate::Metadata::TypeOf_x;
-      using ParametersTypeOf_x = typename TypeOf_instance_CustomizedSoATemplate::Metadata::ParametersTypeOf_x;
-      constexpr static cms::soa::SoAColumnType ColumnTypeOf_x =
-          TypeOf_instance_CustomizedSoATemplate::Metadata::ColumnTypeOf_x;
-      using ConstAccessorOf_x = typename cms::soa::SoAAccessors<typename Metadata::TypeOf_x>::template ColumnType<
-          ColumnTypeOf_x>::template AccessType<cms::soa::SoAAccessType::constAccess>::
-          template Alignment<conditionalAlignment>::template RestrictQualifier<restrictQualify>;
-      using MutableAccessorOf_x = typename cms::soa::SoAAccessors<typename Metadata::TypeOf_x>::template ColumnType<
-          ColumnTypeOf_x>::template AccessType<cms::soa::SoAAccessType::mutableAccess>::
-          template Alignment<conditionalAlignment>::template RestrictQualifier<restrictQualify>;
-      inline __attribute__((always_inline)) const auto parametersOf_x() const { return (parent_.xParameters_); };
-      using TypeOf_y = typename TypeOf_instance_CustomizedSoATemplate::Metadata::TypeOf_y;
-      using ParametersTypeOf_y = typename TypeOf_instance_CustomizedSoATemplate::Metadata::ParametersTypeOf_y;
-      constexpr static cms::soa::SoAColumnType ColumnTypeOf_y =
-          TypeOf_instance_CustomizedSoATemplate::Metadata::ColumnTypeOf_y;
-      using ConstAccessorOf_y = typename cms::soa::SoAAccessors<typename Metadata::TypeOf_y>::template ColumnType<
-          ColumnTypeOf_y>::template AccessType<cms::soa::SoAAccessType::constAccess>::
-          template Alignment<conditionalAlignment>::template RestrictQualifier<restrictQualify>;
-      using MutableAccessorOf_y = typename cms::soa::SoAAccessors<typename Metadata::TypeOf_y>::template ColumnType<
-          ColumnTypeOf_y>::template AccessType<cms::soa::SoAAccessType::mutableAccess>::
-          template Alignment<conditionalAlignment>::template RestrictQualifier<restrictQualify>;
-      inline __attribute__((always_inline)) const auto parametersOf_y() const { return (parent_.yParameters_); };
-      using TypeOf_z = typename TypeOf_instance_CustomizedSoATemplate::Metadata::TypeOf_z;
-      using ParametersTypeOf_z = typename TypeOf_instance_CustomizedSoATemplate::Metadata::ParametersTypeOf_z;
-      constexpr static cms::soa::SoAColumnType ColumnTypeOf_z =
-          TypeOf_instance_CustomizedSoATemplate::Metadata::ColumnTypeOf_z;
-      using ConstAccessorOf_z = typename cms::soa::SoAAccessors<typename Metadata::TypeOf_z>::template ColumnType<
-          ColumnTypeOf_z>::template AccessType<cms::soa::SoAAccessType::constAccess>::
-          template Alignment<conditionalAlignment>::template RestrictQualifier<restrictQualify>;
-      using MutableAccessorOf_z = typename cms::soa::SoAAccessors<typename Metadata::TypeOf_z>::template ColumnType<
-          ColumnTypeOf_z>::template AccessType<cms::soa::SoAAccessType::mutableAccess>::
-          template Alignment<conditionalAlignment>::template RestrictQualifier<restrictQualify>;
-      inline __attribute__((always_inline)) const auto parametersOf_z() const { return (parent_.zParameters_); };
-      using TypeOf_candidateDirection =
-          typename TypeOf_instance_CustomizedSoATemplate::Metadata::TypeOf_candidateDirection;
-      using ParametersTypeOf_candidateDirection =
-          typename TypeOf_instance_CustomizedSoATemplate::Metadata::ParametersTypeOf_candidateDirection;
-      constexpr static cms::soa::SoAColumnType ColumnTypeOf_candidateDirection =
-          TypeOf_instance_CustomizedSoATemplate::Metadata::ColumnTypeOf_candidateDirection;
-      using ConstAccessorOf_candidateDirection =
-          typename cms::soa::SoAAccessors<typename Metadata::TypeOf_candidateDirection>::template ColumnType<
-              ColumnTypeOf_candidateDirection>::template AccessType<cms::soa::SoAAccessType::constAccess>::
-              template Alignment<conditionalAlignment>::template RestrictQualifier<restrictQualify>;
-      using MutableAccessorOf_candidateDirection =
-          typename cms::soa::SoAAccessors<typename Metadata::TypeOf_candidateDirection>::template ColumnType<
-              ColumnTypeOf_candidateDirection>::template AccessType<cms::soa::SoAAccessType::mutableAccess>::
-              template Alignment<conditionalAlignment>::template RestrictQualifier<restrictQualify>;
-      inline __attribute__((always_inline)) const auto parametersOf_candidateDirection() const {
-        return (parent_.candidateDirectionParameters_);
-      };
-      inline __attribute__((always_inline)) auto const* addressOf_x() const { return parametersOf_x().addr_; };
-      inline __attribute__((always_inline)) auto const* addressOf_y() const { return parametersOf_y().addr_; };
-      inline __attribute__((always_inline)) auto const* addressOf_z() const { return parametersOf_z().addr_; };
-      inline __attribute__((always_inline)) auto const* addressOf_candidateDirection() const {
-        return parametersOf_candidateDirection().addr_;
-      };
-      Metadata& operator=(const Metadata&) = delete;
-      Metadata(const Metadata&) = delete;
-
-    private:
-      inline __attribute__((always_inline)) Metadata(const ConstViewTemplateFreeParams& _soa_impl_parent)
-          : parent_(_soa_impl_parent) {}
-      const ConstViewTemplateFreeParams& parent_;
-    };
-    friend Metadata;
-    struct Metarecords {
-      friend ConstViewTemplateFreeParams;
-      Metarecords(const ConstViewTemplateFreeParams& _soa_impl_parent)
-          : parent_(_soa_impl_parent),
-            x_{parent_.metadata().parametersOf_x()},
-            y_{parent_.metadata().parametersOf_y()},
-            z_{parent_.metadata().parametersOf_z()},
-            candidateDirection_{parent_.metadata().parametersOf_candidateDirection()} {}
-      const typename Metadata::ParametersTypeOf_x::ConstType& x() const { return x_; }
-      const typename Metadata::ParametersTypeOf_y::ConstType& y() const { return y_; }
-      const typename Metadata::ParametersTypeOf_z::ConstType& z() const { return z_; }
-      const typename Metadata::ParametersTypeOf_candidateDirection::ConstType& candidateDirection() const {
-        return candidateDirection_;
-      }
-
-    private:
-      const ConstViewTemplateFreeParams& parent_;
-      typename Metadata::ParametersTypeOf_x::ConstType x_;
-      typename Metadata::ParametersTypeOf_y::ConstType y_;
-      typename Metadata::ParametersTypeOf_z::ConstType z_;
-      typename Metadata::ParametersTypeOf_candidateDirection::ConstType candidateDirection_;
-    };
-    inline __attribute__((always_inline)) const Metadata metadata() const { return Metadata(*this); }
-    inline __attribute__((always_inline)) const Metarecords records() const { return Metarecords(*this); }
-    ConstViewTemplateFreeParams() = default;
-    ConstViewTemplateFreeParams(const CustomizedSoATemplate_parametrized& instance_CustomizedSoATemplate)
-        : elements_([&]() -> size_type {
-            bool set = false;
-            size_type ret = 0;
-            if (set) {
-              if (ret != instance_CustomizedSoATemplate.metadata().size())
-                throw std::runtime_error("In constructor by layout: different sizes from layouts.");
-            } else {
-              ret = instance_CustomizedSoATemplate.metadata().size();
-              set = true;
-            }
-            return ret;
-          }()),
-          xParameters_([&]() -> auto {
-            auto params = instance_CustomizedSoATemplate.metadata().parametersOf_x();
-            if constexpr (alignmentEnforcement == AlignmentEnforcement::enforced)
-              if (reinterpret_cast<intptr_t>(params.addr_) % alignment)
-                throw std::runtime_error(
-                    "In constructor by layout: misaligned column: "
-                    "x");
-            return params;
-          }()),
-          yParameters_([&]() -> auto {
-            auto params = instance_CustomizedSoATemplate.metadata().parametersOf_y();
-            if constexpr (alignmentEnforcement == AlignmentEnforcement::enforced)
-              if (reinterpret_cast<intptr_t>(params.addr_) % alignment)
-                throw std::runtime_error(
-                    "In constructor by layout: misaligned column: "
-                    "y");
-            return params;
-          }()),
-          zParameters_([&]() -> auto {
-            auto params = instance_CustomizedSoATemplate.metadata().parametersOf_z();
-            if constexpr (alignmentEnforcement == AlignmentEnforcement::enforced)
-              if (reinterpret_cast<intptr_t>(params.addr_) % alignment)
-                throw std::runtime_error(
-                    "In constructor by layout: misaligned column: "
-                    "z");
-            return params;
-          }()),
-          candidateDirectionParameters_([&]() -> auto {
-            auto params = instance_CustomizedSoATemplate.metadata().parametersOf_candidateDirection();
-            if constexpr (alignmentEnforcement == AlignmentEnforcement::enforced)
-              if (reinterpret_cast<intptr_t>(params.addr_) % alignment)
-                throw std::runtime_error(
-                    "In constructor by layout: misaligned column: "
-                    "candidateDirection");
-            return params;
-          }()) {}
-    ConstViewTemplateFreeParams(
-        size_type _soa_impl_elements,
-        const typename Metadata::ParametersTypeOf_x::TupleOrPointerType x,
-        const typename Metadata::ParametersTypeOf_y::TupleOrPointerType y,
-        const typename Metadata::ParametersTypeOf_z::TupleOrPointerType z,
-        const typename Metadata::ParametersTypeOf_candidateDirection::TupleOrPointerType candidateDirection)
-        : elements_(_soa_impl_elements),
-          xParameters_([&]() -> auto {
-            if constexpr (alignmentEnforcement == AlignmentEnforcement::enforced)
-              if (Metadata::ParametersTypeOf_x::checkAlignment(x, alignment))
-                throw std::runtime_error(
-                    "In constructor by column: misaligned column: "
-                    "x");
-            return x;
-          }()),
-          yParameters_([&]() -> auto {
-            if constexpr (alignmentEnforcement == AlignmentEnforcement::enforced)
-              if (Metadata::ParametersTypeOf_y::checkAlignment(y, alignment))
-                throw std::runtime_error(
-                    "In constructor by column: misaligned column: "
-                    "y");
-            return y;
-          }()),
-          zParameters_([&]() -> auto {
-            if constexpr (alignmentEnforcement == AlignmentEnforcement::enforced)
-              if (Metadata::ParametersTypeOf_z::checkAlignment(z, alignment))
-                throw std::runtime_error(
-                    "In constructor by column: misaligned column: "
-                    "z");
-            return z;
-          }()),
-          candidateDirectionParameters_([&]() -> auto {
-            if constexpr (alignmentEnforcement == AlignmentEnforcement::enforced)
-              if (Metadata::ParametersTypeOf_candidateDirection::checkAlignment(candidateDirection, alignment))
-                throw std::runtime_error(
-                    "In constructor by column: misaligned column: "
-                    "candidateDirection");
-            return candidateDirection;
-          }()) {}
-    ConstViewTemplateFreeParams(typename Metadata::ParametersTypeOf_x::ConstType x,
-                                typename Metadata::ParametersTypeOf_y::ConstType y,
-                                typename Metadata::ParametersTypeOf_z::ConstType z,
-                                typename Metadata::ParametersTypeOf_candidateDirection::ConstType candidateDirection) {
-      bool readyToSet = false;
-      if (not readyToSet) {
-        elements_ = x.size_;
-        readyToSet = true;
-      }
-      auto x_tmp = [&]() -> auto {
-        if (elements_ != x.size_)
-          throw std::runtime_error(
-              "In constructor by column pointers: number of elements not equal for every column: "
-              "x");
-        if constexpr (alignmentEnforcement == AlignmentEnforcement::enforced)
-          if (Metadata::ParametersTypeOf_x::checkAlignment(x, alignment))
-            throw std::runtime_error(
-                "In constructor by column: misaligned column: "
-                "x");
-        return x;
-      }();
-      xParameters_ = x_tmp;
-      if (not readyToSet) {
-        elements_ = y.size_;
-        readyToSet = true;
-      }
-      auto y_tmp = [&]() -> auto {
-        if (elements_ != y.size_)
-          throw std::runtime_error(
-              "In constructor by column pointers: number of elements not equal for every column: "
-              "y");
-        if constexpr (alignmentEnforcement == AlignmentEnforcement::enforced)
-          if (Metadata::ParametersTypeOf_y::checkAlignment(y, alignment))
-            throw std::runtime_error(
-                "In constructor by column: misaligned column: "
-                "y");
-        return y;
-      }();
-      yParameters_ = y_tmp;
-      if (not readyToSet) {
-        elements_ = z.size_;
-        readyToSet = true;
-      }
-      auto z_tmp = [&]() -> auto {
-        if (elements_ != z.size_)
-          throw std::runtime_error(
-              "In constructor by column pointers: number of elements not equal for every column: "
-              "z");
-        if constexpr (alignmentEnforcement == AlignmentEnforcement::enforced)
-          if (Metadata::ParametersTypeOf_z::checkAlignment(z, alignment))
-            throw std::runtime_error(
-                "In constructor by column: misaligned column: "
-                "z");
-        return z;
-      }();
-      zParameters_ = z_tmp;
-      if (not readyToSet) {
-        elements_ = candidateDirection.size_;
-        readyToSet = true;
-      }
-      auto candidateDirection_tmp = [&]() -> auto {
-        if (elements_ != candidateDirection.size_)
-          throw std::runtime_error(
-              "In constructor by column pointers: number of elements not equal for every column: "
-              "candidateDirection");
-        if constexpr (alignmentEnforcement == AlignmentEnforcement::enforced)
-          if (Metadata::ParametersTypeOf_candidateDirection::checkAlignment(candidateDirection, alignment))
-            throw std::runtime_error(
-                "In constructor by column: misaligned column: "
-                "candidateDirection");
-        return candidateDirection;
-      }();
-      candidateDirectionParameters_ = candidateDirection_tmp;
-    }
-    ConstViewTemplateFreeParams(ConstViewTemplateFreeParams const&) = default;
-    ConstViewTemplateFreeParams& operator=(ConstViewTemplateFreeParams const&) = default;
-    template <std::size_t OTHER_VIEW_ALIGNMENT,
-              bool OTHER_VIEW_ALIGNMENT_ENFORCEMENT,
-              bool OTHER_RESTRICT_QUALIFY,
-              bool OTHER_RANGE_CHECKING>
-    ConstViewTemplateFreeParams(ConstViewTemplateFreeParams<OTHER_VIEW_ALIGNMENT,
-                                                            OTHER_VIEW_ALIGNMENT_ENFORCEMENT,
-                                                            OTHER_RESTRICT_QUALIFY,
-                                                            OTHER_RANGE_CHECKING> const& other)
-        : ConstViewTemplateFreeParams{
-              other.elements_,
-              const_cast_SoAParametersImpl(other.xParameters_).tupleOrPointer(),
-              const_cast_SoAParametersImpl(other.yParameters_).tupleOrPointer(),
-              const_cast_SoAParametersImpl(other.zParameters_).tupleOrPointer(),
-              const_cast_SoAParametersImpl(other.candidateDirectionParameters_).tupleOrPointer()} {}
-    template <std::size_t OTHER_VIEW_ALIGNMENT,
-              bool OTHER_VIEW_ALIGNMENT_ENFORCEMENT,
-              bool OTHER_RESTRICT_QUALIFY,
-              bool OTHER_RANGE_CHECKING>
-    ConstViewTemplateFreeParams& operator=(ConstViewTemplateFreeParams<OTHER_VIEW_ALIGNMENT,
-                                                                       OTHER_VIEW_ALIGNMENT_ENFORCEMENT,
-                                                                       OTHER_RESTRICT_QUALIFY,
-                                                                       OTHER_RANGE_CHECKING> const& other) {
-      *this = other;
-    }
-    ConstViewTemplateFreeParams(ConstViewTemplateFreeParams&&) = default;
-    ConstViewTemplateFreeParams& operator=(ConstViewTemplateFreeParams&&) = default;
-    ~ConstViewTemplateFreeParams() = default;
-    struct const_element {
-      inline __attribute__((always_inline)) const_element(
-          size_type _soa_impl_index,
-          const typename Metadata::ParametersTypeOf_x::ConstType x,
-          const typename Metadata::ParametersTypeOf_y::ConstType y,
-          const typename Metadata::ParametersTypeOf_z::ConstType z,
-          const typename Metadata::ParametersTypeOf_candidateDirection::ConstType candidateDirection)
-          : x_(_soa_impl_index, x),
-            y_(_soa_impl_index, y),
-            z_(_soa_impl_index, z),
-            candidateDirection_(_soa_impl_index, candidateDirection) {}
-      inline __attribute__((always_inline))
-      const typename SoAConstValueWithConf<Metadata::ColumnTypeOf_x, const typename Metadata::TypeOf_x>::RefToConst
-      x() const {
-        return x_();
-      }
-      inline __attribute__((always_inline))
-      const typename SoAConstValueWithConf<Metadata::ColumnTypeOf_y, const typename Metadata::TypeOf_y>::RefToConst
-      y() const {
-        return y_();
-      }
-      inline __attribute__((always_inline))
-      const typename SoAConstValueWithConf<Metadata::ColumnTypeOf_z, const typename Metadata::TypeOf_z>::RefToConst
-      z() const {
-        return z_();
-      }
-      inline __attribute__((always_inline))
-      const typename SoAConstValueWithConf<Metadata::ColumnTypeOf_candidateDirection,
-                                           const typename Metadata::TypeOf_candidateDirection>::RefToConst
-      candidateDirection() const {
-        return candidateDirection_();
-      }
-
-    private:
-      const cms::soa::ConstValueTraits<SoAConstValueWithConf<Metadata::ColumnTypeOf_x, typename Metadata::TypeOf_x>,
-                                       Metadata::ColumnTypeOf_x>
-          x_;
-      const cms::soa::ConstValueTraits<SoAConstValueWithConf<Metadata::ColumnTypeOf_y, typename Metadata::TypeOf_y>,
-                                       Metadata::ColumnTypeOf_y>
-          y_;
-      const cms::soa::ConstValueTraits<SoAConstValueWithConf<Metadata::ColumnTypeOf_z, typename Metadata::TypeOf_z>,
-                                       Metadata::ColumnTypeOf_z>
-          z_;
-      const cms::soa::ConstValueTraits<
-          SoAConstValueWithConf<Metadata::ColumnTypeOf_candidateDirection, typename Metadata::TypeOf_candidateDirection>,
-          Metadata::ColumnTypeOf_candidateDirection>
-          candidateDirection_;
-    };
-    inline __attribute__((always_inline)) const_element operator[](size_type _soa_impl_index) const {
-      if constexpr (rangeChecking == cms::soa::RangeChecking::enabled) {
-        if (_soa_impl_index >= elements_ or _soa_impl_index < 0) {
-          throw std::out_of_range(
-              "Out of range index in "
-              "ConstViewTemplateFreeParams"
-              "::operator[]");
-        }
-      }
-      return const_element{_soa_impl_index, xParameters_, yParameters_, zParameters_, candidateDirectionParameters_};
-    }
-    inline __attribute__((always_inline))
-    typename cms::soa::SoAAccessors<typename Metadata::TypeOf_x>::template ColumnType<Metadata::ColumnTypeOf_x>::
-        template AccessType<cms::soa::SoAAccessType::constAccess>::template Alignment<
-            conditionalAlignment>::template RestrictQualifier<restrictQualify>::NoParamReturnType
-        x() const {
-      return typename cms::soa::SoAAccessors<typename Metadata::TypeOf_x>::template ColumnType<
-          Metadata::ColumnTypeOf_x>::template AccessType<cms::soa::SoAAccessType::constAccess>::
-          template Alignment<conditionalAlignment>::template RestrictQualifier<restrictQualify>(xParameters_)();
-    }
-    inline __attribute__((always_inline))
-    typename cms::soa::SoAAccessors<typename Metadata::TypeOf_x>::template ColumnType<Metadata::ColumnTypeOf_x>::
-        template AccessType<cms::soa::SoAAccessType::constAccess>::template Alignment<
-            conditionalAlignment>::template RestrictQualifier<restrictQualify>::ParamReturnType
-        x(size_type _soa_impl_index) const {
-      if constexpr (rangeChecking == cms::soa::RangeChecking::enabled) {
-        if (_soa_impl_index >= elements_ or _soa_impl_index < 0) {
-          throw std::out_of_range(
-              "Out of range index in const "
-              "x"
-              "(size_type index)");
-        }
-      }
-      return
-          typename cms::soa::SoAAccessors<typename Metadata::TypeOf_x>::template ColumnType<Metadata::ColumnTypeOf_x>::
-              template AccessType<cms::soa::SoAAccessType::constAccess>::template Alignment<
-                  conditionalAlignment>::template RestrictQualifier<restrictQualify>(xParameters_)(_soa_impl_index);
-    }
-    inline __attribute__((always_inline))
-    typename cms::soa::SoAAccessors<typename Metadata::TypeOf_y>::template ColumnType<Metadata::ColumnTypeOf_y>::
-        template AccessType<cms::soa::SoAAccessType::constAccess>::template Alignment<
-            conditionalAlignment>::template RestrictQualifier<restrictQualify>::NoParamReturnType
-        y() const {
-      return typename cms::soa::SoAAccessors<typename Metadata::TypeOf_y>::template ColumnType<
-          Metadata::ColumnTypeOf_y>::template AccessType<cms::soa::SoAAccessType::constAccess>::
-          template Alignment<conditionalAlignment>::template RestrictQualifier<restrictQualify>(yParameters_)();
-    }
-    inline __attribute__((always_inline))
-    typename cms::soa::SoAAccessors<typename Metadata::TypeOf_y>::template ColumnType<Metadata::ColumnTypeOf_y>::
-        template AccessType<cms::soa::SoAAccessType::constAccess>::template Alignment<
-            conditionalAlignment>::template RestrictQualifier<restrictQualify>::ParamReturnType
-        y(size_type _soa_impl_index) const {
-      if constexpr (rangeChecking == cms::soa::RangeChecking::enabled) {
-        if (_soa_impl_index >= elements_ or _soa_impl_index < 0) {
-          throw std::out_of_range(
-              "Out of range index in const "
-              "y"
-              "(size_type index)");
-        }
-      }
-      return
-          typename cms::soa::SoAAccessors<typename Metadata::TypeOf_y>::template ColumnType<Metadata::ColumnTypeOf_y>::
-              template AccessType<cms::soa::SoAAccessType::constAccess>::template Alignment<
-                  conditionalAlignment>::template RestrictQualifier<restrictQualify>(yParameters_)(_soa_impl_index);
-    }
-    inline __attribute__((always_inline))
-    typename cms::soa::SoAAccessors<typename Metadata::TypeOf_z>::template ColumnType<Metadata::ColumnTypeOf_z>::
-        template AccessType<cms::soa::SoAAccessType::constAccess>::template Alignment<
-            conditionalAlignment>::template RestrictQualifier<restrictQualify>::NoParamReturnType
-        z() const {
-      return typename cms::soa::SoAAccessors<typename Metadata::TypeOf_z>::template ColumnType<
-          Metadata::ColumnTypeOf_z>::template AccessType<cms::soa::SoAAccessType::constAccess>::
-          template Alignment<conditionalAlignment>::template RestrictQualifier<restrictQualify>(zParameters_)();
-    }
-    inline __attribute__((always_inline))
-    typename cms::soa::SoAAccessors<typename Metadata::TypeOf_z>::template ColumnType<Metadata::ColumnTypeOf_z>::
-        template AccessType<cms::soa::SoAAccessType::constAccess>::template Alignment<
-            conditionalAlignment>::template RestrictQualifier<restrictQualify>::ParamReturnType
-        z(size_type _soa_impl_index) const {
-      if constexpr (rangeChecking == cms::soa::RangeChecking::enabled) {
-        if (_soa_impl_index >= elements_ or _soa_impl_index < 0) {
-          throw std::out_of_range(
-              "Out of range index in const "
-              "z"
-              "(size_type index)");
-        }
-      }
-      return
-          typename cms::soa::SoAAccessors<typename Metadata::TypeOf_z>::template ColumnType<Metadata::ColumnTypeOf_z>::
-              template AccessType<cms::soa::SoAAccessType::constAccess>::template Alignment<
-                  conditionalAlignment>::template RestrictQualifier<restrictQualify>(zParameters_)(_soa_impl_index);
-    }
-    inline __attribute__((always_inline))
-    typename cms::soa::SoAAccessors<typename Metadata::TypeOf_candidateDirection>::template ColumnType<
-        Metadata::ColumnTypeOf_candidateDirection>::template AccessType<cms::soa::SoAAccessType::constAccess>::
-        template Alignment<conditionalAlignment>::template RestrictQualifier<restrictQualify>::NoParamReturnType
-        candidateDirection() const {
-      return typename cms::soa::SoAAccessors<typename Metadata::TypeOf_candidateDirection>::template ColumnType<
-          Metadata::ColumnTypeOf_candidateDirection>::template AccessType<cms::soa::SoAAccessType::constAccess>::
-          template Alignment<conditionalAlignment>::template RestrictQualifier<restrictQualify>(
-              candidateDirectionParameters_)();
-    }
-    inline __attribute__((always_inline))
-    typename cms::soa::SoAAccessors<typename Metadata::TypeOf_candidateDirection>::template ColumnType<
-        Metadata::ColumnTypeOf_candidateDirection>::template AccessType<cms::soa::SoAAccessType::constAccess>::
-        template Alignment<conditionalAlignment>::template RestrictQualifier<restrictQualify>::ParamReturnType
-        candidateDirection(size_type _soa_impl_index) const {
-      if constexpr (rangeChecking == cms::soa::RangeChecking::enabled) {
-        if (_soa_impl_index >= elements_ or _soa_impl_index < 0) {
-          throw std::out_of_range(
-              "Out of range index in const "
-              "candidateDirection"
-              "(size_type index)");
-        }
-      }
-      return typename cms::soa::SoAAccessors<typename Metadata::TypeOf_candidateDirection>::template ColumnType<
-          Metadata::ColumnTypeOf_candidateDirection>::template AccessType<cms::soa::SoAAccessType::constAccess>::
-          template Alignment<conditionalAlignment>::template RestrictQualifier<restrictQualify>(
-              candidateDirectionParameters_)(_soa_impl_index);
-    }
-    template <typename T>
-    friend void dump();
-
-  private:
-    size_type elements_ = 0;
-    typename Metadata::ParametersTypeOf_x::ConstType xParameters_;
-    typename Metadata::ParametersTypeOf_y::ConstType yParameters_;
-    typename Metadata::ParametersTypeOf_z::ConstType zParameters_;
-    typename Metadata::ParametersTypeOf_candidateDirection::ConstType candidateDirectionParameters_;
-  };
-  template <bool RESTRICT_QUALIFY, bool RANGE_CHECKING>
-  using ConstViewTemplate =
-      ConstViewTemplateFreeParams<ALIGNMENT, ALIGNMENT_ENFORCEMENT, RESTRICT_QUALIFY, RANGE_CHECKING>;
-  using ConstView = ConstViewTemplate<cms::soa::RestrictQualify::Default, cms::soa::RangeChecking::Default>;
-  template <std::size_t VIEW_ALIGNMENT, bool VIEW_ALIGNMENT_ENFORCEMENT, bool RESTRICT_QUALIFY, bool RANGE_CHECKING>
-  struct ViewTemplateFreeParams
-      : public ConstViewTemplateFreeParams<VIEW_ALIGNMENT, VIEW_ALIGNMENT_ENFORCEMENT, RESTRICT_QUALIFY, RANGE_CHECKING> {
-    using self_type = ViewTemplateFreeParams;
-    using base_type =
-        ConstViewTemplateFreeParams<VIEW_ALIGNMENT, VIEW_ALIGNMENT_ENFORCEMENT, RESTRICT_QUALIFY, RANGE_CHECKING>;
-    using CustomizedSoATemplate_parametrized = CustomizedSoATemplate<VIEW_ALIGNMENT, VIEW_ALIGNMENT_ENFORCEMENT>;
-    using size_type = cms::soa::size_type;
-    using byte_size_type = cms::soa::byte_size_type;
-    using AlignmentEnforcement = cms::soa::AlignmentEnforcement;
-    constexpr static byte_size_type defaultAlignment = cms::soa::CacheLineSize::defaultSize;
-    constexpr static byte_size_type alignment = VIEW_ALIGNMENT;
-    constexpr static bool alignmentEnforcement = VIEW_ALIGNMENT_ENFORCEMENT;
-    constexpr static byte_size_type conditionalAlignment =
-        alignmentEnforcement == AlignmentEnforcement::enforced ? alignment : 0;
-    constexpr static bool restrictQualify = RESTRICT_QUALIFY;
-    constexpr static bool rangeChecking = RANGE_CHECKING;
-    template <cms::soa::SoAColumnType COLUMN_TYPE, class C>
-    using SoAValueWithConf = cms::soa::SoAValue<COLUMN_TYPE, C, conditionalAlignment, restrictQualify>;
-    template <cms::soa::SoAColumnType COLUMN_TYPE, class C>
-    using SoAConstValueWithConf = cms::soa::SoAConstValue<COLUMN_TYPE, C, conditionalAlignment, restrictQualify>;
-    template <std::size_t, bool, bool, bool>
-    friend struct ViewTemplateFreeParams;
-    struct Metadata {
-      friend ViewTemplateFreeParams;
-      inline __attribute__((always_inline)) size_type size() const { return parent_.elements_; }
-      using TypeOf_instance_CustomizedSoATemplate = CustomizedSoATemplate_parametrized;
-      using TypeOf_x = typename TypeOf_instance_CustomizedSoATemplate::Metadata::TypeOf_x;
-      using ParametersTypeOf_x = typename TypeOf_instance_CustomizedSoATemplate::Metadata::ParametersTypeOf_x;
-      constexpr static cms::soa::SoAColumnType ColumnTypeOf_x =
-          TypeOf_instance_CustomizedSoATemplate::Metadata::ColumnTypeOf_x;
-      using ConstAccessorOf_x = typename cms::soa::SoAAccessors<typename Metadata::TypeOf_x>::template ColumnType<
-          ColumnTypeOf_x>::template AccessType<cms::soa::SoAAccessType::constAccess>::
-          template Alignment<conditionalAlignment>::template RestrictQualifier<restrictQualify>;
-      using MutableAccessorOf_x = typename cms::soa::SoAAccessors<typename Metadata::TypeOf_x>::template ColumnType<
-          ColumnTypeOf_x>::template AccessType<cms::soa::SoAAccessType::mutableAccess>::
-          template Alignment<conditionalAlignment>::template RestrictQualifier<restrictQualify>;
-      inline __attribute__((always_inline)) const auto parametersOf_x() const {
-        return const_cast_SoAParametersImpl(parent_.xParameters_);
-      };
-      using TypeOf_y = typename TypeOf_instance_CustomizedSoATemplate::Metadata::TypeOf_y;
-      using ParametersTypeOf_y = typename TypeOf_instance_CustomizedSoATemplate::Metadata::ParametersTypeOf_y;
-      constexpr static cms::soa::SoAColumnType ColumnTypeOf_y =
-          TypeOf_instance_CustomizedSoATemplate::Metadata::ColumnTypeOf_y;
-      using ConstAccessorOf_y = typename cms::soa::SoAAccessors<typename Metadata::TypeOf_y>::template ColumnType<
-          ColumnTypeOf_y>::template AccessType<cms::soa::SoAAccessType::constAccess>::
-          template Alignment<conditionalAlignment>::template RestrictQualifier<restrictQualify>;
-      using MutableAccessorOf_y = typename cms::soa::SoAAccessors<typename Metadata::TypeOf_y>::template ColumnType<
-          ColumnTypeOf_y>::template AccessType<cms::soa::SoAAccessType::mutableAccess>::
-          template Alignment<conditionalAlignment>::template RestrictQualifier<restrictQualify>;
-      inline __attribute__((always_inline)) const auto parametersOf_y() const {
-        return const_cast_SoAParametersImpl(parent_.yParameters_);
-      };
-      using TypeOf_z = typename TypeOf_instance_CustomizedSoATemplate::Metadata::TypeOf_z;
-      using ParametersTypeOf_z = typename TypeOf_instance_CustomizedSoATemplate::Metadata::ParametersTypeOf_z;
-      constexpr static cms::soa::SoAColumnType ColumnTypeOf_z =
-          TypeOf_instance_CustomizedSoATemplate::Metadata::ColumnTypeOf_z;
-      using ConstAccessorOf_z = typename cms::soa::SoAAccessors<typename Metadata::TypeOf_z>::template ColumnType<
-          ColumnTypeOf_z>::template AccessType<cms::soa::SoAAccessType::constAccess>::
-          template Alignment<conditionalAlignment>::template RestrictQualifier<restrictQualify>;
-      using MutableAccessorOf_z = typename cms::soa::SoAAccessors<typename Metadata::TypeOf_z>::template ColumnType<
-          ColumnTypeOf_z>::template AccessType<cms::soa::SoAAccessType::mutableAccess>::
-          template Alignment<conditionalAlignment>::template RestrictQualifier<restrictQualify>;
-      inline __attribute__((always_inline)) const auto parametersOf_z() const {
-        return const_cast_SoAParametersImpl(parent_.zParameters_);
-      };
-      using TypeOf_candidateDirection =
-          typename TypeOf_instance_CustomizedSoATemplate::Metadata::TypeOf_candidateDirection;
-      using ParametersTypeOf_candidateDirection =
-          typename TypeOf_instance_CustomizedSoATemplate::Metadata::ParametersTypeOf_candidateDirection;
-      constexpr static cms::soa::SoAColumnType ColumnTypeOf_candidateDirection =
-          TypeOf_instance_CustomizedSoATemplate::Metadata::ColumnTypeOf_candidateDirection;
-      using ConstAccessorOf_candidateDirection =
-          typename cms::soa::SoAAccessors<typename Metadata::TypeOf_candidateDirection>::template ColumnType<
-              ColumnTypeOf_candidateDirection>::template AccessType<cms::soa::SoAAccessType::constAccess>::
-              template Alignment<conditionalAlignment>::template RestrictQualifier<restrictQualify>;
-      using MutableAccessorOf_candidateDirection =
-          typename cms::soa::SoAAccessors<typename Metadata::TypeOf_candidateDirection>::template ColumnType<
-              ColumnTypeOf_candidateDirection>::template AccessType<cms::soa::SoAAccessType::mutableAccess>::
-              template Alignment<conditionalAlignment>::template RestrictQualifier<restrictQualify>;
-      inline __attribute__((always_inline)) const auto parametersOf_candidateDirection() const {
-        return const_cast_SoAParametersImpl(parent_.candidateDirectionParameters_);
-      };
-      inline __attribute__((always_inline)) auto* addressOf_x() { return parametersOf_x().addr_; };
-      inline __attribute__((always_inline)) auto* addressOf_y() { return parametersOf_y().addr_; };
-      inline __attribute__((always_inline)) auto* addressOf_z() { return parametersOf_z().addr_; };
-      inline __attribute__((always_inline)) auto* addressOf_candidateDirection() {
-        return parametersOf_candidateDirection().addr_;
-      };
-      inline __attribute__((always_inline)) auto const* addressOf_x() const { return parametersOf_x().addr_; };
-      inline __attribute__((always_inline)) auto const* addressOf_y() const { return parametersOf_y().addr_; };
-      inline __attribute__((always_inline)) auto const* addressOf_z() const { return parametersOf_z().addr_; };
-      inline __attribute__((always_inline)) auto const* addressOf_candidateDirection() const {
-        return parametersOf_candidateDirection().addr_;
-      };
-      Metadata& operator=(const Metadata&) = delete;
-      Metadata(const Metadata&) = delete;
-
-    private:
-      inline __attribute__((always_inline)) Metadata(const ViewTemplateFreeParams& _soa_impl_parent)
-          : parent_(_soa_impl_parent) {}
-      const ViewTemplateFreeParams& parent_;
-    };
-    friend Metadata;
-    struct Metarecords {
-      friend ViewTemplateFreeParams;
-      Metarecords(const ViewTemplateFreeParams& _soa_impl_parent)
-          : parent_(_soa_impl_parent),
-            x_{parent_.metadata().parametersOf_x()},
-            y_{parent_.metadata().parametersOf_y()},
-            z_{parent_.metadata().parametersOf_z()},
-            candidateDirection_{parent_.metadata().parametersOf_candidateDirection()} {}
-      const typename Metadata::ParametersTypeOf_x& x() const { return x_; }
-      const typename Metadata::ParametersTypeOf_y& y() const { return y_; }
-      const typename Metadata::ParametersTypeOf_z& z() const { return z_; }
-      const typename Metadata::ParametersTypeOf_candidateDirection& candidateDirection() const {
-        return candidateDirection_;
-      }
-
-    private:
-      const ViewTemplateFreeParams& parent_;
-      typename Metadata::ParametersTypeOf_x x_;
-      typename Metadata::ParametersTypeOf_y y_;
-      typename Metadata::ParametersTypeOf_z z_;
-      typename Metadata::ParametersTypeOf_candidateDirection candidateDirection_;
-    };
-    inline __attribute__((always_inline)) const Metadata metadata() const { return Metadata(*this); }
-    inline __attribute__((always_inline)) Metadata metadata() { return Metadata(*this); }
-    inline __attribute__((always_inline)) const Metarecords records() const { return Metarecords(*this); }
-    inline __attribute__((always_inline)) Metarecords records() { return Metarecords(*this); }
-    ViewTemplateFreeParams() = default;
-    ViewTemplateFreeParams(CustomizedSoATemplate_parametrized& instance_CustomizedSoATemplate)
-        : base_type{instance_CustomizedSoATemplate} {}
-    ViewTemplateFreeParams(size_type _soa_impl_elements,
-                           typename Metadata::ParametersTypeOf_x::TupleOrPointerType x,
-                           typename Metadata::ParametersTypeOf_y::TupleOrPointerType y,
-                           typename Metadata::ParametersTypeOf_z::TupleOrPointerType z,
-                           typename Metadata::ParametersTypeOf_candidateDirection::TupleOrPointerType candidateDirection)
-        : base_type{_soa_impl_elements, x, y, z, candidateDirection} {}
-    ViewTemplateFreeParams(typename Metadata::ParametersTypeOf_x x,
-                           typename Metadata::ParametersTypeOf_y y,
-                           typename Metadata::ParametersTypeOf_z z,
-                           typename Metadata::ParametersTypeOf_candidateDirection candidateDirection) {
-      bool readyToSet = false;
-      if (not readyToSet) {
-        base_type::elements_ = x.size_;
-        readyToSet = true;
-      }
-      auto x_tmp = [&]() -> auto {
-        if (base_type::elements_ != x.size_)
-          throw std::runtime_error(
-              "In constructor by column pointers: number of elements not equal for every column: "
-              "x");
-        if constexpr (alignmentEnforcement == AlignmentEnforcement::enforced)
-          if (Metadata::ParametersTypeOf_x::checkAlignment(x, alignment))
-            throw std::runtime_error(
-                "In constructor by column: misaligned column: "
-                "x");
-        return x;
-      }();
-      base_type::xParameters_ = x_tmp;
-      if (not readyToSet) {
-        base_type::elements_ = y.size_;
-        readyToSet = true;
-      }
-      auto y_tmp = [&]() -> auto {
-        if (base_type::elements_ != y.size_)
-          throw std::runtime_error(
-              "In constructor by column pointers: number of elements not equal for every column: "
-              "y");
-        if constexpr (alignmentEnforcement == AlignmentEnforcement::enforced)
-          if (Metadata::ParametersTypeOf_y::checkAlignment(y, alignment))
-            throw std::runtime_error(
-                "In constructor by column: misaligned column: "
-                "y");
-        return y;
-      }();
-      base_type::yParameters_ = y_tmp;
-      if (not readyToSet) {
-        base_type::elements_ = z.size_;
-        readyToSet = true;
-      }
-      auto z_tmp = [&]() -> auto {
-        if (base_type::elements_ != z.size_)
-          throw std::runtime_error(
-              "In constructor by column pointers: number of elements not equal for every column: "
-              "z");
-        if constexpr (alignmentEnforcement == AlignmentEnforcement::enforced)
-          if (Metadata::ParametersTypeOf_z::checkAlignment(z, alignment))
-            throw std::runtime_error(
-                "In constructor by column: misaligned column: "
-                "z");
-        return z;
-      }();
-      base_type::zParameters_ = z_tmp;
-      if (not readyToSet) {
-        base_type::elements_ = candidateDirection.size_;
-        readyToSet = true;
-      }
-      auto candidateDirection_tmp = [&]() -> auto {
-        if (base_type::elements_ != candidateDirection.size_)
-          throw std::runtime_error(
-              "In constructor by column pointers: number of elements not equal for every column: "
-              "candidateDirection");
-        if constexpr (alignmentEnforcement == AlignmentEnforcement::enforced)
-          if (Metadata::ParametersTypeOf_candidateDirection::checkAlignment(candidateDirection, alignment))
-            throw std::runtime_error(
-                "In constructor by column: misaligned column: "
-                "candidateDirection");
-        return candidateDirection;
-      }();
-      base_type::candidateDirectionParameters_ = candidateDirection_tmp;
-    }
-    ViewTemplateFreeParams(ViewTemplateFreeParams const&) = default;
-    ViewTemplateFreeParams& operator=(ViewTemplateFreeParams const&) = default;
-    template <std::size_t OTHER_VIEW_ALIGNMENT,
-              bool OTHER_VIEW_ALIGNMENT_ENFORCEMENT,
-              bool OTHER_RESTRICT_QUALIFY,
-              bool OTHER_RANGE_CHECKING>
-    ViewTemplateFreeParams(ViewTemplateFreeParams<OTHER_VIEW_ALIGNMENT,
-                                                  OTHER_VIEW_ALIGNMENT_ENFORCEMENT,
-                                                  OTHER_RESTRICT_QUALIFY,
-                                                  OTHER_RANGE_CHECKING> const& other)
-        : base_type{other.elements_,
-                    const_cast_SoAParametersImpl(other.xParameters_).tupleOrPointer(),
-                    const_cast_SoAParametersImpl(other.yParameters_).tupleOrPointer(),
-                    const_cast_SoAParametersImpl(other.zParameters_).tupleOrPointer(),
-                    const_cast_SoAParametersImpl(other.candidateDirectionParameters_).tupleOrPointer()} {}
-    template <std::size_t OTHER_VIEW_ALIGNMENT,
-              bool OTHER_VIEW_ALIGNMENT_ENFORCEMENT,
-              bool OTHER_RESTRICT_QUALIFY,
-              bool OTHER_RANGE_CHECKING>
-    ViewTemplateFreeParams& operator=(ViewTemplateFreeParams<OTHER_VIEW_ALIGNMENT,
-                                                             OTHER_VIEW_ALIGNMENT_ENFORCEMENT,
-                                                             OTHER_RESTRICT_QUALIFY,
-                                                             OTHER_RANGE_CHECKING> const& other) {
-      static_cast<base_type>(*this) = static_cast<base_type>(other);
-    }
-    ViewTemplateFreeParams(ViewTemplateFreeParams&&) = default;
-    ViewTemplateFreeParams& operator=(ViewTemplateFreeParams&&) = default;
-    ~ViewTemplateFreeParams() = default;
-    using const_element = typename base_type::const_element;
-    using base_type::operator[];
-    struct element {
-      inline __attribute__((always_inline)) element(
-          size_type _soa_impl_index,
-          typename Metadata::ParametersTypeOf_x x,
-          typename Metadata::ParametersTypeOf_y y,
-          typename Metadata::ParametersTypeOf_z z,
-          typename Metadata::ParametersTypeOf_candidateDirection candidateDirection)
-          : x(_soa_impl_index, x),
-            y(_soa_impl_index, y),
-            z(_soa_impl_index, z),
-            candidateDirection(_soa_impl_index, candidateDirection) {}
-      inline __attribute__((always_inline)) element& operator=(const element& _soa_impl_other) {
-        if constexpr (Metadata::ColumnTypeOf_x != cms::soa::SoAColumnType::scalar)
-          x() = _soa_impl_other.x();
-        if constexpr (Metadata::ColumnTypeOf_y != cms::soa::SoAColumnType::scalar)
-          y() = _soa_impl_other.y();
-        if constexpr (Metadata::ColumnTypeOf_z != cms::soa::SoAColumnType::scalar)
-          z() = _soa_impl_other.z();
-        if constexpr (Metadata::ColumnTypeOf_candidateDirection != cms::soa::SoAColumnType::scalar)
-          candidateDirection() = _soa_impl_other.candidateDirection();
-        return *this;
-      }
-      inline __attribute__((always_inline)) element& operator=(const const_element& _soa_impl_other) {
-        if constexpr (Metadata::ColumnTypeOf_x != cms::soa::SoAColumnType::scalar)
-          x() = _soa_impl_other.x();
-        if constexpr (Metadata::ColumnTypeOf_y != cms::soa::SoAColumnType::scalar)
-          y() = _soa_impl_other.y();
-        if constexpr (Metadata::ColumnTypeOf_z != cms::soa::SoAColumnType::scalar)
-          z() = _soa_impl_other.z();
-        if constexpr (Metadata::ColumnTypeOf_candidateDirection != cms::soa::SoAColumnType::scalar)
-          candidateDirection() = _soa_impl_other.candidateDirection();
-        return *this;
-      }
-      inline __attribute__((always_inline)) constexpr element& operator=(
-          const typename CustomizedSoATemplate_parametrized::Metadata::value_element _soa_impl_value) {
-        x() = _soa_impl_value.x;
-        y() = _soa_impl_value.y;
-        z() = _soa_impl_value.z;
-        candidateDirection() = _soa_impl_value.candidateDirection;
-        return *this;
-      }
-      SoAValueWithConf<Metadata::ColumnTypeOf_x, typename Metadata::TypeOf_x> x;
-      SoAValueWithConf<Metadata::ColumnTypeOf_y, typename Metadata::TypeOf_y> y;
-      SoAValueWithConf<Metadata::ColumnTypeOf_z, typename Metadata::TypeOf_z> z;
-      SoAValueWithConf<Metadata::ColumnTypeOf_candidateDirection, typename Metadata::TypeOf_candidateDirection>
-          candidateDirection;
-    };
-    inline __attribute__((always_inline)) element operator[](size_type _soa_impl_index) {
-      if constexpr (rangeChecking == cms::soa::RangeChecking::enabled) {
-        if (_soa_impl_index >= base_type::elements_ or _soa_impl_index < 0) {
-          throw std::out_of_range(
-              "Out of range index in "
-              "ViewTemplateFreeParams"
-              "::operator[]");
-        }
-      }
-      return element{_soa_impl_index,
-                     const_cast_SoAParametersImpl(base_type::xParameters_),
-                     const_cast_SoAParametersImpl(base_type::yParameters_),
-                     const_cast_SoAParametersImpl(base_type::zParameters_),
-                     const_cast_SoAParametersImpl(base_type::candidateDirectionParameters_)};
-    }
-    inline __attribute__((always_inline))
-    typename cms::soa::SoAAccessors<typename Metadata::TypeOf_x>::template ColumnType<Metadata::ColumnTypeOf_x>::
-        template AccessType<cms::soa::SoAAccessType::mutableAccess>::template Alignment<
-            conditionalAlignment>::template RestrictQualifier<restrictQualify>::NoParamReturnType
-        x() {
-      return typename cms::soa::SoAAccessors<typename Metadata::TypeOf_x>::template ColumnType<
-          Metadata::ColumnTypeOf_x>::template AccessType<cms::soa::SoAAccessType::mutableAccess>::
-          template Alignment<conditionalAlignment>::template RestrictQualifier<restrictQualify>(
-              const_cast_SoAParametersImpl(base_type::xParameters_))();
-    }
-    inline __attribute__((always_inline))
-    typename cms::soa::SoAAccessors<typename Metadata::TypeOf_x>::template ColumnType<Metadata::ColumnTypeOf_x>::
-        template AccessType<cms::soa::SoAAccessType::mutableAccess>::template Alignment<
-            conditionalAlignment>::template RestrictQualifier<restrictQualify>::ParamReturnType
-        x(size_type _soa_impl_index) {
-      if constexpr (rangeChecking == cms::soa::RangeChecking::enabled) {
-        if (_soa_impl_index >= base_type::elements_ or _soa_impl_index < 0) {
-          throw std::out_of_range(
-              "Out of range index in mutable "
-              "x"
-              "(size_type index)");
-        }
-      }
-      return typename cms::soa::SoAAccessors<typename Metadata::TypeOf_x>::template ColumnType<
-          Metadata::ColumnTypeOf_x>::template AccessType<cms::soa::SoAAccessType::mutableAccess>::
-          template Alignment<conditionalAlignment>::template RestrictQualifier<restrictQualify>(
-              const_cast_SoAParametersImpl(base_type::xParameters_))(_soa_impl_index);
-    }
-    inline __attribute__((always_inline))
-    typename cms::soa::SoAAccessors<typename Metadata::TypeOf_y>::template ColumnType<Metadata::ColumnTypeOf_y>::
-        template AccessType<cms::soa::SoAAccessType::mutableAccess>::template Alignment<
-            conditionalAlignment>::template RestrictQualifier<restrictQualify>::NoParamReturnType
-        y() {
-      return typename cms::soa::SoAAccessors<typename Metadata::TypeOf_y>::template ColumnType<
-          Metadata::ColumnTypeOf_y>::template AccessType<cms::soa::SoAAccessType::mutableAccess>::
-          template Alignment<conditionalAlignment>::template RestrictQualifier<restrictQualify>(
-              const_cast_SoAParametersImpl(base_type::yParameters_))();
-    }
-    inline __attribute__((always_inline))
-    typename cms::soa::SoAAccessors<typename Metadata::TypeOf_y>::template ColumnType<Metadata::ColumnTypeOf_y>::
-        template AccessType<cms::soa::SoAAccessType::mutableAccess>::template Alignment<
-            conditionalAlignment>::template RestrictQualifier<restrictQualify>::ParamReturnType
-        y(size_type _soa_impl_index) {
-      if constexpr (rangeChecking == cms::soa::RangeChecking::enabled) {
-        if (_soa_impl_index >= base_type::elements_ or _soa_impl_index < 0) {
-          throw std::out_of_range(
-              "Out of range index in mutable "
-              "y"
-              "(size_type index)");
-        }
-      }
-      return typename cms::soa::SoAAccessors<typename Metadata::TypeOf_y>::template ColumnType<
-          Metadata::ColumnTypeOf_y>::template AccessType<cms::soa::SoAAccessType::mutableAccess>::
-          template Alignment<conditionalAlignment>::template RestrictQualifier<restrictQualify>(
-              const_cast_SoAParametersImpl(base_type::yParameters_))(_soa_impl_index);
-    }
-    inline __attribute__((always_inline))
-    typename cms::soa::SoAAccessors<typename Metadata::TypeOf_z>::template ColumnType<Metadata::ColumnTypeOf_z>::
-        template AccessType<cms::soa::SoAAccessType::mutableAccess>::template Alignment<
-            conditionalAlignment>::template RestrictQualifier<restrictQualify>::NoParamReturnType
-        z() {
-      return typename cms::soa::SoAAccessors<typename Metadata::TypeOf_z>::template ColumnType<
-          Metadata::ColumnTypeOf_z>::template AccessType<cms::soa::SoAAccessType::mutableAccess>::
-          template Alignment<conditionalAlignment>::template RestrictQualifier<restrictQualify>(
-              const_cast_SoAParametersImpl(base_type::zParameters_))();
-    }
-    inline __attribute__((always_inline))
-    typename cms::soa::SoAAccessors<typename Metadata::TypeOf_z>::template ColumnType<Metadata::ColumnTypeOf_z>::
-        template AccessType<cms::soa::SoAAccessType::mutableAccess>::template Alignment<
-            conditionalAlignment>::template RestrictQualifier<restrictQualify>::ParamReturnType
-        z(size_type _soa_impl_index) {
-      if constexpr (rangeChecking == cms::soa::RangeChecking::enabled) {
-        if (_soa_impl_index >= base_type::elements_ or _soa_impl_index < 0) {
-          throw std::out_of_range(
-              "Out of range index in mutable "
-              "z"
-              "(size_type index)");
-        }
-      }
-      return typename cms::soa::SoAAccessors<typename Metadata::TypeOf_z>::template ColumnType<
-          Metadata::ColumnTypeOf_z>::template AccessType<cms::soa::SoAAccessType::mutableAccess>::
-          template Alignment<conditionalAlignment>::template RestrictQualifier<restrictQualify>(
-              const_cast_SoAParametersImpl(base_type::zParameters_))(_soa_impl_index);
-    }
-    inline __attribute__((always_inline))
-    typename cms::soa::SoAAccessors<typename Metadata::TypeOf_candidateDirection>::template ColumnType<
-        Metadata::ColumnTypeOf_candidateDirection>::template AccessType<cms::soa::SoAAccessType::mutableAccess>::
-        template Alignment<conditionalAlignment>::template RestrictQualifier<restrictQualify>::NoParamReturnType
-        candidateDirection() {
-      return typename cms::soa::SoAAccessors<typename Metadata::TypeOf_candidateDirection>::template ColumnType<
-          Metadata::ColumnTypeOf_candidateDirection>::template AccessType<cms::soa::SoAAccessType::mutableAccess>::
-          template Alignment<conditionalAlignment>::template RestrictQualifier<restrictQualify>(
-              const_cast_SoAParametersImpl(base_type::candidateDirectionParameters_))();
-    }
-    inline __attribute__((always_inline))
-    typename cms::soa::SoAAccessors<typename Metadata::TypeOf_candidateDirection>::template ColumnType<
-        Metadata::ColumnTypeOf_candidateDirection>::template AccessType<cms::soa::SoAAccessType::mutableAccess>::
-        template Alignment<conditionalAlignment>::template RestrictQualifier<restrictQualify>::ParamReturnType
-        candidateDirection(size_type _soa_impl_index) {
-      if constexpr (rangeChecking == cms::soa::RangeChecking::enabled) {
-        if (_soa_impl_index >= base_type::elements_ or _soa_impl_index < 0) {
-          throw std::out_of_range(
-              "Out of range index in mutable "
-              "candidateDirection"
-              "(size_type index)");
-        }
-      }
-      return typename cms::soa::SoAAccessors<typename Metadata::TypeOf_candidateDirection>::template ColumnType<
-          Metadata::ColumnTypeOf_candidateDirection>::template AccessType<cms::soa::SoAAccessType::mutableAccess>::
-          template Alignment<conditionalAlignment>::template RestrictQualifier<restrictQualify>(
-              const_cast_SoAParametersImpl(base_type::candidateDirectionParameters_))(_soa_impl_index);
-    }
-    template <typename T>
-    friend void dump();
-  };
-  template <bool RESTRICT_QUALIFY, bool RANGE_CHECKING>
-  using ViewTemplate = ViewTemplateFreeParams<ALIGNMENT, ALIGNMENT_ENFORCEMENT, RESTRICT_QUALIFY, RANGE_CHECKING>;
-  using View = ViewTemplate<cms::soa::RestrictQualify::Default, cms::soa::RangeChecking::Default>;
-  CustomizedSoATemplate()
+  SoATemplate()
       : mem_(nullptr),
         elements_(0),
         byteSize_(0),
         x_(nullptr),
         y_(nullptr),
         z_(nullptr),
-        candidateDirectionStride_(0),
-        candidateDirectionElementsWithPadding_(0),
-        candidateDirection_(nullptr) {}
-  CustomizedSoATemplate(std::byte* mem, size_type elements) : mem_(mem), elements_(elements), byteSize_(0) {
+        aStride_(0),
+        aElementsWithPadding_(0),
+        a_(nullptr) {}
+  SoATemplate(std::byte* mem, size_type elements) : mem_(mem), elements_(elements), byteSize_(0) {
     organizeColumnsFromBuffer();
   }
-  CustomizedSoATemplate(CustomizedSoATemplate const& _soa_impl_other)
+  SoATemplate(SoATemplate const& _soa_impl_other)
       : mem_(_soa_impl_other.mem_),
         elements_(_soa_impl_other.elements_),
         byteSize_(_soa_impl_other.byteSize_),
         x_{_soa_impl_other.x_},
         y_{_soa_impl_other.y_},
         z_{_soa_impl_other.z_},
-        candidateDirectionStride_{_soa_impl_other.candidateDirectionStride_},
-        candidateDirectionElementsWithPadding_{_soa_impl_other.candidateDirectionElementsWithPadding_},
-        candidateDirection_{_soa_impl_other.candidateDirection_} {}
-  CustomizedSoATemplate& operator=(CustomizedSoATemplate const& _soa_impl_other) {
+        aStride_{_soa_impl_other.aStride_},
+        aElementsWithPadding_{_soa_impl_other.aElementsWithPadding_},
+        a_{_soa_impl_other.a_} {}
+  SoATemplate& operator=(SoATemplate const& _soa_impl_other) {
     mem_ = _soa_impl_other.mem_;
     elements_ = _soa_impl_other.elements_;
     byteSize_ = _soa_impl_other.byteSize_;
     x_ = _soa_impl_other.x_;
     y_ = _soa_impl_other.y_;
     z_ = _soa_impl_other.z_;
-    candidateDirectionElementsWithPadding_ = _soa_impl_other.candidateDirectionElementsWithPadding_;
-    candidateDirection_ = _soa_impl_other.candidateDirection_;
-    candidateDirectionStride_ = _soa_impl_other.candidateDirectionStride_;
+    aElementsWithPadding_ = _soa_impl_other.aElementsWithPadding_;
+    a_ = _soa_impl_other.a_;
+    aStride_ = _soa_impl_other.aStride_;
     return *this;
   }
   void aggregate(ConstView const& view) {
@@ -52974,35 +50314,34 @@ struct CustomizedSoATemplate {
       throw std::runtime_error("In aggregate method: number of elements mismatch ");
     memcpy(this->metadata().addressOf_x(),
            view.metadata().addressOf_x(),
-           cms::soa::alignSize(this->elements_ * sizeof(float), alignment));
+           cms::soa::alignSize(this->elements_ * sizeof(double), alignment));
     memcpy(this->metadata().addressOf_y(),
            view.metadata().addressOf_y(),
-           cms::soa::alignSize(this->elements_ * sizeof(float), alignment));
+           cms::soa::alignSize(this->elements_ * sizeof(double), alignment));
     memcpy(this->metadata().addressOf_z(),
            view.metadata().addressOf_z(),
-           cms::soa::alignSize(this->elements_ * sizeof(float), alignment));
-    memcpy(this->metadata().addressOf_candidateDirection(),
-           view.metadata().addressOf_candidateDirection(),
+           cms::soa::alignSize(this->elements_ * sizeof(double), alignment));
+    memcpy(this->metadata().addressOf_a(),
+           view.metadata().addressOf_a(),
            cms::soa::alignSize(this->elements_ * sizeof(Eigen::Vector3d::Scalar), alignment) *
                Eigen::Vector3d::RowsAtCompileTime * Eigen::Vector3d::ColsAtCompileTime);
   }
-  AoS_CustomizedSoATemplate<ALIGNMENT, ALIGNMENT_ENFORCEMENT> transpose() {
-    AoS_CustomizedSoATemplate aos(elements_);
+  AoS_SoATemplate<ALIGNMENT, ALIGNMENT_ENFORCEMENT> transpose(std::byte* new_mem) {
+    AoS_SoATemplate aos(elements_, new_mem);
     for (size_type i = 0; i < elements_; i++) {
-      aos[i].x = *(this->metadata().addressOf_x() + i);
-      aos[i].y = *(this->metadata().addressOf_y() + i);
-      aos[i].z = *(this->metadata().addressOf_z() + i);
+      aos[i].x() = *(this->metadata().addressOf_x() + i);
+      aos[i].y() = *(this->metadata().addressOf_y() + i);
+      aos[i].z() = *(this->metadata().addressOf_z() + i);
+      aos[i].a() = *(this->metadata().addressOf_a() + i);
     }
     return aos;
   }
   template <typename T>
   void ROOTReadStreamer(T& onfile) {
-    memcpy(x_, onfile.x_, sizeof(float) * onfile.elements_);
-    memcpy(y_, onfile.y_, sizeof(float) * onfile.elements_);
-    memcpy(z_, onfile.z_, sizeof(float) * onfile.elements_);
-    memcpy(candidateDirection_,
-           onfile.candidateDirection_,
-           sizeof(Eigen::Vector3d::Scalar) * candidateDirectionElementsWithPadding_);
+    memcpy(x_, onfile.x_, sizeof(double) * onfile.elements_);
+    memcpy(y_, onfile.y_, sizeof(double) * onfile.elements_);
+    memcpy(z_, onfile.z_, sizeof(double) * onfile.elements_);
+    memcpy(a_, onfile.a_, sizeof(Eigen::Vector3d::Scalar) * aElementsWithPadding_);
   }
   void ROOTStreamerCleaner() {
     delete[] x_;
@@ -53011,8 +50350,8 @@ struct CustomizedSoATemplate {
     y_ = nullptr;
     delete[] z_;
     z_ = nullptr;
-    delete[] candidateDirection_;
-    candidateDirection_ = nullptr;
+    delete[] a_;
+    a_ = nullptr;
   }
   template <typename T>
   friend void dump();
@@ -53023,648 +50362,120 @@ private:
       if (reinterpret_cast<intptr_t>(mem_) % alignment)
         throw std::runtime_error(
             "In "
-            "CustomizedSoATemplate"
+            "SoATemplate"
             "::"
-            "CustomizedSoATemplate"
+            "SoATemplate"
             ": misaligned buffer");
     auto _soa_impl_curMem = mem_;
-    x_ = reinterpret_cast<float*>(_soa_impl_curMem);
-    _soa_impl_curMem += cms::soa::alignSize(elements_ * sizeof(float), alignment);
+    x_ = reinterpret_cast<double*>(_soa_impl_curMem);
+    _soa_impl_curMem += cms::soa::alignSize(elements_ * sizeof(double), alignment);
     if constexpr (alignmentEnforcement == AlignmentEnforcement::enforced)
       if (reinterpret_cast<intptr_t>(x_) % alignment)
         throw std::runtime_error(
             "In layout constructor: misaligned column: "
             "x");
-    y_ = reinterpret_cast<float*>(_soa_impl_curMem);
-    _soa_impl_curMem += cms::soa::alignSize(elements_ * sizeof(float), alignment);
+    y_ = reinterpret_cast<double*>(_soa_impl_curMem);
+    _soa_impl_curMem += cms::soa::alignSize(elements_ * sizeof(double), alignment);
     if constexpr (alignmentEnforcement == AlignmentEnforcement::enforced)
       if (reinterpret_cast<intptr_t>(y_) % alignment)
         throw std::runtime_error(
             "In layout constructor: misaligned column: "
             "y");
-    z_ = reinterpret_cast<float*>(_soa_impl_curMem);
-    _soa_impl_curMem += cms::soa::alignSize(elements_ * sizeof(float), alignment);
+    z_ = reinterpret_cast<double*>(_soa_impl_curMem);
+    _soa_impl_curMem += cms::soa::alignSize(elements_ * sizeof(double), alignment);
     if constexpr (alignmentEnforcement == AlignmentEnforcement::enforced)
       if (reinterpret_cast<intptr_t>(z_) % alignment)
         throw std::runtime_error(
             "In layout constructor: misaligned column: "
             "z");
-    candidateDirectionStride_ =
+    aStride_ =
         cms::soa::alignSize(elements_ * sizeof(Eigen::Vector3d::Scalar), alignment) / sizeof(Eigen::Vector3d::Scalar);
-    candidateDirectionElementsWithPadding_ =
-        candidateDirectionStride_ * Eigen::Vector3d::RowsAtCompileTime * Eigen::Vector3d::ColsAtCompileTime;
-    candidateDirection_ = reinterpret_cast<Eigen::Vector3d::Scalar*>(_soa_impl_curMem);
+    aElementsWithPadding_ = aStride_ * Eigen::Vector3d::RowsAtCompileTime * Eigen::Vector3d::ColsAtCompileTime;
+    a_ = reinterpret_cast<Eigen::Vector3d::Scalar*>(_soa_impl_curMem);
     _soa_impl_curMem += cms::soa::alignSize(elements_ * sizeof(Eigen::Vector3d::Scalar), alignment) *
                         Eigen::Vector3d::RowsAtCompileTime * Eigen::Vector3d::ColsAtCompileTime;
     if constexpr (alignmentEnforcement == AlignmentEnforcement::enforced)
-      if (reinterpret_cast<intptr_t>(candidateDirection_) % alignment)
+      if (reinterpret_cast<intptr_t>(a_) % alignment)
         throw std::runtime_error(
             "In layout constructor: misaligned column: "
-            "candidateDirection");
+            "a");
     byteSize_ = computeDataSize(elements_);
     if (mem_ + byteSize_ != _soa_impl_curMem)
       throw std::runtime_error(
           "In "
-          "CustomizedSoATemplate"
+          "SoATemplate"
           "::"
-          "CustomizedSoATemplate"
+          "SoATemplate"
           ": unexpected end pointer.");
   }
   std::byte* mem_;
   size_type elements_;
   size_type const scalar_ = 1;
   byte_size_type byteSize_;
-  float* x_ = nullptr;
-  float* y_ = nullptr;
-  float* z_ = nullptr;
-  byte_size_type candidateDirectionStride_ = 0;
-  size_type candidateDirectionElementsWithPadding_ = 0;
-  Eigen::Vector3d::Scalar* candidateDirection_ = nullptr;
+  double* x_ = nullptr;
+  double* y_ = nullptr;
+  double* z_ = nullptr;
+  byte_size_type aStride_ = 0;
+  size_type aElementsWithPadding_ = 0;
+  Eigen::Vector3d::Scalar* a_ = nullptr;
 };
-using CustomizedSoA = CustomizedSoATemplate<>;
-using CustomizedSoAView = CustomizedSoA::View;
-using CustomizedSoAConstView = CustomizedSoA::ConstView;
-static void ____C_A_T_C_H____T_E_S_T____0();
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wexit-time-destructors"
-#pragma clang diagnostic ignored "-Wglobal-constructors"
-namespace {
-  Catch::AutoReg autoRegistrar1(Catch::makeTestInvoker(&____C_A_T_C_H____T_E_S_T____0),
-                                ::Catch::SourceLineInfo("test/SoACustomizedView_t.cc", static_cast<std::size_t>(43)),
-                                Catch::StringRef(),
-                                Catch::NameAndTags{"SoACustomizedView"});
+using SoA = SoATemplate<>;
+using SoAView = SoA::View;
+using SoAConstView = SoA::ConstView;
+using AoS = AoS_SoATemplate<>;
+template <typename View>
+void printSoAView(View view) {
+  std::cout << "SoAView:" << std::endl;
+  if constexpr (has_num<View>::value) {
+    std::cout << "num: " << view.num() << std::endl;
+  }
+  if constexpr (has_metadata<View>::value) {
+    for (auto i = 0; i < view.metadata().size(); ++i) {
+      std::cout << "Element " << i << ": ";
+      if constexpr (has_x<View>::value) {
+        std::cout << "x = " << view.x()[i] << ", ";
+      }
+      if constexpr (has_y<View>::value) {
+        std::cout << "y = " << view.y()[i] << ", ";
+      }
+      if constexpr (has_z<View>::value) {
+        std::cout << "z = " << view.z()[i] << ", ";
+      }
+      if constexpr (has_a<View>::value) {
+        std::cout << "a = " << view[i].a().transpose() << std::endl;
+      }
+    }
+  }
 }
-#pragma clang diagnostic pop
-static void ____C_A_T_C_H____T_E_S_T____0() {
-  const std::size_t elems = 10;
-  const std::size_t positionBufferSize = SoAPosition::computeDataSize(elems);
-  const std::size_t pcaBufferSize = SoAPCA::computeDataSize(elems);
-  std::unique_ptr<std::byte, decltype(std::free)*> bufferPos{
-      reinterpret_cast<std::byte*>(aligned_alloc(SoAPosition::alignment, positionBufferSize)), std::free};
-  std::unique_ptr<std::byte, decltype(std::free)*> bufferPCA{
-      reinterpret_cast<std::byte*>(aligned_alloc(SoAPCA::alignment, pcaBufferSize)), std::free};
-  SoAPosition position{bufferPos.get(), elems};
-  SoAPCA pca{bufferPCA.get(), elems};
-  SoAPositionView positionView{position};
-  SoAPositionConstView positionConstView{position};
-  SoAPCAView pcaView{pca};
-  SoAPCAConstView pcaConstView{pca};
-  for (size_t i = 0; i < elems; i++) {
-    positionView.x()[i] = static_cast<float>(i);
-    positionView.y()[i] = static_cast<float>(i) * 2.0f;
-    positionView.z()[i] = static_cast<float>(i) * 3.0f;
+int main() {
+  std::size_t numElements = 12;
+  std::size_t size = SoA::computeDataSize(numElements);
+  std::size_t aos_size = AoS::aos_size(numElements);
+  std::unique_ptr<std::byte, decltype(std::free)*> slBuffer{
+      reinterpret_cast<std::byte*>(aligned_alloc(SoA::alignment, size)), std::free};
+  std::unique_ptr<std::byte[]> aosBuffer = std::make_unique<std::byte[]>(aos_size);
+  SoA soa(slBuffer.get(), numElements);
+  SoAView view{soa};
+  SoAConstView{soa};
+  for (size_t i = 0; i < numElements; i++) {
+    view.x()[i] = static_cast<double>(i);
+    view.y()[i] = static_cast<double>(i) * 2.0;
+    view.z()[i] = static_cast<double>(i) * 3.0;
   }
-  positionView.detectorType() = 1;
-  float time = 0.01;
-  for (size_t i = 0; i < elems; i++) {
-    pcaView.eigenvector_1()[i] = positionView.x()[i] / time;
-    pcaView.eigenvector_2()[i] = positionView.y()[i] / time;
-    pcaView.eigenvector_3()[i] = positionView.z()[i] / time;
-    pcaView[i].candidateDirection()(0) = positionView[i].x() / time;
-    pcaView[i].candidateDirection()(1) = positionView[i].y() / time;
-    pcaView[i].candidateDirection()(2) = positionView[i].z() / time;
+  soa.soaToStreamInternal(std::cout);
+  printSoAView<SoAView>(view);
+  std::cout << "SoA buffer start: " << static_cast<void*>(slBuffer.get()) << std::endl;
+  std::cout << "AoS buffer start: " << static_cast<void*>(aosBuffer.get()) << std::endl;
+  std::cout << "SoA buffer end: " << static_cast<void*>(slBuffer.get() + size) << std::endl;
+  std::cout << "AoS buffer end: " << static_cast<void*>(aosBuffer.get() + aos_size) << std::endl;
+  AoS soa_to_aos = soa.transpose(aosBuffer.get());
+  for (size_t i = 0; i < numElements; i++) {
+    std::cout << "Element " << i << " :" << soa_to_aos[i].x() << soa_to_aos[i].y() << soa_to_aos[i].z() << std::endl;
   }
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wunused-variable"
-  if (Catch::Section const& catch_internal_Section2 = Catch::SectionInfo(
-          ::Catch::SourceLineInfo("test/SoACustomizedView_t.cc", static_cast<std::size_t>(86)), "Customized View"))
-#pragma clang diagnostic pop
-  {
-    const auto posRecs = positionView.records();
-    const auto pcaRecs = pcaView.records();
-    CustomizedSoAView customizedView(posRecs.x(), posRecs.y(), posRecs.z(), pcaRecs.candidateDirection());
-    do {
-      (void)__builtin_constant_p(customizedView.metadata().addressOf_x() == positionView.metadata().addressOf_x());
-      Catch::AssertionHandler catchAssertionHandler(
-          "REQUIRE"_catch_sr,
-          ::Catch::SourceLineInfo("test/SoACustomizedView_t.cc", static_cast<std::size_t>(95)),
-          "customizedView.metadata().addressOf_x() == positionView.metadata().addressOf_x()",
-          Catch::ResultDisposition::Normal);
-      try {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wparentheses"
-        catchAssertionHandler.handleExpr(Catch::Decomposer() <= customizedView.metadata().addressOf_x() ==
-                                         positionView.metadata().addressOf_x());
-#pragma clang diagnostic pop
-      } catch (...) {
-        catchAssertionHandler.handleUnexpectedInflightException();
-      }
-      catchAssertionHandler.complete();
-    } while ((void)0,
-             (false) && static_cast<bool>(
-                            !!(customizedView.metadata().addressOf_x() == positionView.metadata().addressOf_x())));
-    do {
-      (void)__builtin_constant_p(customizedView.metadata().addressOf_y() == positionView.metadata().addressOf_y());
-      Catch::AssertionHandler catchAssertionHandler(
-          "REQUIRE"_catch_sr,
-          ::Catch::SourceLineInfo("test/SoACustomizedView_t.cc", static_cast<std::size_t>(96)),
-          "customizedView.metadata().addressOf_y() == positionView.metadata().addressOf_y()",
-          Catch::ResultDisposition::Normal);
-      try {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wparentheses"
-        catchAssertionHandler.handleExpr(Catch::Decomposer() <= customizedView.metadata().addressOf_y() ==
-                                         positionView.metadata().addressOf_y());
-#pragma clang diagnostic pop
-      } catch (...) {
-        catchAssertionHandler.handleUnexpectedInflightException();
-      }
-      catchAssertionHandler.complete();
-    } while ((void)0,
-             (false) && static_cast<bool>(
-                            !!(customizedView.metadata().addressOf_y() == positionView.metadata().addressOf_y())));
-    do {
-      (void)__builtin_constant_p(customizedView.metadata().addressOf_z() == positionView.metadata().addressOf_z());
-      Catch::AssertionHandler catchAssertionHandler(
-          "REQUIRE"_catch_sr,
-          ::Catch::SourceLineInfo("test/SoACustomizedView_t.cc", static_cast<std::size_t>(97)),
-          "customizedView.metadata().addressOf_z() == positionView.metadata().addressOf_z()",
-          Catch::ResultDisposition::Normal);
-      try {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wparentheses"
-        catchAssertionHandler.handleExpr(Catch::Decomposer() <= customizedView.metadata().addressOf_z() ==
-                                         positionView.metadata().addressOf_z());
-#pragma clang diagnostic pop
-      } catch (...) {
-        catchAssertionHandler.handleUnexpectedInflightException();
-      }
-      catchAssertionHandler.complete();
-    } while ((void)0,
-             (false) && static_cast<bool>(
-                            !!(customizedView.metadata().addressOf_z() == positionView.metadata().addressOf_z())));
-    do {
-      (void)__builtin_constant_p(customizedView.metadata().addressOf_candidateDirection() ==
-                                 pcaView.metadata().addressOf_candidateDirection());
-      Catch::AssertionHandler catchAssertionHandler(
-          "REQUIRE"_catch_sr,
-          ::Catch::SourceLineInfo("test/SoACustomizedView_t.cc", static_cast<std::size_t>(99)),
-          "customizedView.metadata().addressOf_candidateDirection() == "
-          "pcaView.metadata().addressOf_candidateDirection()",
-          Catch::ResultDisposition::Normal);
-      try {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wparentheses"
-        catchAssertionHandler.handleExpr(Catch::Decomposer() <=
-                                             customizedView.metadata().addressOf_candidateDirection() ==
-                                         pcaView.metadata().addressOf_candidateDirection());
-#pragma clang diagnostic pop
-      } catch (...) {
-        catchAssertionHandler.handleUnexpectedInflightException();
-      }
-      catchAssertionHandler.complete();
-    } while ((void)0,
-             (false) && static_cast<bool>(!!(customizedView.metadata().addressOf_candidateDirection() ==
-                                             pcaView.metadata().addressOf_candidateDirection())));
-    customizedView.x()[3] = 0.;
-    do {
-      (void)__builtin_constant_p(customizedView.x()[3] == positionConstView.x()[3]);
-      Catch::AssertionHandler catchAssertionHandler(
-          "REQUIRE"_catch_sr,
-          ::Catch::SourceLineInfo("test/SoACustomizedView_t.cc", static_cast<std::size_t>(103)),
-          "customizedView.x()[3] == positionConstView.x()[3]",
-          Catch::ResultDisposition::Normal);
-      try {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wparentheses"
-        catchAssertionHandler.handleExpr(Catch::Decomposer() <= customizedView.x()[3] == positionConstView.x()[3]);
-#pragma clang diagnostic pop
-      } catch (...) {
-        catchAssertionHandler.handleUnexpectedInflightException();
-      }
-      catchAssertionHandler.complete();
-    } while ((void)0, (false) && static_cast<bool>(!!(customizedView.x()[3] == positionConstView.x()[3])));
-  }
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wunused-variable"
-  if (Catch::Section const& catch_internal_Section3 =
-          Catch::SectionInfo(::Catch::SourceLineInfo("test/SoACustomizedView_t.cc", static_cast<std::size_t>(106)),
-                             "Customized ConstView"))
-#pragma clang diagnostic pop
-  {
-    const auto posRecs = positionConstView.records();
-    const auto pcaRecs = pcaConstView.records();
-    CustomizedSoAConstView customizedConstView(posRecs.x(), posRecs.y(), posRecs.z(), pcaRecs.candidateDirection());
-    do {
-      (void)__builtin_constant_p(customizedConstView.metadata().addressOf_x() ==
-                                 positionConstView.metadata().addressOf_x());
-      Catch::AssertionHandler catchAssertionHandler(
-          "REQUIRE"_catch_sr,
-          ::Catch::SourceLineInfo("test/SoACustomizedView_t.cc", static_cast<std::size_t>(115)),
-          "customizedConstView.metadata().addressOf_x() == positionConstView.metadata().addressOf_x()",
-          Catch::ResultDisposition::Normal);
-      try {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wparentheses"
-        catchAssertionHandler.handleExpr(Catch::Decomposer() <= customizedConstView.metadata().addressOf_x() ==
-                                         positionConstView.metadata().addressOf_x());
-#pragma clang diagnostic pop
-      } catch (...) {
-        catchAssertionHandler.handleUnexpectedInflightException();
-      }
-      catchAssertionHandler.complete();
-    } while ((void)0,
-             (false) && static_cast<bool>(!!(customizedConstView.metadata().addressOf_x() ==
-                                             positionConstView.metadata().addressOf_x())));
-    do {
-      (void)__builtin_constant_p(customizedConstView.metadata().addressOf_y() ==
-                                 positionConstView.metadata().addressOf_y());
-      Catch::AssertionHandler catchAssertionHandler(
-          "REQUIRE"_catch_sr,
-          ::Catch::SourceLineInfo("test/SoACustomizedView_t.cc", static_cast<std::size_t>(116)),
-          "customizedConstView.metadata().addressOf_y() == positionConstView.metadata().addressOf_y()",
-          Catch::ResultDisposition::Normal);
-      try {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wparentheses"
-        catchAssertionHandler.handleExpr(Catch::Decomposer() <= customizedConstView.metadata().addressOf_y() ==
-                                         positionConstView.metadata().addressOf_y());
-#pragma clang diagnostic pop
-      } catch (...) {
-        catchAssertionHandler.handleUnexpectedInflightException();
-      }
-      catchAssertionHandler.complete();
-    } while ((void)0,
-             (false) && static_cast<bool>(!!(customizedConstView.metadata().addressOf_y() ==
-                                             positionConstView.metadata().addressOf_y())));
-    do {
-      (void)__builtin_constant_p(customizedConstView.metadata().addressOf_z() ==
-                                 positionConstView.metadata().addressOf_z());
-      Catch::AssertionHandler catchAssertionHandler(
-          "REQUIRE"_catch_sr,
-          ::Catch::SourceLineInfo("test/SoACustomizedView_t.cc", static_cast<std::size_t>(117)),
-          "customizedConstView.metadata().addressOf_z() == positionConstView.metadata().addressOf_z()",
-          Catch::ResultDisposition::Normal);
-      try {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wparentheses"
-        catchAssertionHandler.handleExpr(Catch::Decomposer() <= customizedConstView.metadata().addressOf_z() ==
-                                         positionConstView.metadata().addressOf_z());
-#pragma clang diagnostic pop
-      } catch (...) {
-        catchAssertionHandler.handleUnexpectedInflightException();
-      }
-      catchAssertionHandler.complete();
-    } while ((void)0,
-             (false) && static_cast<bool>(!!(customizedConstView.metadata().addressOf_z() ==
-                                             positionConstView.metadata().addressOf_z())));
-    do {
-      (void)__builtin_constant_p(customizedConstView.metadata().addressOf_candidateDirection() ==
-                                 pcaConstView.metadata().addressOf_candidateDirection());
-      Catch::AssertionHandler catchAssertionHandler(
-          "REQUIRE"_catch_sr,
-          ::Catch::SourceLineInfo("test/SoACustomizedView_t.cc", static_cast<std::size_t>(119)),
-          "customizedConstView.metadata().addressOf_candidateDirection() == "
-          "pcaConstView.metadata().addressOf_candidateDirection()",
-          Catch::ResultDisposition::Normal);
-      try {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wparentheses"
-        catchAssertionHandler.handleExpr(Catch::Decomposer() <=
-                                             customizedConstView.metadata().addressOf_candidateDirection() ==
-                                         pcaConstView.metadata().addressOf_candidateDirection());
-#pragma clang diagnostic pop
-      } catch (...) {
-        catchAssertionHandler.handleUnexpectedInflightException();
-      }
-      catchAssertionHandler.complete();
-    } while ((void)0,
-             (false) && static_cast<bool>(!!(customizedConstView.metadata().addressOf_candidateDirection() ==
-                                             pcaConstView.metadata().addressOf_candidateDirection())));
-  }
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wunused-variable"
-  if (Catch::Section const& catch_internal_Section4 =
-          Catch::SectionInfo(::Catch::SourceLineInfo("test/SoACustomizedView_t.cc", static_cast<std::size_t>(122)),
-                             "Customized ConstView from Views"))
-#pragma clang diagnostic pop
-  {
-    const auto posRecs = positionView.records();
-    const auto pcaRecs = pcaView.records();
-    CustomizedSoAConstView customizedConstView(posRecs.x(), posRecs.y(), posRecs.z(), pcaRecs.candidateDirection());
-    positionView.x()[3] = 0.;
-    do {
-      (void)__builtin_constant_p(customizedConstView.x()[3] == positionView.x()[3]);
-      Catch::AssertionHandler catchAssertionHandler(
-          "REQUIRE"_catch_sr,
-          ::Catch::SourceLineInfo("test/SoACustomizedView_t.cc", static_cast<std::size_t>(132)),
-          "customizedConstView.x()[3] == positionView.x()[3]",
-          Catch::ResultDisposition::Normal);
-      try {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wparentheses"
-        catchAssertionHandler.handleExpr(Catch::Decomposer() <= customizedConstView.x()[3] == positionView.x()[3]);
-#pragma clang diagnostic pop
-      } catch (...) {
-        catchAssertionHandler.handleUnexpectedInflightException();
-      }
-      catchAssertionHandler.complete();
-    } while ((void)0, (false) && static_cast<bool>(!!(customizedConstView.x()[3] == positionView.x()[3])));
-  }
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wunused-variable"
-  if (Catch::Section const& catch_internal_Section5 =
-          Catch::SectionInfo(::Catch::SourceLineInfo("test/SoACustomizedView_t.cc", static_cast<std::size_t>(135)),
-                             "Aggregate the Customized View"))
-#pragma clang diagnostic pop
-  {
-    const std::size_t customBufferSize = CustomizedSoA::computeDataSize(elems);
-    std::unique_ptr<std::byte, decltype(std::free)*> bufferCustom{
-        reinterpret_cast<std::byte*>(aligned_alloc(CustomizedSoA::alignment, customBufferSize)), std::free};
-    CustomizedSoA customSoA(bufferCustom.get(), elems);
-    const auto posRecs = positionView.records();
-    const auto pcaRecs = pcaView.records();
-    CustomizedSoAView customizedView(posRecs.x(), posRecs.y(), posRecs.z(), pcaRecs.candidateDirection());
-    customSoA.aggregate(customizedView);
-    CustomizedSoAView customizedAggregatedView{customSoA};
-    do {
-      (void)__builtin_constant_p(customizedAggregatedView.metadata().addressOf_x() !=
-                                 positionConstView.metadata().addressOf_x());
-      Catch::AssertionHandler catchAssertionHandler(
-          "REQUIRE"_catch_sr,
-          ::Catch::SourceLineInfo("test/SoACustomizedView_t.cc", static_cast<std::size_t>(154)),
-          "customizedAggregatedView.metadata().addressOf_x() != positionConstView.metadata().addressOf_x()",
-          Catch::ResultDisposition::Normal);
-      try {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wparentheses"
-        catchAssertionHandler.handleExpr(Catch::Decomposer() <= customizedAggregatedView.metadata().addressOf_x() !=
-                                         positionConstView.metadata().addressOf_x());
-#pragma clang diagnostic pop
-      } catch (...) {
-        catchAssertionHandler.handleUnexpectedInflightException();
-      }
-      catchAssertionHandler.complete();
-    } while ((void)0,
-             (false) && static_cast<bool>(!!(customizedAggregatedView.metadata().addressOf_x() !=
-                                             positionConstView.metadata().addressOf_x())));
-    do {
-      (void)__builtin_constant_p(customizedAggregatedView.metadata().addressOf_y() !=
-                                 positionConstView.metadata().addressOf_y());
-      Catch::AssertionHandler catchAssertionHandler(
-          "REQUIRE"_catch_sr,
-          ::Catch::SourceLineInfo("test/SoACustomizedView_t.cc", static_cast<std::size_t>(155)),
-          "customizedAggregatedView.metadata().addressOf_y() != positionConstView.metadata().addressOf_y()",
-          Catch::ResultDisposition::Normal);
-      try {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wparentheses"
-        catchAssertionHandler.handleExpr(Catch::Decomposer() <= customizedAggregatedView.metadata().addressOf_y() !=
-                                         positionConstView.metadata().addressOf_y());
-#pragma clang diagnostic pop
-      } catch (...) {
-        catchAssertionHandler.handleUnexpectedInflightException();
-      }
-      catchAssertionHandler.complete();
-    } while ((void)0,
-             (false) && static_cast<bool>(!!(customizedAggregatedView.metadata().addressOf_y() !=
-                                             positionConstView.metadata().addressOf_y())));
-    do {
-      (void)__builtin_constant_p(customizedAggregatedView.metadata().addressOf_z() !=
-                                 positionConstView.metadata().addressOf_z());
-      Catch::AssertionHandler catchAssertionHandler(
-          "REQUIRE"_catch_sr,
-          ::Catch::SourceLineInfo("test/SoACustomizedView_t.cc", static_cast<std::size_t>(156)),
-          "customizedAggregatedView.metadata().addressOf_z() != positionConstView.metadata().addressOf_z()",
-          Catch::ResultDisposition::Normal);
-      try {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wparentheses"
-        catchAssertionHandler.handleExpr(Catch::Decomposer() <= customizedAggregatedView.metadata().addressOf_z() !=
-                                         positionConstView.metadata().addressOf_z());
-#pragma clang diagnostic pop
-      } catch (...) {
-        catchAssertionHandler.handleUnexpectedInflightException();
-      }
-      catchAssertionHandler.complete();
-    } while ((void)0,
-             (false) && static_cast<bool>(!!(customizedAggregatedView.metadata().addressOf_z() !=
-                                             positionConstView.metadata().addressOf_z())));
-    do {
-      (void)__builtin_constant_p(customizedAggregatedView.metadata().addressOf_candidateDirection() !=
-                                 pcaConstView.metadata().addressOf_candidateDirection());
-      Catch::AssertionHandler catchAssertionHandler(
-          "REQUIRE"_catch_sr,
-          ::Catch::SourceLineInfo("test/SoACustomizedView_t.cc", static_cast<std::size_t>(158)),
-          "customizedAggregatedView.metadata().addressOf_candidateDirection() != "
-          "pcaConstView.metadata().addressOf_candidateDirection()",
-          Catch::ResultDisposition::Normal);
-      try {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wparentheses"
-        catchAssertionHandler.handleExpr(Catch::Decomposer() <=
-                                             customizedAggregatedView.metadata().addressOf_candidateDirection() !=
-                                         pcaConstView.metadata().addressOf_candidateDirection());
-#pragma clang diagnostic pop
-      } catch (...) {
-        catchAssertionHandler.handleUnexpectedInflightException();
-      }
-      catchAssertionHandler.complete();
-    } while ((void)0,
-             (false) && static_cast<bool>(!!(customizedAggregatedView.metadata().addressOf_candidateDirection() !=
-                                             pcaConstView.metadata().addressOf_candidateDirection())));
-    do {
-      (void)__builtin_constant_p(0 == reinterpret_cast<uintptr_t>(customizedAggregatedView.metadata().addressOf_x()) %
-                                          decltype(customSoA)::alignment);
-      Catch::AssertionHandler catchAssertionHandler(
-          "REQUIRE"_catch_sr,
-          ::Catch::SourceLineInfo("test/SoACustomizedView_t.cc", static_cast<std::size_t>(162)),
-          "0 == reinterpret_cast<uintptr_t>(customizedAggregatedView.metadata().addressOf_x()) % "
-          "decltype(customSoA)::alignment",
-          Catch::ResultDisposition::Normal);
-      try {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wparentheses"
-        catchAssertionHandler.handleExpr(
-            Catch::Decomposer() <= 0 == reinterpret_cast<uintptr_t>(customizedAggregatedView.metadata().addressOf_x()) %
-                                            decltype(customSoA)::alignment);
-#pragma clang diagnostic pop
-      } catch (...) {
-        catchAssertionHandler.handleUnexpectedInflightException();
-      }
-      catchAssertionHandler.complete();
-    } while ((void)0,
-             (false) && static_cast<bool>(
-                            !!(0 == reinterpret_cast<uintptr_t>(customizedAggregatedView.metadata().addressOf_x()) %
-                                        decltype(customSoA)::alignment)));
-    do {
-      (void)__builtin_constant_p(0 == reinterpret_cast<uintptr_t>(customizedAggregatedView.metadata().addressOf_y()) %
-                                          decltype(customSoA)::alignment);
-      Catch::AssertionHandler catchAssertionHandler(
-          "REQUIRE"_catch_sr,
-          ::Catch::SourceLineInfo("test/SoACustomizedView_t.cc", static_cast<std::size_t>(164)),
-          "0 == reinterpret_cast<uintptr_t>(customizedAggregatedView.metadata().addressOf_y()) % "
-          "decltype(customSoA)::alignment",
-          Catch::ResultDisposition::Normal);
-      try {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wparentheses"
-        catchAssertionHandler.handleExpr(
-            Catch::Decomposer() <= 0 == reinterpret_cast<uintptr_t>(customizedAggregatedView.metadata().addressOf_y()) %
-                                            decltype(customSoA)::alignment);
-#pragma clang diagnostic pop
-      } catch (...) {
-        catchAssertionHandler.handleUnexpectedInflightException();
-      }
-      catchAssertionHandler.complete();
-    } while ((void)0,
-             (false) && static_cast<bool>(
-                            !!(0 == reinterpret_cast<uintptr_t>(customizedAggregatedView.metadata().addressOf_y()) %
-                                        decltype(customSoA)::alignment)));
-    do {
-      (void)__builtin_constant_p(0 == reinterpret_cast<uintptr_t>(customizedAggregatedView.metadata().addressOf_z()) %
-                                          decltype(customSoA)::alignment);
-      Catch::AssertionHandler catchAssertionHandler(
-          "REQUIRE"_catch_sr,
-          ::Catch::SourceLineInfo("test/SoACustomizedView_t.cc", static_cast<std::size_t>(166)),
-          "0 == reinterpret_cast<uintptr_t>(customizedAggregatedView.metadata().addressOf_z()) % "
-          "decltype(customSoA)::alignment",
-          Catch::ResultDisposition::Normal);
-      try {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wparentheses"
-        catchAssertionHandler.handleExpr(
-            Catch::Decomposer() <= 0 == reinterpret_cast<uintptr_t>(customizedAggregatedView.metadata().addressOf_z()) %
-                                            decltype(customSoA)::alignment);
-#pragma clang diagnostic pop
-      } catch (...) {
-        catchAssertionHandler.handleUnexpectedInflightException();
-      }
-      catchAssertionHandler.complete();
-    } while ((void)0,
-             (false) && static_cast<bool>(
-                            !!(0 == reinterpret_cast<uintptr_t>(customizedAggregatedView.metadata().addressOf_z()) %
-                                        decltype(customSoA)::alignment)));
-    do {
-      (void)__builtin_constant_p(
-          0 == reinterpret_cast<uintptr_t>(customizedAggregatedView.metadata().addressOf_candidateDirection()) %
-                   decltype(customSoA)::alignment);
-      Catch::AssertionHandler catchAssertionHandler(
-          "REQUIRE"_catch_sr,
-          ::Catch::SourceLineInfo("test/SoACustomizedView_t.cc", static_cast<std::size_t>(168)),
-          "0 == reinterpret_cast<uintptr_t>(customizedAggregatedView.metadata().addressOf_candidateDirection()) % "
-          "decltype(customSoA)::alignment",
-          Catch::ResultDisposition::Normal);
-      try {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wparentheses"
-        catchAssertionHandler.handleExpr(
-            Catch::Decomposer() <= 0 ==
-            reinterpret_cast<uintptr_t>(customizedAggregatedView.metadata().addressOf_candidateDirection()) %
-                decltype(customSoA)::alignment);
-#pragma clang diagnostic pop
-      } catch (...) {
-        catchAssertionHandler.handleUnexpectedInflightException();
-      }
-      catchAssertionHandler.complete();
-    } while (
-        (void)0,
-        (false) && static_cast<bool>(!!(0 == reinterpret_cast<uintptr_t>(
-                                                 customizedAggregatedView.metadata().addressOf_candidateDirection()) %
-                                                 decltype(customSoA)::alignment)));
-    do {
-      (void)__builtin_constant_p(reinterpret_cast<std::byte*>(customizedAggregatedView.metadata().addressOf_x()) +
-                                     cms::soa::alignSize(elems * sizeof(float), CustomizedSoA::alignment) ==
-                                 reinterpret_cast<std::byte*>(customizedAggregatedView.metadata().addressOf_y()));
-      Catch::AssertionHandler catchAssertionHandler(
-          "REQUIRE"_catch_sr,
-          ::Catch::SourceLineInfo("test/SoACustomizedView_t.cc", static_cast<std::size_t>(173)),
-          "reinterpret_cast<std::byte *>(customizedAggregatedView.metadata().addressOf_x()) + "
-          "cms::soa::alignSize(elems * sizeof(float), CustomizedSoA::alignment) == reinterpret_cast<std::byte "
-          "*>(customizedAggregatedView.metadata().addressOf_y())",
-          Catch::ResultDisposition::Normal);
-      try {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wparentheses"
-        catchAssertionHandler.handleExpr(
-            Catch::Decomposer() <= reinterpret_cast<std::byte*>(customizedAggregatedView.metadata().addressOf_x()) +
-                                       cms::soa::alignSize(elems * sizeof(float), CustomizedSoA::alignment) ==
-            reinterpret_cast<std::byte*>(customizedAggregatedView.metadata().addressOf_y()));
-#pragma clang diagnostic pop
-      } catch (...) {
-        catchAssertionHandler.handleUnexpectedInflightException();
-      }
-      catchAssertionHandler.complete();
-    } while ((void)0,
-             (false) && static_cast<bool>(
-                            !!(reinterpret_cast<std::byte*>(customizedAggregatedView.metadata().addressOf_x()) +
-                                   cms::soa::alignSize(elems * sizeof(float), CustomizedSoA::alignment) ==
-                               reinterpret_cast<std::byte*>(customizedAggregatedView.metadata().addressOf_y()))));
-    do {
-      (void)__builtin_constant_p(reinterpret_cast<std::byte*>(customizedAggregatedView.metadata().addressOf_y()) +
-                                     cms::soa::alignSize(elems * sizeof(float), CustomizedSoA::alignment) ==
-                                 reinterpret_cast<std::byte*>(customizedAggregatedView.metadata().addressOf_z()));
-      Catch::AssertionHandler catchAssertionHandler(
-          "REQUIRE"_catch_sr,
-          ::Catch::SourceLineInfo("test/SoACustomizedView_t.cc", static_cast<std::size_t>(176)),
-          "reinterpret_cast<std::byte *>(customizedAggregatedView.metadata().addressOf_y()) + "
-          "cms::soa::alignSize(elems * sizeof(float), CustomizedSoA::alignment) == reinterpret_cast<std::byte "
-          "*>(customizedAggregatedView.metadata().addressOf_z())",
-          Catch::ResultDisposition::Normal);
-      try {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wparentheses"
-        catchAssertionHandler.handleExpr(
-            Catch::Decomposer() <= reinterpret_cast<std::byte*>(customizedAggregatedView.metadata().addressOf_y()) +
-                                       cms::soa::alignSize(elems * sizeof(float), CustomizedSoA::alignment) ==
-            reinterpret_cast<std::byte*>(customizedAggregatedView.metadata().addressOf_z()));
-#pragma clang diagnostic pop
-      } catch (...) {
-        catchAssertionHandler.handleUnexpectedInflightException();
-      }
-      catchAssertionHandler.complete();
-    } while ((void)0,
-             (false) && static_cast<bool>(
-                            !!(reinterpret_cast<std::byte*>(customizedAggregatedView.metadata().addressOf_y()) +
-                                   cms::soa::alignSize(elems * sizeof(float), CustomizedSoA::alignment) ==
-                               reinterpret_cast<std::byte*>(customizedAggregatedView.metadata().addressOf_z()))));
-    do {
-      (void)__builtin_constant_p(
-          reinterpret_cast<std::byte*>(customizedAggregatedView.metadata().addressOf_z()) +
-              cms::soa::alignSize(elems * sizeof(float), CustomizedSoA::alignment) ==
-          reinterpret_cast<std::byte*>(customizedAggregatedView.metadata().addressOf_candidateDirection()));
-      Catch::AssertionHandler catchAssertionHandler(
-          "REQUIRE"_catch_sr,
-          ::Catch::SourceLineInfo("test/SoACustomizedView_t.cc", static_cast<std::size_t>(179)),
-          "reinterpret_cast<std::byte *>(customizedAggregatedView.metadata().addressOf_z()) + "
-          "cms::soa::alignSize(elems * sizeof(float), CustomizedSoA::alignment) == reinterpret_cast<std::byte "
-          "*>(customizedAggregatedView.metadata().addressOf_candidateDirection())",
-          Catch::ResultDisposition::Normal);
-      try {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wparentheses"
-        catchAssertionHandler.handleExpr(
-            Catch::Decomposer() <= reinterpret_cast<std::byte*>(customizedAggregatedView.metadata().addressOf_z()) +
-                                       cms::soa::alignSize(elems * sizeof(float), CustomizedSoA::alignment) ==
-            reinterpret_cast<std::byte*>(customizedAggregatedView.metadata().addressOf_candidateDirection()));
-#pragma clang diagnostic pop
-      } catch (...) {
-        catchAssertionHandler.handleUnexpectedInflightException();
-      }
-      catchAssertionHandler.complete();
-    } while ((void)0,
-             (false) &&
-                 static_cast<bool>(!!(reinterpret_cast<std::byte*>(customizedAggregatedView.metadata().addressOf_z()) +
-                                          cms::soa::alignSize(elems * sizeof(float), CustomizedSoA::alignment) ==
-                                      reinterpret_cast<std::byte*>(
-                                          customizedAggregatedView.metadata().addressOf_candidateDirection()))));
-    customizedAggregatedView.x()[3] = 0.;
-    do {
-      (void)__builtin_constant_p(customizedAggregatedView.x()[3] != positionView.x()[3]);
-      Catch::AssertionHandler catchAssertionHandler(
-          "REQUIRE"_catch_sr,
-          ::Catch::SourceLineInfo("test/SoACustomizedView_t.cc", static_cast<std::size_t>(183)),
-          "customizedAggregatedView.x()[3] != positionView.x()[3]",
-          Catch::ResultDisposition::Normal);
-      try {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wparentheses"
-        catchAssertionHandler.handleExpr(Catch::Decomposer() <= customizedAggregatedView.x()[3] != positionView.x()[3]);
-#pragma clang diagnostic pop
-      } catch (...) {
-        catchAssertionHandler.handleUnexpectedInflightException();
-      }
-      catchAssertionHandler.complete();
-    } while ((void)0, (false) && static_cast<bool>(!!(customizedAggregatedView.x()[3] != positionView.x()[3])));
-  }
+  std::ptrdiff_t offset = reinterpret_cast<char*>(&soa_to_aos[0].y()) - reinterpret_cast<char*>(&soa_to_aos[0].x());
+  std::cout << "Offset tra x e y: " << offset << " bytes\n";
+  std::ptrdiff_t offsetsoa = reinterpret_cast<char*>(&view[0].y()) - reinterpret_cast<char*>(&view[0].x());
+  std::cout << "Offset tra x e y: " << offsetsoa << " bytes\n";
+  std::ptrdiff_t offset_addresses = reinterpret_cast<char*>(&soa_to_aos[0].x()) - reinterpret_cast<char*>(&view[0].x());
+  std::cout << "Offset tra x e y: " << offset_addresses << " bytes\n";
 }

@@ -540,7 +540,7 @@
 // clang-format on
 
 #define _DEFINE_VALUE_ELEMENT_SCALAR_MEMBER_IMPL(VALUE_TYPE, CPP_TYPE, NAME, args)                                     \
-  CPP_TYPE NAME;                                                                                                       \
+  CPP_TYPE BOOST_PP_CAT(NAME, _);                                                                                                       \
 
 
 #define _DEFINE_VALUE_ELEMENT_SCALAR_MEMBERS(R, DATA, TYPE_NAME)                                                       \
@@ -565,20 +565,6 @@
               BOOST_PP_EMPTY(),                                                                                        \
               BOOST_PP_EXPAND(_ACCUMULATE_AOS_MEMBERS_IMPL TYPE_NAME))
 // clang-format on
-
-#define _ASSIGN_DATA_TO_AOS_IMPL(VALUE_TYPE, CPP_TYPE, NAME, args)                                                     \
-  _SWITCH_ON_TYPE(VALUE_TYPE,                                                                                          \
-      /* Scalar */                                                                                                     \
-      ,                                                                                                                \
-      aos[i].NAME = *(BOOST_PP_CAT(this->metadata().addressOf_, NAME)() + i);                                             \
-      ,                                                                                                                \
-  )
-      // aos[i].NAME = BOOST_PP_CAT(this->metadata().addressOf_, NAME)() + i;) 
-
-#define _ASSIGN_DATA_TO_AOS(R, DATA, TYPE_NAME)                                                                         \
-  BOOST_PP_IF(BOOST_PP_GREATER(BOOST_PP_TUPLE_ELEM(0, TYPE_NAME), 2),                                                  \
-              BOOST_PP_EMPTY(),                                                                                        \
-              BOOST_PP_EXPAND(_ASSIGN_DATA_TO_AOS_IMPL TYPE_NAME))
 
 #define _DEFINE_AOS_ALIAS_IMPL(VALUE_TYPE, CPP_TYPE, NAME, args)                                                       \
   _SWITCH_ON_TYPE(VALUE_TYPE,                                                                                          \
@@ -607,21 +593,118 @@
               BOOST_PP_EXPAND(_DEFINE_AOS_ALIAS_IMPL TYPE_NAME))           
               
 #define _DEFINE_AOS_ELEMENT_MEMBERS_IMPL(VALUE_TYPE, CPP_TYPE, NAME, args)                                             \
-  SoAValueWithConf<BOOST_PP_CAT(ColumnTypeOf_, NAME),                                                                  \
-                   typename BOOST_PP_CAT(TypeOf_, NAME)>                                                               \
-                   NAME;                                                                                                
+  _SWITCH_ON_TYPE(VALUE_TYPE,                                                                                          \
+    /* Scalar */                                                                                                       \
+    ,                                                                                                                  \
+    /* Column */                                                                                                       \
+    CPP_TYPE BOOST_PP_CAT(NAME, _);                                                                                                     \
+    ,                                                                                                                  \
+    /* Eigen column */                                                                                                 \
+    Eigen::Map<CPP_TYPE> BOOST_PP_CAT(NAME, _);                                                                                                     \
+  )
 
 #define _DEFINE_AOS_ELEMENT_MEMBERS(R, DATA, TYPE_NAME)                                                                \
-BOOST_PP_IF(BOOST_PP_GREATER(BOOST_PP_TUPLE_ELEM(0, TYPE_NAME), 2),                                                  \
+BOOST_PP_IF(BOOST_PP_GREATER(BOOST_PP_TUPLE_ELEM(0, TYPE_NAME), 2),                                                    \
             BOOST_PP_EMPTY(),                                                                                          \
-            BOOST_PP_DEFER(_DEFINE_AOS_ELEMENT_MEMBERS_IMPL) BOOST_PP_OBSTRUCT() TYPE_NAME)           
+            _DEFINE_AOS_ELEMENT_MEMBERS_IMPL TYPE_NAME)                 
+
+#define _DEFAULT_AOS_VALUES_IMPL(VALUE_TYPE, CPP_TYPE, NAME, args)                                                     \
+  _SWITCH_ON_TYPE(VALUE_TYPE,                                                                                          \
+    /* Scalar */                                                                                                       \
+    (scalar::BOOST_PP_CAT(NAME, _)(NAME))                                                                              \
+    ,                                                                                                                  \
+    /* Column */                                                                                                       \
+    (BOOST_PP_CAT(NAME, _)(NAME))                                                                                      \
+    ,                                                                                                                  \
+    /* Eigen column */                                                                                                 \
+    (BOOST_PP_CAT(NAME, _)(NAME))                                                                                      \
+  )
+
+#define _DEFAULT_AOS_VALUES(R, DATA, TYPE_NAME)                                                                        \
+BOOST_PP_IF(BOOST_PP_GREATER(BOOST_PP_TUPLE_ELEM(0, TYPE_NAME), 2),                                                    \
+            BOOST_PP_EMPTY(),                                                                                          \
+            BOOST_PP_EXPAND(_DEFAULT_AOS_VALUES_IMPL TYPE_NAME))     
+
+#define _DEFAULT_INPUTS_IMPL(VALUE_TYPE, CPP_TYPE, NAME, args)                                                        \
+  _SWITCH_ON_TYPE(VALUE_TYPE,                                                                                          \
+    /* Scalar */                                                                                                       \
+    (CPP_TYPE NAME = 0)                                                                                                \
+    ,                                                                                                                  \
+    /* Column */                                                                                                       \
+    (CPP_TYPE NAME = 0)                                                                                                \
+    ,                                                                                                                  \
+    /* Eigen column */                                                                                                 \
+    (CPP_TYPE::Scalar* NAME = nullptr)                                                                                 \
+    )
+
+#define _DEFAULT_INPUTS(R, DATA, TYPE_NAME)                                                                           \
+BOOST_PP_IF(BOOST_PP_GREATER(BOOST_PP_TUPLE_ELEM(0, TYPE_NAME), 2),                                                    \
+            BOOST_PP_EMPTY(),                                                                                          \
+            BOOST_PP_EXPAND(_DEFAULT_INPUTS_IMPL TYPE_NAME))    
+
+#define _INITIALIZE_AOS_MEMORY_IMPL(VALUE_TYPE, CPP_TYPE, NAME, args)                                                  \
+  _SWITCH_ON_TYPE(VALUE_TYPE,                                                                                          \
+    /* Scalar */                                                                                                       \
+    ,                                                                                                                  \
+    /* Column */                                                                                                       \
+    NAME = SoAValueWithConfParams<BOOST_PP_CAT(NAME, _Params)>(idx, reinterpret_cast<CPP_TYPE*>(data + _elem_impl_offset));                                                                                      \
+    _elem_impl_offset += sizeof(CPP_TYPE);                                                                              \
+    ,                                                                                                                  \
+    /* Eigen column */                                                                                                 \
+  )
+
+#define _INITIALIZE_AOS_MEMORY(R, DATA, TYPE_NAME)                                                                     \
+BOOST_PP_IF(BOOST_PP_GREATER(BOOST_PP_TUPLE_ELEM(0, TYPE_NAME), 2),                                                    \
+            BOOST_PP_EMPTY(),                                                                                          \
+            BOOST_PP_EXPAND(_INITIALIZE_AOS_MEMORY_IMPL TYPE_NAME))    
+
+#define _AOS_ACCESSORS_IMPL(VALUE_TYPE, CPP_TYPE, NAME, args)                                                          \
+  _SWITCH_ON_TYPE(VALUE_TYPE,                                                                                          \
+    /* Scalar */                                                                                                       \
+    ,                                                                                                                  \
+    /* Column */                                                                                                       \
+    CPP_TYPE& NAME() { return BOOST_PP_CAT(NAME, _); }                                                                 \
+    ,                                                                                                                  \
+    /* Eigen column */                                                                                                 \
+    Eigen::Map<CPP_TYPE>& NAME() { return BOOST_PP_CAT(NAME, _); }                                                                 \
+  )
+
+#define _AOS_ACCESSORS(R, DATA, TYPE_NAME)                                                                             \
+BOOST_PP_IF(BOOST_PP_GREATER(BOOST_PP_TUPLE_ELEM(0, TYPE_NAME), 2),                                                    \
+            BOOST_PP_EMPTY(),                                                                                          \
+            BOOST_PP_EXPAND(_AOS_ACCESSORS_IMPL TYPE_NAME))    
+
+
+#define _AOS_CONST_ACCESSORS_IMPL(VALUE_TYPE, CPP_TYPE, NAME, args)                                                          \
+_SWITCH_ON_TYPE(VALUE_TYPE,                                                                                          \
+  /* Scalar */                                                                                                       \
+  ,                                                                                                                  \
+  /* Column */                                                                                                       \
+  const CPP_TYPE& NAME() const { return BOOST_PP_CAT(NAME, _); }                                                                 \
+  ,                                                                                                                  \
+  /* Eigen column */                                                                                                 \
+  const Eigen::Map<CPP_TYPE>& NAME() const { return BOOST_PP_CAT(NAME, _); }                                                                 \
+)
+
+#define _AOS_CONST_ACCESSORS(R, DATA, TYPE_NAME)                                                                             \
+BOOST_PP_IF(BOOST_PP_GREATER(BOOST_PP_TUPLE_ELEM(0, TYPE_NAME), 2),                                                    \
+          BOOST_PP_EMPTY(),                                                                                          \
+          BOOST_PP_EXPAND(_AOS_CONST_ACCESSORS_IMPL TYPE_NAME))                
+
+#define _ASSIGN_VALUES_TO_AOS_IMPL(VALUE_TYPE, CPP_TYPE, NAME, args)                                                   \
+  aos[i].NAME() = *(BOOST_PP_CAT(this->metadata().addressOf_, NAME)() + i);                                            
+
+#define _ASSIGN_VALUES_TO_AOS(R, DATA, TYPE_NAME)                                                                      \
+BOOST_PP_IF(BOOST_PP_GREATER(BOOST_PP_TUPLE_ELEM(0, TYPE_NAME), 2),                                                    \
+            BOOST_PP_EMPTY(),                                                                                          \
+            BOOST_PP_EXPAND(_ASSIGN_VALUES_TO_AOS_IMPL TYPE_NAME))    
 
 #ifdef DEBUG
 #define _DO_RANGECHECK true
 #else
 #define _DO_RANGECHECK false
 #endif
-
+ 
 /*
  * A macro defining a SoA layout (collection of scalars and columns of equal lengths)
  */
@@ -642,10 +725,19 @@ bool ALIGNMENT_ENFORCEMENT = cms::soa::AlignmentEnforcement::relaxed>           
     _ITERATE_ON_ALL(_DEFINE_AOS_ALIAS, ~, __VA_ARGS__)                                                                 \
     /* Here it is possible to inherit from SoA to obtain Metadata::value_element or implement a new one */             \
     struct Element {                                                                                                   \
-      _ITERATE_ON_ALL(_DEFINE_AOS_ELEMENT_MEMBERS, ~, __VA_ARGS__)                                                   \
+      Element(_ITERATE_ON_ALL_COMMA(_DEFAULT_INPUTS, ~, __VA_ARGS__))                                                  \
+       : _ITERATE_ON_ALL_COMMA(_DEFAULT_AOS_VALUES, ~, __VA_ARGS__) {}                                                 \
+                                                                                                                       \
+      /* Element(size_type idx, _ITERATE_ON_ALL_COMMA(_DEFAULT_INPUTS, ~, __VA_ARGS__)) */                                 \
+      /*  : _ITERATE_ON_ALL_COMMA(_INITIALIZE_AOS_VALUES, ~, __VA_ARGS__) {} */                                             \
+                                                                                                                       \
+      _ITERATE_ON_ALL(_DEFINE_AOS_ELEMENT_MEMBERS, ~, __VA_ARGS__)                                                     \
       struct scalar {                                                                                                  \
         _ITERATE_ON_ALL(_DEFINE_VALUE_ELEMENT_SCALAR_MEMBERS, ~, __VA_ARGS__)                                          \
       };                                                                                                                \
+                                                                                                                       \
+      _ITERATE_ON_ALL(_AOS_ACCESSORS, ~, __VA_ARGS__)                                                                  \
+      _ITERATE_ON_ALL(_AOS_CONST_ACCESSORS, ~, __VA_ARGS__)                                                            \
       /* Helper function used to retrieve the total size of the element */                                             \
       static constexpr byte_size_type element_size() {                                                                 \
         byte_size_type _aos_impl_ret = 0;                                                                              \
@@ -654,25 +746,32 @@ bool ALIGNMENT_ENFORCEMENT = cms::soa::AlignmentEnforcement::relaxed>           
       }                                                                                                                \
     };                                                                                                                 \
                                                                                                                        \
-  BOOST_PP_CAT(AoS_, CLASS)() : elem(nullptr), elements_(0) { }                                                       \
+  BOOST_PP_CAT(AoS_, CLASS)() : elem_(nullptr), elements_(0) { }                                                       \
                                                                                                                       \
-  BOOST_PP_CAT(AoS_, CLASS)(size_type elements) : elements_(elements) {                                                     \
-    elem = std::make_unique<Element[]>(elements);                                                                     \
+  BOOST_PP_CAT(AoS_, CLASS)(size_type elements, std::byte* mem) : elements_(elements) {                                \
+    elem_ = reinterpret_cast<Element*>(mem);                                                                      \
+    for (size_type i = 0; i < elements; i++) {                                                                        \
+      new (&elem_[i]) Element();                                                                                      \
+    }                                                                                                                 \
+  }                                                                                                                   \
+                                                                                                                      \
+  static constexpr byte_size_type aos_size(size_type elements) {                                                   \
+    return elements * Element::element_size();                                                                       \
   }                                                                                                                   \
                                                                                                                       \
   /* Access operator */                                                                                               \
   Element& operator[](size_type i) {                                                                                   \
-    return elem[i];                                                                                                 \
+    return elem_[i];                                                                                                 \
   }                                                                                                                   \
                                                                                                                       \
   /* Access operator (const) */                                                                                          \
   const Element& operator[](size_type i) const {                                                                         \
-    return elem[i];                                                                                                 \
+    return elem_[i];                                                                                                 \
   }                                                                                                                   \
                                                                                                                       \
   private:                                                                                                            \
-    std::unique_ptr<Element[]> elem;                                                                                  \
-    size_type elements_;                                                                                                      \
+    Element* elem_;                                                                                                     \
+    size_type elements_;                                                                                               \
   };                                                                                                                  \
                                                                                                                       \
   template <CMS_SOA_BYTE_SIZE_TYPE ALIGNMENT = cms::soa::CacheLineSize::defaultSize,                                   \
@@ -855,12 +954,12 @@ bool ALIGNMENT_ENFORCEMENT = cms::soa::AlignmentEnforcement::relaxed>           
     }                                                                                                                  \
                                                                                                                       \
     SOA_HOST_ONLY                                                                                                      \
-    BOOST_PP_CAT(AoS_, CLASS)<ALIGNMENT, ALIGNMENT_ENFORCEMENT> transpose() {                                                                            \
-      BOOST_PP_CAT(AoS_, CLASS) aos(elements_);                                                                        \
-      for (size_type i = 0; i < elements_; i++) {                                                                         \
-        _ITERATE_ON_ALL(_ASSIGN_DATA_TO_AOS, ~, __VA_ARGS__)                                                            \
+    BOOST_PP_CAT(AoS_, CLASS)<ALIGNMENT, ALIGNMENT_ENFORCEMENT> transpose(std::byte* new_mem) {                        \
+      BOOST_PP_CAT(AoS_, CLASS) aos(elements_, new_mem);                                                               \
+      for (size_type i = 0; i < elements_; i++) {                                                                      \
+        _ITERATE_ON_ALL(_ASSIGN_VALUES_TO_AOS, ~, __VA_ARGS__)                                                         \
       }                                                                                                                \
-      return aos;                                                                                                       \
+      return aos;                                                                                                      \
     }                                                                                                                  \
                                                                                                                        \
     /* ROOT read streamer */                                                                                           \

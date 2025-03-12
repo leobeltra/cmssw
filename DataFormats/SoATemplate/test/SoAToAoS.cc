@@ -46,8 +46,7 @@ GENERATE_SOA_LAYOUT(SoATemplate,
     SOA_COLUMN(double, x),
     SOA_COLUMN(double, y),
     SOA_COLUMN(double, z),
-    SOA_EIGEN_COLUMN(Eigen::Vector3d, a),
-    SOA_SCALAR(int, num))
+    SOA_EIGEN_COLUMN(Eigen::Vector3d, a))
 
 using SoA = SoATemplate<>;
 using SoAView = SoA::View;
@@ -89,9 +88,15 @@ int main() {
     std::size_t numElements = 12;
     std::size_t size = SoA::computeDataSize(numElements);
 
+    std::size_t aos_size = AoS::aos_size(numElements);
+
     std::unique_ptr<std::byte, decltype(std::free) *> slBuffer{
         reinterpret_cast<std::byte *>(aligned_alloc(SoA::alignment, size)), std::free};
-        
+     
+        // std::unique_ptr<std::byte, decltype(std::free) *> aosBuffer{
+        //     reinterpret_cast<std::byte *>(aligned_alloc(SoA::alignment, 1000)), std::free};
+    std::unique_ptr<std::byte[]> aosBuffer = std::make_unique<std::byte[]>(aos_size);
+
     SoA soa(slBuffer.get(), numElements); 
     SoAView view{soa};
     SoAConstView{soa};
@@ -100,29 +105,39 @@ int main() {
             view.x()[i] = static_cast<double>(i);
             view.y()[i] = static_cast<double>(i) * 2.0;
             view.z()[i] = static_cast<double>(i) * 3.0;
-            Eigen::Vector3d::Scalar* vec = &view.a()[0];
-            *vec = 11.11;
-            *(vec + 1) = 6.2;
-            *(vec + 2*sizeof(Eigen::Vector3d::Scalar)) = 12.12;
-            *(vec + 4*sizeof(Eigen::Vector3d::Scalar)) = 13.13;
     }
-    view.num() = 42;
 
-    std::cout << sizeof(Eigen::Vector3d::Scalar) << std::endl;
     soa.soaToStreamInternal(std::cout);
     printSoAView<SoAView>(view);
 
-    AoS aos(numElements);
-
-    AoS soa_to_aos = soa.transpose();
+    std::cout << "SoA buffer start: " << static_cast<void*>(slBuffer.get()) << std::endl;
+    std::cout << "AoS buffer start: " << static_cast<void*>(aosBuffer.get()) << std::endl;
+    std::cout << "SoA buffer end: " << static_cast<void*>(slBuffer.get() + size) << std::endl;
+    std::cout << "AoS buffer end: " << static_cast<void*>(aosBuffer.get() + aos_size) << std::endl;
+    
+    AoS soa_to_aos(numElements, aosBuffer.get());
 
     for (size_t i = 0; i < numElements; i++) {
-        std::cout << "Element " << i << " :" << soa_to_aos[i].x << soa_to_aos[i].y << soa_to_aos[i].z << std::endl;
+        soa_to_aos[i].x() = static_cast<double>(i);
+        soa_to_aos[i].y() = static_cast<double>(i) * 2.0;
+        soa_to_aos[i].z() = static_cast<double>(i) * 3.0;
+        std::cout << "carletto ancelotti" << std::endl;
+        soa_to_aos[i].a()(0) = static_cast<double>(i) * 4.0;
+        std::cout << "carletto ancelotti" << std::endl;
+        soa_to_aos[i].a()(1) = static_cast<double>(i) * 5.0;
+        soa_to_aos[i].a()(2) = static_cast<double>(i) * 6.0;
+    }
+    
+    // AoS soa_to_aos = soa.transpose(aosBuffer.get());
+
+    for (size_t i = 0; i < numElements; i++) {
+        std::cout << "Element " << i << " :" << soa_to_aos[i].x() << soa_to_aos[i].y() << soa_to_aos[i].z() 
+                << soa_to_aos[i].a()(0) << soa_to_aos[i].a()(1) << soa_to_aos[i].a()(2) << std::endl;
     }
 
     // Calcolare la differenza di indirizzo tra x e y per il primo elemento
-    std::ptrdiff_t offset = reinterpret_cast<char*>(&soa_to_aos[0].y) - 
-    reinterpret_cast<char*>(&soa_to_aos[0].x);
+    std::ptrdiff_t offset = reinterpret_cast<char*>(&soa_to_aos[0].y()) - 
+    reinterpret_cast<char*>(&soa_to_aos[0].x());
 
     std::cout << "Offset tra x e y: " << offset << " bytes\n"; 
 
@@ -130,4 +145,9 @@ int main() {
     reinterpret_cast<char*>(&view[0].x());
 
     std::cout << "Offset tra x e y: " << offsetsoa << " bytes\n";
+
+    std::ptrdiff_t offset_addresses = reinterpret_cast<char*>(&soa_to_aos[0].x()) - 
+    reinterpret_cast<char*>(&view[0].x());
+
+    std::cout << "Offset tra x e y: " << offset_addresses << " bytes\n"; 
 }
