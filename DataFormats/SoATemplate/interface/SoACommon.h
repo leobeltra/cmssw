@@ -274,7 +274,8 @@ namespace cms::soa {
     constexpr inline std::remove_const_t<T>* non_const_ptr(T* p) {
       return const_cast<std::remove_const_t<T>*>(p);
     }
-  }  // namespace
+  }  // namespace      std::cout << "works?" << std::endl; 
+
 
   template <SoAColumnType COLUMN_TYPE, typename T>
   SOA_HOST_DEVICE SOA_INLINE constexpr SoAParametersImpl<COLUMN_TYPE, T> const_cast_SoAParametersImpl(
