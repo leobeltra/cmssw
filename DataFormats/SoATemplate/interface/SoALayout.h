@@ -607,14 +607,12 @@
               BOOST_PP_EXPAND(_DEFINE_AOS_ALIAS_IMPL TYPE_NAME))           
               
 #define _DEFINE_AOS_ELEMENT_MEMBERS_IMPL(VALUE_TYPE, CPP_TYPE, NAME, args)                                             \
-  SoAValueWithConf<BOOST_PP_CAT(ColumnTypeOf_, NAME),                                                                  \
-                   typename BOOST_PP_CAT(TypeOf_, NAME)>                                                               \
-                   NAME;                                                                                                
+  CPP_TYPE NAME;                                                                 
 
 #define _DEFINE_AOS_ELEMENT_MEMBERS(R, DATA, TYPE_NAME)                                                                \
 BOOST_PP_IF(BOOST_PP_GREATER(BOOST_PP_TUPLE_ELEM(0, TYPE_NAME), 2),                                                  \
             BOOST_PP_EMPTY(),                                                                                          \
-            BOOST_PP_DEFER(_DEFINE_AOS_ELEMENT_MEMBERS_IMPL) BOOST_PP_OBSTRUCT() TYPE_NAME)           
+            _DEFINE_AOS_ELEMENT_MEMBERS_IMPL TYPE_NAME)           
 
 #ifdef DEBUG
 #define _DO_RANGECHECK true
