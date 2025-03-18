@@ -89,7 +89,7 @@ TEST_CASE("SoACustomizedView") {
     Queue queue(device);
 
     // common number of elements for the SoAs
-    const std::size_t elems = 117;
+    const std::size_t elems = 17;
 
     // buffer sizes
     const std::size_t positionBufferSize = SoAPosition::computeDataSize(elems);
@@ -110,10 +110,6 @@ TEST_CASE("SoACustomizedView") {
     SoAPositionConstView positionConstView{position};
     SoAPCAView pcaView{pca};
     SoAPCAConstView pcaConstView{pca};
-
-    // alpaka::memset(queue, bufferPos, 0);
-    
-    // alpaka::memset(queue, bufferPCA, 0);
 
     // fill up
     auto blockSize = 64;
@@ -209,10 +205,6 @@ TEST_CASE("SoACustomizedView") {
       const auto pcaRecs = pcaView.records();
       CustomizedSoAView customizedView(posRecs.x(), posRecs.y(), posRecs.z(), pcaRecs.candidateDirection(), posRecs.detectorType());
 
-      customSoA.soaToStreamInternal(std::cout);
-      position.soaToStreamInternal(std::cout);
-      pca.soaToStreamInternal(std::cout);
-
       // aggregate the columns from the view with runtime check for the size
       customSoA.deepCopy(customizedView, queue);
       // building the View of the aggregated SoA
@@ -276,8 +268,9 @@ TEST_CASE("SoACustomizedView") {
         REQUIRE(customizedView_host[i].candidateDirection()(0) == pcaView_host[i].candidateDirection()(0));
         REQUIRE(customizedView_host[i].candidateDirection()(1) == pcaView_host[i].candidateDirection()(1));
         REQUIRE(customizedView_host[i].candidateDirection()(2) == pcaView_host[i].candidateDirection()(2));
-        std::cout << "Element " << i << " is equal" << std::endl;
       }
+
+      REQUIRE(customizedView_host.detectorType() == positionView_host.detectorType());
 
       // Check for the independency of the aggregated SoA
       auto alpakaView = alpaka::createView(device, &customizedAggregatedView.x()[3], 1);

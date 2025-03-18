@@ -79,6 +79,9 @@ public:
     alpaka::memset(std::forward<TQueue>(queue), *buffer_, 0x00);
   }
 
+  template <typename TQueue, typename = std::enable_if_t<alpaka::isQueue<TQueue>>>
+  void deepCopy(ConstView const& view, TQueue& queue) { layout_.deepCopy(view, queue); }  
+
 private:
   std::optional<Buffer> buffer_;  //!
   Layout layout_;                 //

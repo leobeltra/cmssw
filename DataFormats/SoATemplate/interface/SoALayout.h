@@ -437,17 +437,18 @@
                   BOOST_PP_CAT(view.metadata().addressOf_, NAME)(),                                                    \
                   this->elements_ ));                                                                                  \
       , /* Eigen column */                                                                                             \
-      for (size_t i = 0; i < CPP_TYPE::RowsAtCompileTime * CPP_TYPE::ColsAtCompileTime; i++) {                        \
-      alpaka::memcpy(queue,                                                                                            \
+      for (size_t i = 0; i < CPP_TYPE::RowsAtCompileTime * CPP_TYPE::ColsAtCompileTime; i++) {                         \
+        alpaka::memcpy(queue,                                                                                          \
                 alpaka::createView(alpaka::getDev(queue),                                                              \
-                  BOOST_PP_CAT(this->metadata().addressOf_, NAME)() + i * cms::soa::alignSize(this->elements_ * sizeof(CPP_TYPE), alignment),                                                   \
-                  this->elements_ ),                                                                                    \
+                  BOOST_PP_CAT(this->metadata().addressOf_, NAME)() + i *                                              \
+                    cms::soa::alignSize(this->elements_ * sizeof(CPP_TYPE::Scalar), alignment) /                       \
+                    sizeof(CPP_TYPE::Scalar),                                                                          \
+                  this->elements_),                                                                                    \
                 alpaka::createView(alpaka::getDev(queue),                                                              \
-                  &view[0].NAME().coeff(i),                                                                                  \
-                  this->elements_                                                                                      \
-                    ));                                                                                               \
-                  }                                                                                                    \
-                ) 
+                  &view[0].NAME().coeff(i),                                                                            \
+                  this->elements_));                                                                                   \
+          }                                                                                                            \
+        ) 
 
 #define _COPY_VIEW_COLUMNS_IMPL_L(VALUE_TYPE, CPP_TYPE, NAME)                                           \
 _SWITCH_ON_TYPE(VALUE_TYPE, /* Scalar */                                                            \
@@ -636,7 +637,6 @@ _SWITCH_ON_TYPE(VALUE_TYPE, /* Scalar */                                        
         throw std::runtime_error(                                                                                      \
             "In deepCopy method: number of elements mismatch ");                                                       \
       _ITERATE_ON_ALL(_COPY_VIEW_COLUMNS, ~, __VA_ARGS__)                                                              \
-      alpaka::wait(queue);                                                                                             \
     }                                                                                                                  \
                                                                                                                        \
     /* ROOT read streamer */                                                                                           \

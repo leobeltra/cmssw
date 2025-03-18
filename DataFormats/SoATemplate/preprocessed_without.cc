@@ -58886,7 +58886,6 @@ struct SoAPositionTemplate {
     alpaka::memcpy(queue,
                    alpaka::createView(alpaka::getDev(queue), this->metadata().addressOf_detectorType(), 1),
                    alpaka::createView(alpaka::getDev(queue), view.metadata().addressOf_detectorType(), 1));
-    alpaka::wait(queue);
   }
   template <typename T>
   void ROOTReadStreamer(T& onfile) {
@@ -58965,7 +58964,7 @@ private:
   float* z_ = nullptr;
   int* detectorType_ = nullptr;
 };
-using SoAPosition = SoAPositionTemplate<>;
+using SoAPosition = SoAPositionTemplate<cms::soa::CacheLineSize::IntelCPU>;
 using SoAPositionView = SoAPosition::View;
 using SoAPositionConstView = SoAPosition::ConstView;
 template <std::size_t ALIGNMENT = cms::soa::CacheLineSize::defaultSize,
@@ -60386,11 +60385,11 @@ struct SoAPCATemplate {
           queue,
           alpaka::createView(alpaka::getDev(queue),
                              this->metadata().addressOf_candidateDirection() +
-                                 i * cms::soa::alignSize(this->elements_ * sizeof(Eigen::Vector3d), alignment),
+                                 i * cms::soa::alignSize(this->elements_ * sizeof(Eigen::Vector3d::Scalar), alignment) /
+                                     sizeof(Eigen::Vector3d::Scalar),
                              this->elements_),
-          alpaka::createView(alpaka::getDev(queue), &view[0].candidateDirection()(i), this->elements_));
+          alpaka::createView(alpaka::getDev(queue), &view[0].candidateDirection().coeff(i), this->elements_));
     }
-    alpaka::wait(queue);
   }
   template <typename T>
   void ROOTReadStreamer(T& onfile) {
@@ -60489,7 +60488,7 @@ private:
   size_type candidateDirectionElementsWithPadding_ = 0;
   Eigen::Vector3d::Scalar* candidateDirection_ = nullptr;
 };
-using SoAPCA = SoAPCATemplate<>;
+using SoAPCA = SoAPCATemplate<cms::soa::CacheLineSize::IntelCPU>;
 using SoAPCAView = SoAPCA::View;
 using SoAPCAConstView = SoAPCA::ConstView;
 template <std::size_t ALIGNMENT = cms::soa::CacheLineSize::defaultSize,
@@ -61830,14 +61829,14 @@ struct CustomizedSoATemplate {
           queue,
           alpaka::createView(alpaka::getDev(queue),
                              this->metadata().addressOf_candidateDirection() +
-                                 i * cms::soa::alignSize(this->elements_ * sizeof(Eigen::Vector3d), alignment),
+                                 i * cms::soa::alignSize(this->elements_ * sizeof(Eigen::Vector3d::Scalar), alignment) /
+                                     sizeof(Eigen::Vector3d::Scalar),
                              this->elements_),
-          alpaka::createView(alpaka::getDev(queue), &view[0].candidateDirection()(i), this->elements_));
+          alpaka::createView(alpaka::getDev(queue), &view[0].candidateDirection().coeff(i), this->elements_));
     }
     alpaka::memcpy(queue,
                    alpaka::createView(alpaka::getDev(queue), this->metadata().addressOf_detectorType(), 1),
                    alpaka::createView(alpaka::getDev(queue), view.metadata().addressOf_detectorType(), 1));
-    alpaka::wait(queue);
   }
   template <typename T>
   void ROOTReadStreamer(T& onfile) {
@@ -61936,7 +61935,7 @@ private:
   Eigen::Vector3d::Scalar* candidateDirection_ = nullptr;
   int* detectorType_ = nullptr;
 };
-using CustomizedSoA = CustomizedSoATemplate<cms::soa::CacheLineSize::IntelCPU>;
+using CustomizedSoA = CustomizedSoATemplate<>;
 using CustomizedSoAView = CustomizedSoA::View;
 using CustomizedSoAConstView = CustomizedSoA::ConstView;
 struct FillSoA {
@@ -62011,7 +62010,7 @@ static void ____C_A_T_C_H____T_E_S_T____0() {
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wunused-variable"
     if (Catch::Section const& catch_internal_Section2 = Catch::SectionInfo(
-            ::Catch::SourceLineInfo("test/alpaka/SoACustomizedView_t.dev.cc", static_cast<std::size_t>(133)),
+            ::Catch::SourceLineInfo("test/alpaka/SoACustomizedView_t.dev.cc", static_cast<std::size_t>(129)),
             "Customized View"))
 #pragma clang diagnostic pop
     {
@@ -62023,7 +62022,7 @@ static void ____C_A_T_C_H____T_E_S_T____0() {
         (void)__builtin_constant_p(customizedView.metadata().addressOf_x() == positionView.metadata().addressOf_x());
         Catch::AssertionHandler catchAssertionHandler(
             "REQUIRE"_catch_sr,
-            ::Catch::SourceLineInfo("test/alpaka/SoACustomizedView_t.dev.cc", static_cast<std::size_t>(142)),
+            ::Catch::SourceLineInfo("test/alpaka/SoACustomizedView_t.dev.cc", static_cast<std::size_t>(138)),
             "customizedView.metadata().addressOf_x() == positionView.metadata().addressOf_x()",
             Catch::ResultDisposition::Normal);
         try {
@@ -62043,7 +62042,7 @@ static void ____C_A_T_C_H____T_E_S_T____0() {
         (void)__builtin_constant_p(customizedView.metadata().addressOf_y() == positionView.metadata().addressOf_y());
         Catch::AssertionHandler catchAssertionHandler(
             "REQUIRE"_catch_sr,
-            ::Catch::SourceLineInfo("test/alpaka/SoACustomizedView_t.dev.cc", static_cast<std::size_t>(143)),
+            ::Catch::SourceLineInfo("test/alpaka/SoACustomizedView_t.dev.cc", static_cast<std::size_t>(139)),
             "customizedView.metadata().addressOf_y() == positionView.metadata().addressOf_y()",
             Catch::ResultDisposition::Normal);
         try {
@@ -62063,7 +62062,7 @@ static void ____C_A_T_C_H____T_E_S_T____0() {
         (void)__builtin_constant_p(customizedView.metadata().addressOf_z() == positionView.metadata().addressOf_z());
         Catch::AssertionHandler catchAssertionHandler(
             "REQUIRE"_catch_sr,
-            ::Catch::SourceLineInfo("test/alpaka/SoACustomizedView_t.dev.cc", static_cast<std::size_t>(144)),
+            ::Catch::SourceLineInfo("test/alpaka/SoACustomizedView_t.dev.cc", static_cast<std::size_t>(140)),
             "customizedView.metadata().addressOf_z() == positionView.metadata().addressOf_z()",
             Catch::ResultDisposition::Normal);
         try {
@@ -62084,7 +62083,7 @@ static void ____C_A_T_C_H____T_E_S_T____0() {
                                    pcaView.metadata().addressOf_candidateDirection());
         Catch::AssertionHandler catchAssertionHandler(
             "REQUIRE"_catch_sr,
-            ::Catch::SourceLineInfo("test/alpaka/SoACustomizedView_t.dev.cc", static_cast<std::size_t>(146)),
+            ::Catch::SourceLineInfo("test/alpaka/SoACustomizedView_t.dev.cc", static_cast<std::size_t>(142)),
             "customizedView.metadata().addressOf_candidateDirection() == "
             "pcaView.metadata().addressOf_candidateDirection()",
             Catch::ResultDisposition::Normal);
@@ -62107,7 +62106,7 @@ static void ____C_A_T_C_H____T_E_S_T____0() {
                                    positionView.metadata().addressOf_detectorType());
         Catch::AssertionHandler catchAssertionHandler(
             "REQUIRE"_catch_sr,
-            ::Catch::SourceLineInfo("test/alpaka/SoACustomizedView_t.dev.cc", static_cast<std::size_t>(147)),
+            ::Catch::SourceLineInfo("test/alpaka/SoACustomizedView_t.dev.cc", static_cast<std::size_t>(143)),
             "customizedView.metadata().addressOf_detectorType() == positionView.metadata().addressOf_detectorType()",
             Catch::ResultDisposition::Normal);
         try {
@@ -62133,7 +62132,7 @@ static void ____C_A_T_C_H____T_E_S_T____0() {
         (void)__builtin_constant_p(xCustom == xPos);
         Catch::AssertionHandler catchAssertionHandler(
             "REQUIRE"_catch_sr,
-            ::Catch::SourceLineInfo("test/alpaka/SoACustomizedView_t.dev.cc", static_cast<std::size_t>(159)),
+            ::Catch::SourceLineInfo("test/alpaka/SoACustomizedView_t.dev.cc", static_cast<std::size_t>(155)),
             "xCustom == xPos",
             Catch::ResultDisposition::Normal);
         try {
@@ -62150,7 +62149,7 @@ static void ____C_A_T_C_H____T_E_S_T____0() {
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wunused-variable"
     if (Catch::Section const& catch_internal_Section3 = Catch::SectionInfo(
-            ::Catch::SourceLineInfo("test/alpaka/SoACustomizedView_t.dev.cc", static_cast<std::size_t>(162)),
+            ::Catch::SourceLineInfo("test/alpaka/SoACustomizedView_t.dev.cc", static_cast<std::size_t>(158)),
             "Customized ConstView"))
 #pragma clang diagnostic pop
     {
@@ -62163,7 +62162,7 @@ static void ____C_A_T_C_H____T_E_S_T____0() {
                                    positionConstView.metadata().addressOf_x());
         Catch::AssertionHandler catchAssertionHandler(
             "REQUIRE"_catch_sr,
-            ::Catch::SourceLineInfo("test/alpaka/SoACustomizedView_t.dev.cc", static_cast<std::size_t>(171)),
+            ::Catch::SourceLineInfo("test/alpaka/SoACustomizedView_t.dev.cc", static_cast<std::size_t>(167)),
             "customizedConstView.metadata().addressOf_x() == positionConstView.metadata().addressOf_x()",
             Catch::ResultDisposition::Normal);
         try {
@@ -62184,7 +62183,7 @@ static void ____C_A_T_C_H____T_E_S_T____0() {
                                    positionConstView.metadata().addressOf_y());
         Catch::AssertionHandler catchAssertionHandler(
             "REQUIRE"_catch_sr,
-            ::Catch::SourceLineInfo("test/alpaka/SoACustomizedView_t.dev.cc", static_cast<std::size_t>(172)),
+            ::Catch::SourceLineInfo("test/alpaka/SoACustomizedView_t.dev.cc", static_cast<std::size_t>(168)),
             "customizedConstView.metadata().addressOf_y() == positionConstView.metadata().addressOf_y()",
             Catch::ResultDisposition::Normal);
         try {
@@ -62205,7 +62204,7 @@ static void ____C_A_T_C_H____T_E_S_T____0() {
                                    positionConstView.metadata().addressOf_z());
         Catch::AssertionHandler catchAssertionHandler(
             "REQUIRE"_catch_sr,
-            ::Catch::SourceLineInfo("test/alpaka/SoACustomizedView_t.dev.cc", static_cast<std::size_t>(173)),
+            ::Catch::SourceLineInfo("test/alpaka/SoACustomizedView_t.dev.cc", static_cast<std::size_t>(169)),
             "customizedConstView.metadata().addressOf_z() == positionConstView.metadata().addressOf_z()",
             Catch::ResultDisposition::Normal);
         try {
@@ -62226,7 +62225,7 @@ static void ____C_A_T_C_H____T_E_S_T____0() {
                                    pcaConstView.metadata().addressOf_candidateDirection());
         Catch::AssertionHandler catchAssertionHandler(
             "REQUIRE"_catch_sr,
-            ::Catch::SourceLineInfo("test/alpaka/SoACustomizedView_t.dev.cc", static_cast<std::size_t>(175)),
+            ::Catch::SourceLineInfo("test/alpaka/SoACustomizedView_t.dev.cc", static_cast<std::size_t>(171)),
             "customizedConstView.metadata().addressOf_candidateDirection() == "
             "pcaConstView.metadata().addressOf_candidateDirection()",
             Catch::ResultDisposition::Normal);
@@ -62249,7 +62248,7 @@ static void ____C_A_T_C_H____T_E_S_T____0() {
                                    positionConstView.metadata().addressOf_detectorType());
         Catch::AssertionHandler catchAssertionHandler(
             "REQUIRE"_catch_sr,
-            ::Catch::SourceLineInfo("test/alpaka/SoACustomizedView_t.dev.cc", static_cast<std::size_t>(176)),
+            ::Catch::SourceLineInfo("test/alpaka/SoACustomizedView_t.dev.cc", static_cast<std::size_t>(172)),
             "customizedConstView.metadata().addressOf_detectorType() == "
             "positionConstView.metadata().addressOf_detectorType()",
             Catch::ResultDisposition::Normal);
@@ -62271,7 +62270,7 @@ static void ____C_A_T_C_H____T_E_S_T____0() {
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wunused-variable"
     if (Catch::Section const& catch_internal_Section4 = Catch::SectionInfo(
-            ::Catch::SourceLineInfo("test/alpaka/SoACustomizedView_t.dev.cc", static_cast<std::size_t>(179)),
+            ::Catch::SourceLineInfo("test/alpaka/SoACustomizedView_t.dev.cc", static_cast<std::size_t>(175)),
             "Customized ConstView from Views"))
 #pragma clang diagnostic pop
     {
@@ -62289,7 +62288,7 @@ static void ____C_A_T_C_H____T_E_S_T____0() {
         (void)__builtin_constant_p(xCustom == xPos);
         Catch::AssertionHandler catchAssertionHandler(
             "REQUIRE"_catch_sr,
-            ::Catch::SourceLineInfo("test/alpaka/SoACustomizedView_t.dev.cc", static_cast<std::size_t>(196)),
+            ::Catch::SourceLineInfo("test/alpaka/SoACustomizedView_t.dev.cc", static_cast<std::size_t>(192)),
             "xCustom == xPos",
             Catch::ResultDisposition::Normal);
         try {
@@ -62306,7 +62305,7 @@ static void ____C_A_T_C_H____T_E_S_T____0() {
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wunused-variable"
     if (Catch::Section const& catch_internal_Section5 = Catch::SectionInfo(
-            ::Catch::SourceLineInfo("test/alpaka/SoACustomizedView_t.dev.cc", static_cast<std::size_t>(199)),
+            ::Catch::SourceLineInfo("test/alpaka/SoACustomizedView_t.dev.cc", static_cast<std::size_t>(195)),
             "Aggregate the Customized View"))
 #pragma clang diagnostic pop
     {
@@ -62317,9 +62316,6 @@ static void ____C_A_T_C_H____T_E_S_T____0() {
       const auto pcaRecs = pcaView.records();
       CustomizedSoAView customizedView(
           posRecs.x(), posRecs.y(), posRecs.z(), pcaRecs.candidateDirection(), posRecs.detectorType());
-      customSoA.soaToStreamInternal(std::cout);
-      position.soaToStreamInternal(std::cout);
-      pca.soaToStreamInternal(std::cout);
       customSoA.deepCopy(customizedView, queue);
       CustomizedSoAView customizedAggregatedView{customSoA};
       do {
@@ -62327,7 +62323,7 @@ static void ____C_A_T_C_H____T_E_S_T____0() {
                                    positionConstView.metadata().addressOf_x());
         Catch::AssertionHandler catchAssertionHandler(
             "REQUIRE"_catch_sr,
-            ::Catch::SourceLineInfo("test/alpaka/SoACustomizedView_t.dev.cc", static_cast<std::size_t>(221)),
+            ::Catch::SourceLineInfo("test/alpaka/SoACustomizedView_t.dev.cc", static_cast<std::size_t>(213)),
             "customizedAggregatedView.metadata().addressOf_x() != positionConstView.metadata().addressOf_x()",
             Catch::ResultDisposition::Normal);
         try {
@@ -62348,7 +62344,7 @@ static void ____C_A_T_C_H____T_E_S_T____0() {
                                    positionConstView.metadata().addressOf_y());
         Catch::AssertionHandler catchAssertionHandler(
             "REQUIRE"_catch_sr,
-            ::Catch::SourceLineInfo("test/alpaka/SoACustomizedView_t.dev.cc", static_cast<std::size_t>(222)),
+            ::Catch::SourceLineInfo("test/alpaka/SoACustomizedView_t.dev.cc", static_cast<std::size_t>(214)),
             "customizedAggregatedView.metadata().addressOf_y() != positionConstView.metadata().addressOf_y()",
             Catch::ResultDisposition::Normal);
         try {
@@ -62369,7 +62365,7 @@ static void ____C_A_T_C_H____T_E_S_T____0() {
                                    positionConstView.metadata().addressOf_z());
         Catch::AssertionHandler catchAssertionHandler(
             "REQUIRE"_catch_sr,
-            ::Catch::SourceLineInfo("test/alpaka/SoACustomizedView_t.dev.cc", static_cast<std::size_t>(223)),
+            ::Catch::SourceLineInfo("test/alpaka/SoACustomizedView_t.dev.cc", static_cast<std::size_t>(215)),
             "customizedAggregatedView.metadata().addressOf_z() != positionConstView.metadata().addressOf_z()",
             Catch::ResultDisposition::Normal);
         try {
@@ -62390,7 +62386,7 @@ static void ____C_A_T_C_H____T_E_S_T____0() {
                                    pcaConstView.metadata().addressOf_candidateDirection());
         Catch::AssertionHandler catchAssertionHandler(
             "REQUIRE"_catch_sr,
-            ::Catch::SourceLineInfo("test/alpaka/SoACustomizedView_t.dev.cc", static_cast<std::size_t>(225)),
+            ::Catch::SourceLineInfo("test/alpaka/SoACustomizedView_t.dev.cc", static_cast<std::size_t>(217)),
             "customizedAggregatedView.metadata().addressOf_candidateDirection() != "
             "pcaConstView.metadata().addressOf_candidateDirection()",
             Catch::ResultDisposition::Normal);
@@ -62413,7 +62409,7 @@ static void ____C_A_T_C_H____T_E_S_T____0() {
                                    positionConstView.metadata().addressOf_detectorType());
         Catch::AssertionHandler catchAssertionHandler(
             "REQUIRE"_catch_sr,
-            ::Catch::SourceLineInfo("test/alpaka/SoACustomizedView_t.dev.cc", static_cast<std::size_t>(226)),
+            ::Catch::SourceLineInfo("test/alpaka/SoACustomizedView_t.dev.cc", static_cast<std::size_t>(218)),
             "customizedAggregatedView.metadata().addressOf_detectorType() != "
             "positionConstView.metadata().addressOf_detectorType()",
             Catch::ResultDisposition::Normal);
@@ -62436,7 +62432,7 @@ static void ____C_A_T_C_H____T_E_S_T____0() {
                                             decltype(customSoA)::alignment);
         Catch::AssertionHandler catchAssertionHandler(
             "REQUIRE"_catch_sr,
-            ::Catch::SourceLineInfo("test/alpaka/SoACustomizedView_t.dev.cc", static_cast<std::size_t>(230)),
+            ::Catch::SourceLineInfo("test/alpaka/SoACustomizedView_t.dev.cc", static_cast<std::size_t>(222)),
             "0 == reinterpret_cast<uintptr_t>(customizedAggregatedView.metadata().addressOf_x()) % "
             "decltype(customSoA)::alignment",
             Catch::ResultDisposition::Normal);
@@ -62461,7 +62457,7 @@ static void ____C_A_T_C_H____T_E_S_T____0() {
                                             decltype(customSoA)::alignment);
         Catch::AssertionHandler catchAssertionHandler(
             "REQUIRE"_catch_sr,
-            ::Catch::SourceLineInfo("test/alpaka/SoACustomizedView_t.dev.cc", static_cast<std::size_t>(232)),
+            ::Catch::SourceLineInfo("test/alpaka/SoACustomizedView_t.dev.cc", static_cast<std::size_t>(224)),
             "0 == reinterpret_cast<uintptr_t>(customizedAggregatedView.metadata().addressOf_y()) % "
             "decltype(customSoA)::alignment",
             Catch::ResultDisposition::Normal);
@@ -62486,7 +62482,7 @@ static void ____C_A_T_C_H____T_E_S_T____0() {
                                             decltype(customSoA)::alignment);
         Catch::AssertionHandler catchAssertionHandler(
             "REQUIRE"_catch_sr,
-            ::Catch::SourceLineInfo("test/alpaka/SoACustomizedView_t.dev.cc", static_cast<std::size_t>(234)),
+            ::Catch::SourceLineInfo("test/alpaka/SoACustomizedView_t.dev.cc", static_cast<std::size_t>(226)),
             "0 == reinterpret_cast<uintptr_t>(customizedAggregatedView.metadata().addressOf_z()) % "
             "decltype(customSoA)::alignment",
             Catch::ResultDisposition::Normal);
@@ -62512,7 +62508,7 @@ static void ____C_A_T_C_H____T_E_S_T____0() {
                      decltype(customSoA)::alignment);
         Catch::AssertionHandler catchAssertionHandler(
             "REQUIRE"_catch_sr,
-            ::Catch::SourceLineInfo("test/alpaka/SoACustomizedView_t.dev.cc", static_cast<std::size_t>(236)),
+            ::Catch::SourceLineInfo("test/alpaka/SoACustomizedView_t.dev.cc", static_cast<std::size_t>(228)),
             "0 == reinterpret_cast<uintptr_t>(customizedAggregatedView.metadata().addressOf_candidateDirection()) % "
             "decltype(customSoA)::alignment",
             Catch::ResultDisposition::Normal);
@@ -62539,7 +62535,7 @@ static void ____C_A_T_C_H____T_E_S_T____0() {
                      decltype(customSoA)::alignment);
         Catch::AssertionHandler catchAssertionHandler(
             "REQUIRE"_catch_sr,
-            ::Catch::SourceLineInfo("test/alpaka/SoACustomizedView_t.dev.cc", static_cast<std::size_t>(238)),
+            ::Catch::SourceLineInfo("test/alpaka/SoACustomizedView_t.dev.cc", static_cast<std::size_t>(230)),
             "0 == reinterpret_cast<uintptr_t>(customizedAggregatedView.metadata().addressOf_detectorType()) % "
             "decltype(customSoA)::alignment",
             Catch::ResultDisposition::Normal);
@@ -62565,7 +62561,7 @@ static void ____C_A_T_C_H____T_E_S_T____0() {
                                    reinterpret_cast<std::byte*>(customizedAggregatedView.metadata().addressOf_y()));
         Catch::AssertionHandler catchAssertionHandler(
             "REQUIRE"_catch_sr,
-            ::Catch::SourceLineInfo("test/alpaka/SoACustomizedView_t.dev.cc", static_cast<std::size_t>(243)),
+            ::Catch::SourceLineInfo("test/alpaka/SoACustomizedView_t.dev.cc", static_cast<std::size_t>(235)),
             "reinterpret_cast<std::byte *>(customizedAggregatedView.metadata().addressOf_x()) + "
             "cms::soa::alignSize(elems * sizeof(float), CustomizedSoA::alignment) == reinterpret_cast<std::byte "
             "*>(customizedAggregatedView.metadata().addressOf_y())",
@@ -62593,7 +62589,7 @@ static void ____C_A_T_C_H____T_E_S_T____0() {
                                    reinterpret_cast<std::byte*>(customizedAggregatedView.metadata().addressOf_z()));
         Catch::AssertionHandler catchAssertionHandler(
             "REQUIRE"_catch_sr,
-            ::Catch::SourceLineInfo("test/alpaka/SoACustomizedView_t.dev.cc", static_cast<std::size_t>(246)),
+            ::Catch::SourceLineInfo("test/alpaka/SoACustomizedView_t.dev.cc", static_cast<std::size_t>(238)),
             "reinterpret_cast<std::byte *>(customizedAggregatedView.metadata().addressOf_y()) + "
             "cms::soa::alignSize(elems * sizeof(float), CustomizedSoA::alignment) == reinterpret_cast<std::byte "
             "*>(customizedAggregatedView.metadata().addressOf_z())",
@@ -62622,7 +62618,7 @@ static void ____C_A_T_C_H____T_E_S_T____0() {
             reinterpret_cast<std::byte*>(customizedAggregatedView.metadata().addressOf_candidateDirection()));
         Catch::AssertionHandler catchAssertionHandler(
             "REQUIRE"_catch_sr,
-            ::Catch::SourceLineInfo("test/alpaka/SoACustomizedView_t.dev.cc", static_cast<std::size_t>(249)),
+            ::Catch::SourceLineInfo("test/alpaka/SoACustomizedView_t.dev.cc", static_cast<std::size_t>(241)),
             "reinterpret_cast<std::byte *>(customizedAggregatedView.metadata().addressOf_z()) + "
             "cms::soa::alignSize(elems * sizeof(float), CustomizedSoA::alignment) == reinterpret_cast<std::byte "
             "*>(customizedAggregatedView.metadata().addressOf_candidateDirection())",
@@ -62653,7 +62649,7 @@ static void ____C_A_T_C_H____T_E_S_T____0() {
             reinterpret_cast<std::byte*>(customizedAggregatedView.metadata().addressOf_detectorType()));
         Catch::AssertionHandler catchAssertionHandler(
             "REQUIRE"_catch_sr,
-            ::Catch::SourceLineInfo("test/alpaka/SoACustomizedView_t.dev.cc", static_cast<std::size_t>(253)),
+            ::Catch::SourceLineInfo("test/alpaka/SoACustomizedView_t.dev.cc", static_cast<std::size_t>(245)),
             "reinterpret_cast<std::byte *>(customizedAggregatedView.metadata().addressOf_candidateDirection()) + "
             "cms::soa::alignSize(elems * sizeof(Eigen::Vector3d::Scalar), CustomizedSoA::alignment) * "
             "Eigen::Vector3d::RowsAtCompileTime * Eigen::Vector3d::ColsAtCompileTime == reinterpret_cast<std::byte "
@@ -62698,7 +62694,7 @@ static void ____C_A_T_C_H____T_E_S_T____0() {
           (void)__builtin_constant_p(customizedView_host[i].x() == positionView_host[i].x());
           Catch::AssertionHandler catchAssertionHandler(
               "REQUIRE"_catch_sr,
-              ::Catch::SourceLineInfo("test/alpaka/SoACustomizedView_t.dev.cc", static_cast<std::size_t>(273)),
+              ::Catch::SourceLineInfo("test/alpaka/SoACustomizedView_t.dev.cc", static_cast<std::size_t>(265)),
               "customizedView_host[i].x() == positionView_host[i].x()",
               Catch::ResultDisposition::Normal);
           try {
@@ -62716,7 +62712,7 @@ static void ____C_A_T_C_H____T_E_S_T____0() {
           (void)__builtin_constant_p(customizedView_host[i].y() == positionView_host[i].y());
           Catch::AssertionHandler catchAssertionHandler(
               "REQUIRE"_catch_sr,
-              ::Catch::SourceLineInfo("test/alpaka/SoACustomizedView_t.dev.cc", static_cast<std::size_t>(274)),
+              ::Catch::SourceLineInfo("test/alpaka/SoACustomizedView_t.dev.cc", static_cast<std::size_t>(266)),
               "customizedView_host[i].y() == positionView_host[i].y()",
               Catch::ResultDisposition::Normal);
           try {
@@ -62734,7 +62730,7 @@ static void ____C_A_T_C_H____T_E_S_T____0() {
           (void)__builtin_constant_p(customizedView_host[i].z() == positionView_host[i].z());
           Catch::AssertionHandler catchAssertionHandler(
               "REQUIRE"_catch_sr,
-              ::Catch::SourceLineInfo("test/alpaka/SoACustomizedView_t.dev.cc", static_cast<std::size_t>(275)),
+              ::Catch::SourceLineInfo("test/alpaka/SoACustomizedView_t.dev.cc", static_cast<std::size_t>(267)),
               "customizedView_host[i].z() == positionView_host[i].z()",
               Catch::ResultDisposition::Normal);
           try {
@@ -62753,7 +62749,7 @@ static void ____C_A_T_C_H____T_E_S_T____0() {
                                      pcaView_host[i].candidateDirection()(0));
           Catch::AssertionHandler catchAssertionHandler(
               "REQUIRE"_catch_sr,
-              ::Catch::SourceLineInfo("test/alpaka/SoACustomizedView_t.dev.cc", static_cast<std::size_t>(276)),
+              ::Catch::SourceLineInfo("test/alpaka/SoACustomizedView_t.dev.cc", static_cast<std::size_t>(268)),
               "customizedView_host[i].candidateDirection()(0) == pcaView_host[i].candidateDirection()(0)",
               Catch::ResultDisposition::Normal);
           try {
@@ -62774,7 +62770,7 @@ static void ____C_A_T_C_H____T_E_S_T____0() {
                                      pcaView_host[i].candidateDirection()(1));
           Catch::AssertionHandler catchAssertionHandler(
               "REQUIRE"_catch_sr,
-              ::Catch::SourceLineInfo("test/alpaka/SoACustomizedView_t.dev.cc", static_cast<std::size_t>(277)),
+              ::Catch::SourceLineInfo("test/alpaka/SoACustomizedView_t.dev.cc", static_cast<std::size_t>(269)),
               "customizedView_host[i].candidateDirection()(1) == pcaView_host[i].candidateDirection()(1)",
               Catch::ResultDisposition::Normal);
           try {
@@ -62795,7 +62791,7 @@ static void ____C_A_T_C_H____T_E_S_T____0() {
                                      pcaView_host[i].candidateDirection()(2));
           Catch::AssertionHandler catchAssertionHandler(
               "REQUIRE"_catch_sr,
-              ::Catch::SourceLineInfo("test/alpaka/SoACustomizedView_t.dev.cc", static_cast<std::size_t>(278)),
+              ::Catch::SourceLineInfo("test/alpaka/SoACustomizedView_t.dev.cc", static_cast<std::size_t>(270)),
               "customizedView_host[i].candidateDirection()(2) == pcaView_host[i].candidateDirection()(2)",
               Catch::ResultDisposition::Normal);
           try {
@@ -62811,7 +62807,6 @@ static void ____C_A_T_C_H____T_E_S_T____0() {
         } while ((void)0,
                  (false) && static_cast<bool>(!!(customizedView_host[i].candidateDirection()(2) ==
                                                  pcaView_host[i].candidateDirection()(2))));
-        std::cout << "Element " << i << " is equal" << std::endl;
       }
       auto alpakaView = alpaka::createView(device, &customizedAggregatedView.x()[3], 1);
       auto alpakaViewpos = alpaka::createView(device, &positionView.x()[3], 1);
@@ -62823,7 +62818,7 @@ static void ____C_A_T_C_H____T_E_S_T____0() {
         (void)__builtin_constant_p(xCustom != xPos);
         Catch::AssertionHandler catchAssertionHandler(
             "REQUIRE"_catch_sr,
-            ::Catch::SourceLineInfo("test/alpaka/SoACustomizedView_t.dev.cc", static_cast<std::size_t>(291)),
+            ::Catch::SourceLineInfo("test/alpaka/SoACustomizedView_t.dev.cc", static_cast<std::size_t>(282)),
             "xCustom != xPos",
             Catch::ResultDisposition::Normal);
         try {
