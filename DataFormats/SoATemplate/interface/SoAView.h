@@ -552,7 +552,6 @@ namespace cms::soa {
 
 // clang-format off
 #define _INITIALIZE_VIEW_PARAMETERS_AND_SIZE_IMPL(LAYOUT_NAME, LAYOUT_MEMBER, LOCAL_NAME)                              \
-        /* Scalar */                                                                                                   \
         if (not readyToSet) {                                                                                          \
           base_type::elements_ = LOCAL_NAME.size_;                                                                     \
           readyToSet = true;                                                                                           \
@@ -575,7 +574,6 @@ namespace cms::soa {
 
 // clang-format off
 #define _INITIALIZE_CONST_VIEW_PARAMETERS_AND_SIZE_IMPL(LAYOUT_NAME, LAYOUT_MEMBER, LOCAL_NAME)                        \
-        /* Scalar */                                                                                                   \
         if (not readyToSet) {                                                                                          \
           elements_ = LOCAL_NAME.size_;                                                                                \
           readyToSet = true;                                                                                           \
