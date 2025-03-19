@@ -137,7 +137,7 @@
         cms::soa::SoAParameters_ColumnType<cms::soa::SoAColumnType::scalar>::DataType<CPP_TYPE>;                       \
       SOA_HOST_DEVICE SOA_INLINE                                                                                       \
       BOOST_PP_CAT(ParametersTypeOf_, NAME) BOOST_PP_CAT(parametersOf_, NAME)() const {                                \
-        return  BOOST_PP_CAT(ParametersTypeOf_, NAME) (parent_.BOOST_PP_CAT(NAME, _), parent_.metadata().size());      \
+        return  BOOST_PP_CAT(ParametersTypeOf_, NAME) (parent_.BOOST_PP_CAT(NAME, _));                                 \
       }                                                                                                                \
       SOA_HOST_DEVICE SOA_INLINE                                                                                       \
       CPP_TYPE* BOOST_PP_CAT(addressOf_, NAME)() {                                                                     \
@@ -148,7 +148,7 @@
          cms::soa::SoAParameters_ColumnType<cms::soa::SoAColumnType::column>::DataType<CPP_TYPE>;                      \
       SOA_HOST_DEVICE SOA_INLINE                                                                                       \
       BOOST_PP_CAT(ParametersTypeOf_, NAME) BOOST_PP_CAT(parametersOf_, NAME)() const {                                \
-        return  BOOST_PP_CAT(ParametersTypeOf_, NAME) (parent_.BOOST_PP_CAT(NAME, _), parent_.metadata().size());      \
+        return  BOOST_PP_CAT(ParametersTypeOf_, NAME) (parent_.BOOST_PP_CAT(NAME, _));                                 \
       }                                                                                                                \
       SOA_HOST_DEVICE SOA_INLINE                                                                                       \
       CPP_TYPE const* BOOST_PP_CAT(addressOf_, NAME)() const {                                                         \
@@ -171,8 +171,7 @@
       BOOST_PP_CAT(ParametersTypeOf_, NAME) BOOST_PP_CAT(parametersOf_, NAME)() const {                                \
         return BOOST_PP_CAT(ParametersTypeOf_, NAME) (                                                                 \
           parent_.BOOST_PP_CAT(NAME, _),                                                                               \
-          parent_.BOOST_PP_CAT(NAME, Stride_),                                                                         \
-          parent_.metadata().size());                                                                                  \
+          parent_.BOOST_PP_CAT(NAME, Stride_));                                                                        \
       }                                                                                                                \
       SOA_HOST_DEVICE SOA_INLINE                                                                                       \
       byte_size_type BOOST_PP_CAT(NAME, Pitch()) const {                                                               \
@@ -512,33 +511,6 @@
               BOOST_PP_EXPAND(_DECLARE_SOA_DATA_MEMBER_IMPL TYPE_NAME))
 // clang-format on
 
-// clang-format off
-#define _COPY_VIEW_COLUMNS_IMPL(VALUE_TYPE, CPP_TYPE, NAME, args)                                                      \
-  _SWITCH_ON_TYPE(VALUE_TYPE,                                                                                          \
-      /* Scalar */                                                                                                     \
-      memcpy(BOOST_PP_CAT(this->metadata().addressOf_, NAME)(),                                                        \
-              BOOST_PP_CAT(view.metadata().addressOf_, NAME)(),                                                        \
-              cms::soa::alignSize(sizeof(CPP_TYPE), alignment));                                                       \
-      ,                                                                                                                \
-      /* Column */                                                                                                     \
-      memcpy(BOOST_PP_CAT(this->metadata().addressOf_, NAME)(),                                                        \
-              BOOST_PP_CAT(view.metadata().addressOf_, NAME)(),                                                        \
-              cms::soa::alignSize(this->elements_ * sizeof(CPP_TYPE), alignment));                                     \
-      ,                                                                                                                \
-      /* Eigen column */                                                                                               \
-      memcpy(BOOST_PP_CAT(this->metadata().addressOf_, NAME)(),                                                        \
-              BOOST_PP_CAT(view.metadata().addressOf_, NAME)(),                                                        \
-              cms::soa::alignSize(this->elements_ * sizeof(CPP_TYPE::Scalar), alignment) *                             \
-                  CPP_TYPE::RowsAtCompileTime * CPP_TYPE::ColsAtCompileTime);)
-// clang-format on                             
-
-// clang-format off
-#define _COPY_VIEW_COLUMNS(R, DATA, TYPE_NAME)                                                                         \
-  BOOST_PP_IF(BOOST_PP_GREATER(BOOST_PP_TUPLE_ELEM(0, TYPE_NAME), 2),                                                  \
-              BOOST_PP_EMPTY(),                                                                                        \
-              BOOST_PP_EXPAND(_COPY_VIEW_COLUMNS_IMPL TYPE_NAME))
-// clang-format on
-
 #ifdef DEBUG
 #define _DO_RANGECHECK true
 #else
@@ -719,14 +691,6 @@
         byteSize_ = _soa_impl_other.byteSize_;                                                                         \
         _ITERATE_ON_ALL(_DECLARE_MEMBER_ASSIGNMENT, ~, __VA_ARGS__)                                                    \
         return *this;                                                                                                  \
-    }                                                                                                                  \
-                                                                                                                       \
-    SOA_HOST_ONLY                                                                                                      \
-    void aggregate(ConstView const& view) {                                                                            \
-      if (elements_ < view.metadata().size())                                                                          \
-        throw std::runtime_error(                                                                                      \
-            "In aggregate method: number of elements mismatch ");                                                      \
-      _ITERATE_ON_ALL(_COPY_VIEW_COLUMNS, ~, __VA_ARGS__)                                                              \
     }                                                                                                                  \
                                                                                                                        \
     /* ROOT read streamer */                                                                                           \

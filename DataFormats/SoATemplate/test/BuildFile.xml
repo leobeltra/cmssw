@@ -21,12 +21,6 @@
   <use name="catch2"/>
 </bin>
 
-<bin file="SoACustomizedView_t.cc" name="SoACustomizedView_t">
-  <use name="boost"/>
-  <use name="catch2"/>
-  <use name="eigen"/>
-</bin>
-
 <bin file="SoACustomizedMethods_t.cc" name="SoACustomizedMethods_t">
   <use name="boost"/>
   <use name="catch2"/>
