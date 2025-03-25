@@ -588,7 +588,7 @@ namespace cms::soa {
               "In constructor by column pointers: number of elements not equal for every column: "                     \
               BOOST_PP_STRINGIZE(LOCAL_NAME));                                                                         \
           if constexpr (alignmentEnforcement == AlignmentEnforcement::enforced)                                        \
-            if (Metadata:: BOOST_PP_CAT(ParametersTypeOf_, LOCAL_NAME)::checkAlignment(LOCAL_NAME, alignment))         \
+            if (Metadata::BOOST_PP_CAT(ParametersTypeOf_, LOCAL_NAME)::checkAlignment(LOCAL_NAME, alignment))         \
               throw std::runtime_error("In constructor by column: misaligned column: " #LOCAL_NAME);                   \
           return LOCAL_NAME;                                                                                           \
             }();                                                                                                       \

@@ -1,6 +1,5 @@
 #include <Eigen/Core>
 #include <Eigen/Dense>
-#include <alpaka/alpaka.hpp>  
 
 #define CATCH_CONFIG_MAIN
 #include <catch.hpp>

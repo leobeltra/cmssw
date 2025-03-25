@@ -58,34 +58,7 @@
 
 // clang-format off
 #define _DECLARE_SOA_STREAM_INFO_IMPL(VALUE_TYPE, CPP_TYPE, NAME)                                                      \
-  _SWITCH_ON_TYPE(                                                                                                     \
-      VALUE_TYPE,                                                                                                      \
-      /* Dump scalar */                                                                                                \
-      _soa_impl_os << " Scalar " BOOST_PP_STRINGIZE(NAME) " at offset " << _soa_impl_offset                            \
-         << " has size " << sizeof(CPP_TYPE)                                                                           \
-         << " and padding " << ((sizeof(CPP_TYPE) - 1) / alignment + 1) * alignment - sizeof(CPP_TYPE)                 \
-         << std::endl;                                                                                                 \
-      _soa_impl_offset += ((sizeof(CPP_TYPE) - 1) / alignment + 1) * alignment;                                        \
-      ,                                                                                                                \
-      /* Dump column */                                                                                                \
-      _soa_impl_os << " Column " BOOST_PP_STRINGIZE(NAME) " at offset " << _soa_impl_offset << " has size "            \
-         << sizeof(CPP_TYPE) * elements_ << " and padding "                                                            \
-         << cms::soa::alignSize(elements_ * sizeof(CPP_TYPE), alignment) - (elements_ * sizeof(CPP_TYPE))              \
-         << std::endl;                                                                                                 \
-      _soa_impl_offset += cms::soa::alignSize(elements_ * sizeof(CPP_TYPE), alignment);                                \
-      ,                                                                                                                \
-      /* Dump Eigen column */                                                                                          \
-      _soa_impl_os << " Eigen value " BOOST_PP_STRINGIZE(NAME) " at offset " << _soa_impl_offset << " has dimension "  \
-         << "(" << CPP_TYPE::RowsAtCompileTime << " x " << CPP_TYPE::ColsAtCompileTime << ")"                          \
-         << " and per column size "                                                                                    \
-         << sizeof(CPP_TYPE::Scalar) * elements_                                                                       \
-         << " and padding "                                                                                            \
-         << cms::soa::alignSize(elements_ * sizeof(CPP_TYPE::Scalar), alignment)                                       \
-            - (elements_ * sizeof(CPP_TYPE::Scalar))                                                                   \
-         << std::endl;                                                                                                 \
-      _soa_impl_offset += cms::soa::alignSize(elements_ * sizeof(CPP_TYPE::Scalar), alignment)                         \
-                * CPP_TYPE::RowsAtCompileTime * CPP_TYPE::ColsAtCompileTime;                                           \
-  )
+    printColumn<typename Metadata::BOOST_PP_CAT(ParametersTypeOf_, NAME)>(_soa_impl_os, _soa_impl_offset);                                     \
 // clang-format on
 
 #define _DECLARE_SOA_STREAM_INFO(R, DATA, TYPE_NAME) BOOST_PP_EXPAND(_DECLARE_SOA_STREAM_INFO_IMPL TYPE_NAME)
@@ -436,6 +409,36 @@
 
 #define _COPY_VIEW_COLUMNS(R, DATA, TYPE_NAME) BOOST_PP_EXPAND(_COPY_VIEW_COLUMNS_IMPL TYPE_NAME)
 
+#define _DECLARE_DESCRIPTOR_SPANS_IMPL(VALUE_TYPE, CPP_TYPE, NAME)                                    \
+  _SWITCH_ON_TYPE(VALUE_TYPE,                                                                         \
+    /* Scalar */                                                                                      \
+    (std::span<CPP_TYPE>)                                                                             \
+    ,                                                                                                 \
+    /* Column */                                                                                      \
+    (std::span<CPP_TYPE>)                                                                             \
+    ,                                                                                                 \
+    (std::span<CPP_TYPE::Scalar>)                                                                     \
+  )
+
+#define _DECLARE_DESCRIPTOR_SPANS(R, DATA, TYPE_NAME) BOOST_PP_EXPAND(_DECLARE_DESCRIPTOR_SPANS_IMPL TYPE_NAME)
+
+#define _ASSIGN_SPAN_TO_COLUMNS_IMPL(VALUE_TYPE, CPP_TYPE, NAME)                                      \
+  _SWITCH_ON_TYPE(VALUE_TYPE,                                                                         \
+    /* Scalar */                                                                                      \
+    (std::span<CPP_TYPE>(view.metadata().BOOST_PP_CAT(addressOf_, NAME)(),                            \
+                    cms::soa::alignSize(sizeof(CPP_TYPE), alignment) / sizeof(CPP_TYPE)))             \
+    ,                                                                                                 \
+    /* Column */                                                                                      \
+    (std::span<CPP_TYPE>(view.metadata().BOOST_PP_CAT(addressOf_, NAME)(),                            \
+                    cms::soa::alignSize(view.metadata().size() * sizeof(CPP_TYPE), alignment) / sizeof(CPP_TYPE))) \
+    ,                                                                                                 \
+    (std::span<CPP_TYPE::Scalar>(view.metadata().BOOST_PP_CAT(addressOf_, NAME)(),                      \
+                    cms::soa::alignSize(view.metadata().size() * sizeof(CPP_TYPE::Scalar), alignment) *                    \
+                    CPP_TYPE::RowsAtCompileTime * CPP_TYPE::ColsAtCompileTime / sizeof(CPP_TYPE::Scalar))) \
+  )
+
+#define _ASSIGN_SPAN_TO_COLUMNS(R, DATA, TYPE_NAME) BOOST_PP_EXPAND(_ASSIGN_SPAN_TO_COLUMNS_IMPL TYPE_NAME)
+
 #ifdef DEBUG
 #define _DO_RANGECHECK true
 #else
@@ -573,6 +576,22 @@
                                                                                                                        \
     using View = ViewTemplate<cms::soa::RestrictQualify::Default, cms::soa::RangeChecking::Default>;                   \
                                                                                                                        \
+    struct Descriptor {                                                                                                \
+      std::tuple<_ITERATE_ON_ALL_COMMA(_DECLARE_DESCRIPTOR_SPANS, ~, __VA_ARGS__)> buff;                               \
+                                                                                                                       \
+      Descriptor(View& view)                                                                                           \
+          : buff{ _ITERATE_ON_ALL_COMMA(_ASSIGN_SPAN_TO_COLUMNS, ~, __VA_ARGS__)} {}                                   \
+                                                                                                                       \
+      template <std::size_t Index>                                                                                     \
+      auto operator()() -> std::span<std::tuple_element_t<Index,                                                       \
+                                     std::tuple<_ITERATE_ON_ALL_COMMA(_DECLARE_DESCRIPTOR_SPANS, ~, __VA_ARGS__)>>> {  \
+          return std::get<Index>(buff);                                                                                \
+      }                                                                                                                \
+                                                                                                                       \
+      template <std::size_t Index>                                                                                     \
+      auto* data() { return std::get<Index>(buff).data(); }                                                            \
+    };                                                                                                                 \
+                                                                                                                       \
     /* Trivial constuctor */                                                                                           \
     CLASS()                                                                                                            \
         : mem_(nullptr),                                                                                               \
@@ -635,6 +654,36 @@
       byteSize_ = computeDataSize(elements_);                                                                          \
       if (mem_ + byteSize_ != _soa_impl_curMem)                                                                        \
         throw std::runtime_error("In " #CLASS "::" #CLASS ": unexpected end pointer.");                                \
+    }                                                                                                                  \
+                                                                                                                       \
+    template <typename SoAColumn>                                                         \
+    void printColumn(std::ostream & _soa_impl_os, byte_size_type offset) const {                                             \
+      if constexpr (SoAColumn::columnType == cms::soa::SoAColumnType::scalar) {                                                  \
+        _soa_impl_os << "Scalar " /* name? :( */ "at offset" << offset                                                   \
+        << " has size " << sizeof(typename SoAColumn::ValueType)                                                                                     \
+        << " and padding " << ((sizeof(typename SoAColumn::ValueType) - 1) / alignment + 1) * alignment - sizeof(typename SoAColumn::ValueType)                                  \
+        << std::endl;                                                                                                    \
+        offset += ((sizeof(typename SoAColumn::ValueType) - 1) / alignment + 1) * alignment;                                                       \
+      }                                                                                                                \
+      else if constexpr (SoAColumn::columnType == cms::soa::SoAColumnType::column) {                                                          \
+        _soa_impl_os << " Column " /* name? :( */ " at offset " << offset << " has size "                               \
+        << sizeof(typename SoAColumn::ValueType) * elements_ << " and padding "                                                                    \
+        << cms::soa::alignSize(elements_ * sizeof(typename SoAColumn::ValueType), alignment) - (elements_ * sizeof(typename SoAColumn::ValueType))                             \
+        << std::endl;                                                                                                  \
+        offset += cms::soa::alignSize(elements_ * sizeof(typename SoAColumn::ValueType), alignment);                                               \
+      }                                                                                                                \
+      else if constexpr (SoAColumn::columnType == cms::soa::SoAColumnType::eigen){                                                            \
+        _soa_impl_os << " Eigen value " /* name? :( */  " at offset " << offset << " has dimension "                   \
+        << "(" << SoAColumn::ValueType::RowsAtCompileTime << " x " << SoAColumn::ValueType::ColsAtCompileTime << ")"                                         \
+        << " and per column size "                                                                                     \
+        << sizeof(typename SoAColumn::ValueType::Scalar) * elements_                                                                               \
+        << " and padding "                                                                                             \
+        << cms::soa::alignSize(elements_ * sizeof(typename SoAColumn::ValueType::Scalar), alignment)                                               \
+           - (elements_ * sizeof(typename SoAColumn::ValueType::Scalar))                                                                           \
+        << std::endl;                                                                                                  \
+        offset += cms::soa::alignSize(elements_ * sizeof(typename SoAColumn::ValueType::Scalar), alignment)                                        \
+               * SoAColumn::ValueType::RowsAtCompileTime * SoAColumn::ValueType::ColsAtCompileTime;                                                          \
+      }                                                                                                                \
     }                                                                                                                  \
                                                                                                                        \
     /* Data members */                                                                                                 \
