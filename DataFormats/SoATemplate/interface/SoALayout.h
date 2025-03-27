@@ -287,17 +287,7 @@
  */
 // clang-format off
 #define _ACCUMULATE_SOA_ELEMENT_IMPL(VALUE_TYPE, CPP_TYPE, NAME)                                                       \
-  _SWITCH_ON_TYPE(VALUE_TYPE,                                                                                          \
-      /* Scalar */                                                                                                     \
-      _soa_impl_ret += cms::soa::alignSize(sizeof(CPP_TYPE), alignment);                                               \
-      ,                                                                                                                \
-      /* Column */                                                                                                     \
-      _soa_impl_ret += cms::soa::alignSize(elements * sizeof(CPP_TYPE), alignment);                                    \
-      ,                                                                                                                \
-      /* Eigen column */                                                                                               \
-      _soa_impl_ret += cms::soa::alignSize(elements * sizeof(CPP_TYPE::Scalar), alignment)                             \
-             * CPP_TYPE::RowsAtCompileTime * CPP_TYPE::ColsAtCompileTime;                                              \
-  )
+      _soa_impl_ret += computeColumnSize<typename Metadata::BOOST_PP_CAT(ParametersTypeOf_, NAME)>(elements);          \
 // clang-format on
 
 #define _ACCUMULATE_SOA_ELEMENT(R, DATA, TYPE_NAME) _ACCUMULATE_SOA_ELEMENT_IMPL TYPE_NAME
@@ -516,8 +506,10 @@
         return CLASS(_soa_impl_addr, parent_.elements_);                                                               \
       }                                                                                                                \
                                                                                                                        \
+      /* Necessario aggiungere column data member */                                                                   \
       _ITERATE_ON_ALL(_DEFINE_METADATA_MEMBERS, ~, __VA_ARGS__)                                                        \
                                                                                                                        \
+      /* Probably good to mantain more or less like this */                                                            \
       struct value_element {                                                                                           \
         SOA_HOST_DEVICE SOA_INLINE value_element                                                                       \
           BOOST_PP_IF(                                                                                                 \
@@ -532,6 +524,7 @@
         )                                                                                                              \
         {}                                                                                                             \
                                                                                                                        \
+        /* Probably to mantain like this */                                                                            \
         _ITERATE_ON_ALL(_DEFINE_VALUE_ELEMENT_MEMBERS, ~, __VA_ARGS__)                                                 \
       };                                                                                                               \
                                                                                                                        \
@@ -656,34 +649,52 @@
         throw std::runtime_error("In " #CLASS "::" #CLASS ": unexpected end pointer.");                                \
     }                                                                                                                  \
                                                                                                                        \
-    template <typename SoAColumn>                                                         \
-    void printColumn(std::ostream & _soa_impl_os, byte_size_type offset) const {                                             \
-      if constexpr (SoAColumn::columnType == cms::soa::SoAColumnType::scalar) {                                                  \
-        _soa_impl_os << "Scalar " /* name? :( */ "at offset" << offset                                                   \
-        << " has size " << sizeof(typename SoAColumn::ValueType)                                                                                     \
-        << " and padding " << ((sizeof(typename SoAColumn::ValueType) - 1) / alignment + 1) * alignment - sizeof(typename SoAColumn::ValueType)                                  \
-        << std::endl;                                                                                                    \
-        offset += ((sizeof(typename SoAColumn::ValueType) - 1) / alignment + 1) * alignment;                                                       \
-      }                                                                                                                \
-      else if constexpr (SoAColumn::columnType == cms::soa::SoAColumnType::column) {                                                          \
-        _soa_impl_os << " Column " /* name? :( */ " at offset " << offset << " has size "                               \
-        << sizeof(typename SoAColumn::ValueType) * elements_ << " and padding "                                                                    \
-        << cms::soa::alignSize(elements_ * sizeof(typename SoAColumn::ValueType), alignment) - (elements_ * sizeof(typename SoAColumn::ValueType))                             \
+    template <typename SoAColumn>                                                                                      \
+    void printColumn(std::ostream & _soa_impl_os, byte_size_type offset) const {                                       \
+      if constexpr (SoAColumn::columnType == cms::soa::SoAColumnType::scalar) {                                        \
+        _soa_impl_os << "Scalar " /* name? :( */ "at offset" << offset                                                 \
+        << " has size " << sizeof(typename SoAColumn::ScalarType)                                                      \
+        << " and padding " << ((sizeof(typename SoAColumn::ScalarType) - 1) / alignment + 1) *                         \
+                                 alignment - sizeof(typename SoAColumn::ScalarType)                                    \
         << std::endl;                                                                                                  \
-        offset += cms::soa::alignSize(elements_ * sizeof(typename SoAColumn::ValueType), alignment);                                               \
+        offset += ((sizeof(typename SoAColumn::ScalarType) - 1) / alignment + 1) * alignment;                          \
       }                                                                                                                \
-      else if constexpr (SoAColumn::columnType == cms::soa::SoAColumnType::eigen){                                                            \
+      else if constexpr (SoAColumn::columnType == cms::soa::SoAColumnType::column) {                                   \
+        _soa_impl_os << " Column " /* name? :( */ " at offset " << offset << " has size "                              \
+        << sizeof(typename SoAColumn::ScalarType) * elements_ << " and padding "                                       \
+        << cms::soa::alignSize(elements_ * sizeof(typename SoAColumn::ScalarType), alignment) -                        \
+                               (elements_ * sizeof(typename SoAColumn::ScalarType))                                    \
+        << std::endl;                                                                                                  \
+        offset += cms::soa::alignSize(elements_ * sizeof(typename SoAColumn::ScalarType), alignment);                  \
+      }                                                                                                                \
+      else if constexpr (SoAColumn::columnType == cms::soa::SoAColumnType::eigen){                                     \
         _soa_impl_os << " Eigen value " /* name? :( */  " at offset " << offset << " has dimension "                   \
-        << "(" << SoAColumn::ValueType::RowsAtCompileTime << " x " << SoAColumn::ValueType::ColsAtCompileTime << ")"                                         \
+        << "(" << SoAColumn::ValueType::RowsAtCompileTime << " x " << SoAColumn::ValueType::ColsAtCompileTime << ")"   \
         << " and per column size "                                                                                     \
-        << sizeof(typename SoAColumn::ValueType::Scalar) * elements_                                                                               \
+        << sizeof(typename SoAColumn::ScalarType) * elements_                                                          \
         << " and padding "                                                                                             \
-        << cms::soa::alignSize(elements_ * sizeof(typename SoAColumn::ValueType::Scalar), alignment)                                               \
-           - (elements_ * sizeof(typename SoAColumn::ValueType::Scalar))                                                                           \
+        << cms::soa::alignSize(elements_ * sizeof(typename SoAColumn::ScalarType), alignment)                          \
+           - (elements_ * sizeof(typename SoAColumn::ScalarType))                                                      \
         << std::endl;                                                                                                  \
-        offset += cms::soa::alignSize(elements_ * sizeof(typename SoAColumn::ValueType::Scalar), alignment)                                        \
-               * SoAColumn::ValueType::RowsAtCompileTime * SoAColumn::ValueType::ColsAtCompileTime;                                                          \
+        offset += cms::soa::alignSize(elements_ * sizeof(typename SoAColumn::ScalarType), alignment)                   \
+               * SoAColumn::ValueType::RowsAtCompileTime * SoAColumn::ValueType::ColsAtCompileTime;                    \
       }                                                                                                                \
+    }                                                                                                                  \
+                                                                                                                       \
+    template <typename SoAColumn>                                                                                      \
+    static constexpr byte_size_type computeColumnSize(size_type elements) {                                            \
+      byte_size_type _column_size = 0;                                                                                 \
+      if constexpr (SoAColumn::columnType == cms::soa::SoAColumnType::scalar) {                                        \
+        _column_size = cms::soa::alignSize(sizeof(typename SoAColumn::ScalarType), alignment);                         \
+      }                                                                                                                \
+      else if constexpr (SoAColumn::columnType == cms::soa::SoAColumnType::column) {                                   \
+        _column_size = cms::soa::alignSize(elements * sizeof(typename SoAColumn::ScalarType), alignment);              \
+      }                                                                                                                \
+      else if constexpr (SoAColumn::columnType == cms::soa::SoAColumnType::eigen) {                                    \
+        _column_size = cms::soa::alignSize(elements * sizeof(typename SoAColumn::ScalarType), alignment)               \
+              * SoAColumn::ValueType::RowsAtCompileTime * SoAColumn::ValueType::ColsAtCompileTime;                     \
+      }                                                                                                                \
+      return _column_size;                                                                                             \
     }                                                                                                                  \
                                                                                                                        \
     /* Data members */                                                                                                 \
