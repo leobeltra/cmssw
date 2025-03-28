@@ -1,6 +1,5 @@
 #include <Eigen/Core>
 #include <Eigen/Dense>
-#include <alpaka/alpaka.hpp>  
 
 #define CATCH_CONFIG_MAIN
 #include <catch.hpp>
@@ -34,13 +33,13 @@ GENERATE_SOA_LAYOUT(CustomizedSoATemplate,
                     SOA_COLUMN(float, z),
                     SOA_EIGEN_COLUMN(Eigen::Vector3d, candidateDirection))
 
-using CustomizedSoA = CustomizedSoATemplate<>;
+using CustomizedSoA = CustomizedSoATemplate<cms::soa::CacheLineSize::IntelCPU>;
 using CustomizedSoAView = CustomizedSoA::View;
 using CustomizedSoAConstView = CustomizedSoA::ConstView;
 
 TEST_CASE("SoACustomizedView") {
   // common number of elements for the SoAs
-  const std::size_t elems = 10;
+  const std::size_t elems = 17;
 
   // buffer sizes
   const std::size_t positionBufferSize = SoAPosition::computeDataSize(elems);
@@ -176,6 +175,16 @@ TEST_CASE("SoACustomizedView") {
                 cms::soa::alignSize(elems * sizeof(float), CustomizedSoA::alignment) ==
             reinterpret_cast<std::byte *>(customizedAggregatedView.metadata().addressOf_candidateDirection()));
 
+    // Ckeck the correctness of the copy
+    for (size_t i = 0; i < elems; i++) {
+      REQUIRE(customizedAggregatedView[i].x() == positionConstView[i].x());
+      REQUIRE(customizedAggregatedView[i].y() == positionConstView[i].y());
+      REQUIRE(customizedAggregatedView[i].z() == positionConstView[i].z());
+      REQUIRE(customizedAggregatedView[i].candidateDirection()(0) == pcaConstView[i].candidateDirection()(0));
+      REQUIRE(customizedAggregatedView[i].candidateDirection()(1) == pcaConstView[i].candidateDirection()(1));
+      REQUIRE(customizedAggregatedView[i].candidateDirection()(2) == pcaConstView[i].candidateDirection()(2));
+    }
+      
     // Check for the independency of the aggregated SoA
     customizedAggregatedView.x()[3] = 0.;
     REQUIRE(customizedAggregatedView.x()[3] != positionView.x()[3]);

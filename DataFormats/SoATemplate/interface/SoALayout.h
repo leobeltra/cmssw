@@ -598,7 +598,7 @@
         return *this;                                                                                                  \
     }                                                                                                                  \
                                                                                                                        \
-    void deepCopy(ConstView const& view, TQueue& queue) {                                                              \
+    void deepCopy(ConstView const& view) {                                                                             \
       if (elements_ < view.metadata().size())                                                                          \
         throw std::runtime_error(                                                                                      \
             "In deepCopy method: number of elements mismatch ");                                                       \
