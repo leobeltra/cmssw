@@ -510,7 +510,7 @@
               BOOST_PP_EXPAND(_DECLARE_SOA_DATA_MEMBER_IMPL TYPE_NAME))
 // clang-format on
 
-#define _COPY_VIEW_COLUMNS_IMPL(VALUE_TYPE, CPP_TYPE, NAME)                                          \
+#define _COPY_VIEW_COLUMNS_IMPL(VALUE_TYPE, CPP_TYPE, NAME, ARGS)                                          \
   _SWITCH_ON_TYPE(                                                                                   \
       VALUE_TYPE, /* Scalar */                                                                       \
       memcpy(BOOST_PP_CAT(this->metadata().addressOf_, NAME)(),                                      \
@@ -527,7 +527,12 @@
                view.metadata().size() * sizeof(CPP_TYPE::Scalar));                                   \
       })
 
-#define _COPY_VIEW_COLUMNS(R, DATA, TYPE_NAME) BOOST_PP_EXPAND(_COPY_VIEW_COLUMNS_IMPL TYPE_NAME)
+// clang-format off      
+#define _COPY_VIEW_COLUMNS(R, DATA, TYPE_NAME) BOOST_PP_EXPAND(_COPY_VIEW_COLUMNS_IMPL TYPE_NAME)    \
+  BOOST_PP_IF(BOOST_PP_GREATER(BOOST_PP_TUPLE_ELEM(0, TYPE_NAME), _VALUE_LAST_COLUMN_TYPE),          \
+              BOOST_PP_EMPTY(),                                                                      \
+              BOOST_PP_EXPAND(_COPY_VIEW_COLUMNS_IMPL TYPE_NAME))
+// clang-format on
 
 #ifdef DEBUG
 #define _DO_RANGECHECK true

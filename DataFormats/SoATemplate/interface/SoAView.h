@@ -893,7 +893,8 @@ namespace cms::soa {
       private:                                                                                                         \
         const CONST_VIEW& parent_;                                                                                     \
         _ITERATE_ON_ALL(_DECLARE_STRUCT_CONST_DATA_MEMBER, ~, VALUE_LIST)                                              \
-    };                                                                                                                 \                                                                                                                              
+    };                                                                                                                 \
+                                                                                                                       \
     SOA_HOST_DEVICE SOA_INLINE const Metadata metadata() const { return Metadata(*this); }                             \
     SOA_HOST_DEVICE SOA_INLINE const Metarecords records() const { return Metarecords(*this); }                        \
                                                                                                                        \
