@@ -34,7 +34,7 @@ Muon system:
 * M1: 2021 baseline with additional chambers in GE21 and iRPC31/41
 * M2: 2023 GE21 shifted in position
 * M3: 2024 with additional chambers in GE21 and iRPC31
-* M4: 2025 with additional chambers in GE21 and iRPC
+* M4: 2025 with additional chambers in GE21 and iRPC and modified DTShield
 * M5: Same as M1 with modified RPC
 * M6: Same as M2 with modified RPC
 * M7: Same as M3 with modified RPC
@@ -43,9 +43,14 @@ Muon system:
 * M10: Same as M2 with modified RPC, corrected for phi staggering and z-position
 * M11: Same as M3 with modified RPC, corrected for phi staggering and z-position
 * M12: Same as M4 with modified RPC, corrected for phi staggering and z-position
+* M13: Same as M9 with modified DTShield
+* M14: Same as M10 with modified DTShield
+* M15: Same as M11 with modified DTShield
+* M16: Same as M12 with unmounted GE11 for 2025
 
 PPS:
 * P7: 2021 baseline (after removing overlaps and using common materials whenever possible)
+* P8: First 2025 version with the rotated PPS detectors
 
 The script also handles the common and forward elements of the geometry:
 * O4: as O6, but with zero material
@@ -125,6 +130,7 @@ Calorimeters:
 * C23: HGCal (same as the v18 version which is in C22 but without internal cells in the Geant4 geometry defintiion) + Phase2 HCAL and EB (used in Run4D106)
 * C24: HGCal (v18 version of HGCal geometry as in C122 but turning off all dead areas and gaps) + Phase2 HCAL and EB (used in Run4D109)
 * C25: sane as C18 but changing ebalgo.xml to make it more conformant with standard
+* C26: HGCal (v19 version of HGCal geometry with calibration cells, nonzero cssette retraction, correct mousebite, guard ring, proper cell size) + Phase2 HCAL and EB (used in Run4D120)
 
 Muon system:
 * M4: Phase2 muon system for TDR w/ GE2/1, ME0, RE3/1, RE4/1 (incl. granularity in ME0, staggered GE2/1), 96 iRPC strips, no overlaps, MB4Shields
@@ -195,3 +201,4 @@ Several detector combinations have been generated:
 * D117 = T35+C25+M15+I18+O10+F9
 * D118 = T35+C25+M15+I19+O10+F9
 * D119 = T35+C25+M15+I20+O10+F9
+* D120 = T35+C26+M15+I20+O10+F9
