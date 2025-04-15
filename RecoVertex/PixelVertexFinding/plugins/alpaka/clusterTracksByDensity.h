@@ -33,10 +33,13 @@ namespace ALPAKA_ACCELERATOR_NAMESPACE::vertexFinder {
   ) {
     constexpr bool verbose = false;
 
-    if constexpr (verbose) {
-      if (cms::alpakatools::once_per_block(acc))
-        printf("params %d %f %f %f\n", minT, eps, errmax, chi2max);
-    }
+    // if constexpr (verbose) {
+    //   if (cms::alpakatools::once_per_block(acc))
+    //     printf("params %d %f %f %f\n", minT, eps, errmax, chi2max);
+    //     printf("address ws %p\n", &ws);
+    //     printf("address ntrks %p\n", &ws.ntrks());
+    // }
+    if (ws.ntrks() == 0) return;
 
     auto nt = ws.ntrks();
     ALPAKA_ASSERT_ACC(static_cast<int>(nt) <= ws.metadata().size());

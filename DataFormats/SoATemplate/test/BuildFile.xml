@@ -1,3 +1,4 @@
+
 <iftool name="cuda-gcc-support">
   <bin file="SoALayoutAndView_t.cu" name="testCudaSoALayoutAndView_t">
     <use name="boost"/>
@@ -6,6 +7,7 @@
     <use name="HeterogeneousCore/CUDAUtilities"/>
   </bin>
 </iftool>
+
 
 <iftool name="rocm">
   <bin file="SoALayoutAndView_t.hip.cc" name="testRocmSoALayoutAndView_t">

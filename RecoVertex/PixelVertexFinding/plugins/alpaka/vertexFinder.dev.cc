@@ -76,9 +76,9 @@ namespace ALPAKA_ACCELERATOR_NAMESPACE {
     class VertexFinderOneKernel {
     public:
       ALPAKA_FN_ACC void operator()(Acc1D const& acc,
+                                    WsSoAView ws,
                                     VtxSoAView data,
                                     TrkSoAView trkdata,
-                                    WsSoAView ws,
                                     bool doSplit,
                                     int minT,      // min number of neighbours to be "seed"
                                     float eps,     // max absolute distance to cluster
@@ -155,18 +155,18 @@ namespace ALPAKA_ACCELERATOR_NAMESPACE {
           queue, loadTracksWorkDiv, LoadTracks<TrackerTraits>{}, tracks_view, data, trkdata, ws, ptMin, ptMax);
 
       // Running too many thread lead to problems when printf is enabled.
-      const auto finderSorterWorkDiv = cms::alpakatools::make_workdiv<Acc1D>(1, 1024 - 128);
+      const auto finderSorterWorkDiv = cms::alpakatools::make_workdiv<Acc1D>(1, 256  - 128);
       const auto splitterFitterWorkDiv = cms::alpakatools::make_workdiv<Acc1D>(1024, 128);
 
-      if (oneKernel_) {
+      if (false) {
         // implemented only for density clustesrs
 #ifndef THREE_KERNELS
         alpaka::exec<Acc1D>(queue,
                             finderSorterWorkDiv,
                             VertexFinderOneKernel{},
+                            ws,
                             data,
                             trkdata,
-                            ws,
                             doSplitting_,
                             minT,
                             eps,
@@ -174,7 +174,7 @@ namespace ALPAKA_ACCELERATOR_NAMESPACE {
                             chi2max);
 #else
         alpaka::exec<Acc1D>(
-            queue, finderSorterWorkDiv, VertexFinderOneKernel{}, data, trkdata, ws, minT, eps, errmax, chi2max);
+            queue, finderSorterWorkDiv, VertexFinderOneKernel{}, ws, data, trkdata, minT, eps, errmax, chi2max);
 
         // one block per vertex...
         if (doSplitting_)

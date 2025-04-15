@@ -104,32 +104,32 @@
       constexpr static cms::soa::SoAColumnType BOOST_PP_CAT(ColumnTypeOf_, NAME) = cms::soa::SoAColumnType::scalar;    \
       SOA_HOST_DEVICE SOA_INLINE                                                                                       \
       CPP_TYPE const* BOOST_PP_CAT(addressOf_, NAME)() const {                                                         \
-        return parent_.metadata().BOOST_PP_CAT(parametersOf_, NAME)().addr_;                                           \
+        return parent_.metadata().BOOST_PP_CAT(parametersOf_, NAME)().data->data();                                           \
       }                                                                                                                \
       using BOOST_PP_CAT(ParametersTypeOf_, NAME) =                                                                    \
         cms::soa::SoAParameters_ColumnType<cms::soa::SoAColumnType::scalar>::DataType<CPP_TYPE>;                       \
       SOA_HOST_DEVICE SOA_INLINE                                                                                       \
       BOOST_PP_CAT(ParametersTypeOf_, NAME) BOOST_PP_CAT(parametersOf_, NAME)() const {                                \
-        return  BOOST_PP_CAT(ParametersTypeOf_, NAME) (parent_.BOOST_PP_CAT(NAME, _), parent_.metadata().size());      \
+        return  BOOST_PP_CAT(ParametersTypeOf_, NAME) (&BOOST_PP_CAT(NAME, Span_));      \
       }                                                                                                                \
       SOA_HOST_DEVICE SOA_INLINE                                                                                       \
       CPP_TYPE* BOOST_PP_CAT(addressOf_, NAME)() {                                                                     \
-        return parent_.metadata().BOOST_PP_CAT(parametersOf_, NAME)().addr_;                                           \
+        return parent_.metadata().BOOST_PP_CAT(parametersOf_, NAME)().data->data();                                           \
       },                                                                                                               \
       /* Column */                                                                                                     \
       using BOOST_PP_CAT(ParametersTypeOf_, NAME) =                                                                    \
          cms::soa::SoAParameters_ColumnType<cms::soa::SoAColumnType::column>::DataType<CPP_TYPE>;                      \
       SOA_HOST_DEVICE SOA_INLINE                                                                                       \
       BOOST_PP_CAT(ParametersTypeOf_, NAME) BOOST_PP_CAT(parametersOf_, NAME)() const {                                \
-        return  BOOST_PP_CAT(ParametersTypeOf_, NAME) (parent_.BOOST_PP_CAT(NAME, _), parent_.metadata().size());      \
+        return  BOOST_PP_CAT(ParametersTypeOf_, NAME) (&BOOST_PP_CAT(NAME, Span_));      \
       }                                                                                                                \
       SOA_HOST_DEVICE SOA_INLINE                                                                                       \
       CPP_TYPE const* BOOST_PP_CAT(addressOf_, NAME)() const {                                                         \
-        return parent_.metadata().BOOST_PP_CAT(parametersOf_, NAME)().addr_;                                           \
+        return parent_.metadata().BOOST_PP_CAT(parametersOf_, NAME)().data->data();                                           \
       }                                                                                                                \
       SOA_HOST_DEVICE SOA_INLINE                                                                                       \
       CPP_TYPE* BOOST_PP_CAT(addressOf_, NAME)() {                                                                     \
-        return parent_.metadata().BOOST_PP_CAT(parametersOf_, NAME)().addr_;                                           \
+        return parent_.metadata().BOOST_PP_CAT(parametersOf_, NAME)().data->data();                                           \
       }                                                                                                                \
       SOA_HOST_DEVICE SOA_INLINE                                                                                       \
       byte_size_type BOOST_PP_CAT(NAME, Pitch()) const {                                                               \
@@ -143,9 +143,8 @@
       SOA_HOST_DEVICE SOA_INLINE                                                                                       \
       BOOST_PP_CAT(ParametersTypeOf_, NAME) BOOST_PP_CAT(parametersOf_, NAME)() const {                                \
         return BOOST_PP_CAT(ParametersTypeOf_, NAME) (                                                                 \
-          parent_.BOOST_PP_CAT(NAME, _),                                                                               \
-          parent_.BOOST_PP_CAT(NAME, Stride_),                                                                         \
-          parent_.metadata().size());                                                                                  \
+          &BOOST_PP_CAT(NAME, Span_),                                                                              \
+          parent_.BOOST_PP_CAT(NAME, Stride_));                                                                                  \
       }                                                                                                                \
       SOA_HOST_DEVICE SOA_INLINE                                                                                       \
       byte_size_type BOOST_PP_CAT(NAME, Pitch()) const {                                                               \
@@ -156,15 +155,37 @@
       constexpr static cms::soa::SoAColumnType BOOST_PP_CAT(ColumnTypeOf_, NAME) = cms::soa::SoAColumnType::eigen;     \
       SOA_HOST_DEVICE SOA_INLINE                                                                                       \
       CPP_TYPE::Scalar const* BOOST_PP_CAT(addressOf_, NAME)() const {                                                 \
-        return parent_.metadata().BOOST_PP_CAT(parametersOf_, NAME)().addr_;                                           \
+        return parent_.metadata().BOOST_PP_CAT(parametersOf_, NAME)().data->data();                                           \
       }                                                                                                                \
       SOA_HOST_DEVICE SOA_INLINE                                                                                       \
       CPP_TYPE::Scalar* BOOST_PP_CAT(addressOf_, NAME)() {                                                             \
-        return parent_.metadata().BOOST_PP_CAT(parametersOf_, NAME)().addr_;                                           \
+        return parent_.metadata().BOOST_PP_CAT(parametersOf_, NAME)().data->data();                                           \
       }                                                                                                                \
 )
 // clang-format on
 #define _DEFINE_METADATA_MEMBERS(R, DATA, TYPE_NAME) _DEFINE_METADATA_MEMBERS_IMPL TYPE_NAME
+
+#define _INITIALIZE_SPANS_IMPL(VALUE_TYPE, CPP_TYPE, NAME)                                                             \
+  _SWITCH_ON_TYPE(VALUE_TYPE,                                                                                          \
+    (BOOST_PP_CAT(NAME, Span_)(parent_.BOOST_PP_CAT(NAME, _), 1))                                                       \
+    ,                                                                                                                  \
+    (BOOST_PP_CAT(NAME, Span_)(parent_.BOOST_PP_CAT(NAME, _), parent_.elements_))                                       \
+    ,                                                                                                                  \
+    (BOOST_PP_CAT(NAME, Span_)(parent_.BOOST_PP_CAT(NAME, _), parent_.elements_))                                        \
+  ) 
+
+#define _INITIALIZE_SPANS(R, DATA, TYPE_NAME) _INITIALIZE_SPANS_IMPL TYPE_NAME
+
+#define _DECLARE_SPAN_MEMBERS_IMPL(VALUE_TYPE, CPP_TYPE, NAME)                                                         \
+  _SWITCH_ON_TYPE(VALUE_TYPE,                                                                                          \
+    std::span<CPP_TYPE> BOOST_PP_CAT(NAME, Span_);                                                               \
+    ,                                                                                                                  \
+    std::span<CPP_TYPE> BOOST_PP_CAT(NAME, Span_);                                                               \
+    ,                                                                                                                  \
+    std::span<CPP_TYPE::Scalar> BOOST_PP_CAT(NAME, Span_);                                                       \
+  )  
+
+#define _DECLARE_SPAN_MEMBERS(R, DATA, TYPE_NAME) _DECLARE_SPAN_MEMBERS_IMPL TYPE_NAME
 
 // clang-format off
 #define _DECLARE_MEMBER_TRIVIAL_CONSTRUCTION_IMPL(VALUE_TYPE, CPP_TYPE, NAME)                                          \
@@ -536,8 +557,10 @@
       Metadata(const Metadata&) = delete;                                                                              \
                                                                                                                        \
     private:                                                                                                           \
-      SOA_HOST_DEVICE SOA_INLINE Metadata(const CLASS& _soa_impl_parent) : parent_(_soa_impl_parent) {}                \
+      SOA_HOST_DEVICE SOA_INLINE Metadata(const CLASS& _soa_impl_parent) : parent_(_soa_impl_parent),                  \
+                                                            _ITERATE_ON_ALL_COMMA(_INITIALIZE_SPANS, ~, __VA_ARGS__) {}                \
       const CLASS& parent_;                                                                                            \
+      _ITERATE_ON_ALL(_DECLARE_SPAN_MEMBERS, ~, __VA_ARGS__)                                                           \
       using ParentClass = CLASS;                                                                                       \
     };                                                                                                                 \
                                                                                                                        \
