@@ -52,6 +52,13 @@ TEST_CASE("SoAGenericView") {
   std::unique_ptr<std::byte, decltype(std::free) *> bufferPCA{
       reinterpret_cast<std::byte *>(aligned_alloc(SoAPCA::alignment, pcaBufferSize)), std::free};
 
+  // memory buffer for the SoA of positions
+  std::unique_ptr<std::byte, decltype(std::free) *> bufferPos2{
+    reinterpret_cast<std::byte *>(aligned_alloc(SoAPosition::alignment, positionBufferSize)), std::free};    
+  
+  SoAPosition position2{bufferPos2.get(), elems};
+  SoAPositionView positionView2{position2};
+  SoAPositionConstView positionConstView2{position2};
   // SoA Layouts
   SoAPosition position{bufferPos.get(), elems};
   SoAPCA pca{bufferPCA.get(), elems};
@@ -67,6 +74,7 @@ TEST_CASE("SoAGenericView") {
     positionView[i] = {i * 1.0f, i * 2.0f, i * 3.0f};
     auto pcaView_i = positionView[i];
     pcaView_i.x() = i * 1.0f;
+    // positionView2[i] = pcaView_i;
   }
   positionView.detectorType() = 1;
 
@@ -80,7 +88,15 @@ TEST_CASE("SoAGenericView") {
     pcaView[i].candidateDirection()(2) = positionView[i].z() / time;
   }
 
+  std::memcpy(bufferPos.get(), bufferPos2.get(), positionBufferSize);
+
   SECTION("Generic View") {
+    for (size_t i = 0; i < elems; i++) {
+      REQUIRE(positionView[i].x() == positionView2[i].x());
+      REQUIRE(positionView[i].y() == positionView2[i].y());
+      REQUIRE(positionView[i].z() == positionView2[i].z());
+      REQUIRE(positionView[i].detectorType() == positionView2[i].detectorType());
+    }
     // addresses and size of the SoA columns
     const auto posRecs = positionView.records();
     const auto pcaRecs = pcaView.records();

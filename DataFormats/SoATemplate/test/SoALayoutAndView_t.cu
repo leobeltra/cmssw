@@ -223,8 +223,6 @@ int main(void) {
   auto& sn = h_soahd.someNumber();
   sn = numElements + 2;
 
-
-
   // Push to device
   cudaCheck(cudaMemcpyAsync(d_buf, h_buf, hostDeviceSize, cudaMemcpyDefault, stream));
 
