@@ -124,7 +124,7 @@ namespace cms::soa {
 // clang-format off
 #define _DECLARE_VIEW_MEMBER_POINTERS_IMPL(LAYOUT_NAME, LAYOUT_MEMBER, LOCAL_NAME)                                     \
   SOA_HOST_DEVICE SOA_INLINE auto* BOOST_PP_CAT(addressOf_, LOCAL_NAME)() {                                            \
-    return BOOST_PP_CAT(parametersOf_, LOCAL_NAME)().data->data();                                                            \
+    return BOOST_PP_CAT(parametersOf_, LOCAL_NAME)().data->data_;                                                            \
   };
 // clang-format on
 
@@ -137,7 +137,7 @@ namespace cms::soa {
 // clang-format off
 #define _DECLARE_VIEW_MEMBER_CONST_POINTERS_IMPL(LAYOUT_NAME, LAYOUT_MEMBER, LOCAL_NAME)                               \
   SOA_HOST_DEVICE SOA_INLINE auto const* BOOST_PP_CAT(addressOf_, LOCAL_NAME)() const {                                \
-    return BOOST_PP_CAT(parametersOf_, LOCAL_NAME)().data->data();                                                            \
+    return BOOST_PP_CAT(parametersOf_, LOCAL_NAME)().data->data_;                                                            \
   };
 // clang-format on
 
@@ -171,7 +171,7 @@ namespace cms::soa {
   (BOOST_PP_CAT(NAME, Parameters_)([&]() -> auto {                                                                     \
     auto params = LAYOUT.metadata().BOOST_PP_CAT(parametersOf_, MEMBER)();                                             \
     if constexpr (alignmentEnforcement == AlignmentEnforcement::enforced)                                              \
-      if (reinterpret_cast<intptr_t>(params.data->data()) % alignment)                                                        \
+      if (reinterpret_cast<intptr_t>(params.data->data_) % alignment)                                                        \
         throw std::runtime_error("In constructor by layout: misaligned column: " #NAME);                               \
     return params;                                                                                                     \
   }()))
@@ -555,7 +555,7 @@ namespace cms::soa {
   BOOST_PP_EXPAND(_ACCESSORS_STRUCT_MEMBERS_IMPL LAYOUT_MEMBER_NAME)
 
 // #define COPY_CONSTRUCTOR_IMPL(LAYOUT_NAME, LAYOUT_MEMBER, LOCAL_NAME)  
-//   this->BOOST_PP_CAT(LOCAL_NAME, Parameters_).data->data() = other.data->data(); 
+//   this->BOOST_PP_CAT(LOCAL_NAME, Parameters_).data->data_ = other.data->data_; 
   
 
 // #define COPY_CONSTRUCTOR(R, DATA, LAYOUT_MEMBER_NAME)   

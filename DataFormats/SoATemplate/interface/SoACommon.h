@@ -59,6 +59,22 @@
  * declaration fails ROOT dictionary generation.  */
 #define CMS_SOA_BYTE_SIZE_TYPE std::size_t
 
+template <typename T>
+struct MySpan {
+  // T* data() { return data_; }
+  SOA_HOST_DEVICE T* data() const { return data_; }
+  SOA_HOST_DEVICE std::size_t size() const { return size_; }
+  SOA_HOST_DEVICE T& operator[](std::size_t i) { return data_[i]; }
+  SOA_HOST_DEVICE T const& operator[](std::size_t i) const { return data_[i]; }
+  SOA_HOST_DEVICE MySpan(T* data, std::size_t size) : data_(data), size_(size) {}
+  SOA_HOST_DEVICE MySpan() : data_(nullptr), size_(0) {}
+  SOA_HOST_DEVICE MySpan(T* data) : data_(data), size_(0) {}
+
+  T* data_ = nullptr;
+  // T const* dataconst_ = nullptr;
+  std::size_t size_ = 0;
+};
+
 namespace cms::soa {
 
   // size_type for indices. Compatible with ROOT Int_t, but limited to 2G entries
@@ -121,7 +137,7 @@ namespace cms::soa {
 
     using ValueType = T;
     using ScalarType = T;
-    using SpanType = std::span<ScalarType>;
+    using SpanType = MySpan<ScalarType>;
     using TupleOrPointerType = const ValueType*;
 
     // default constructor
@@ -129,7 +145,7 @@ namespace cms::soa {
 
     // constructor from address and size
     // SOA_HOST_DEVICE SOA_INLINE constexpr SoAConstParametersImpl(ValueType const* addr, size_type size)
-    //     : .data->data()(addr), size_(size) {}
+    //     : .data->data_(addr), size_(size) {}
     SOA_HOST_DEVICE SOA_INLINE constexpr SoAConstParametersImpl(SpanType const* pair)
       : data(pair) {}
 
@@ -144,7 +160,7 @@ namespace cms::soa {
       return reinterpret_cast<intptr_t>(addr) % alignment;
     }
 
-    TupleOrPointerType tupleOrPointer() { return data->data(); }
+    TupleOrPointerType tupleOrPointer() { return data->data_; }
 
   public:
     // scalar or column
@@ -160,7 +176,7 @@ namespace cms::soa {
 
     using ValueType = T;
     using ScalarType = typename T::Scalar;
-    using SpanType = std::span<ScalarType>;
+    using SpanType = MySpan<ScalarType>;
     using TupleOrPointerType = std::tuple<ScalarType*, byte_size_type>;
 
     // default constructor
@@ -179,7 +195,7 @@ namespace cms::soa {
     // constructor from address and stride packed in a tuple
     SOA_HOST_DEVICE SOA_INLINE constexpr SoAConstParametersImpl(TupleOrPointerType const& tuple)
         : stride_(std::get<1>(tuple)) {
-          data->data() = std::get<0>(tuple);
+          data->data_ = std::get<0>(tuple);
         }
 
     // constructor from a non-const parameter set
@@ -191,7 +207,7 @@ namespace cms::soa {
       return reinterpret_cast<intptr_t>(addr) % alignment;
     }
 
-    TupleOrPointerType tupleOrPointer() { return {data->data(), stride_}; }
+    TupleOrPointerType tupleOrPointer() { return {data->data_, stride_}; }
 
   public:
     // address, stride and size
@@ -215,7 +231,7 @@ namespace cms::soa {
 
     using ValueType = T;
     using ScalarType = T;
-    using SpanType = std::span<ScalarType>;
+    using SpanType = MySpan<ScalarType>;
     using TupleOrPointerType = ValueType*;
 
     using ConstType = SoAConstParametersImpl<columnType, ValueType>;
@@ -239,7 +255,7 @@ namespace cms::soa {
       return reinterpret_cast<intptr_t>(addr) % alignment;
     }
 
-    TupleOrPointerType tupleOrPointer() { return data->data(); }
+    TupleOrPointerType tupleOrPointer() { return data->data_; }
 
   public:
     // scalar or column
@@ -255,7 +271,7 @@ namespace cms::soa {
 
     using ValueType = T;
     using ScalarType = typename T::Scalar;
-    using SpanType = std::span<ScalarType>;
+    using SpanType = MySpan<ScalarType>;
     using TupleOrPointerType = std::tuple<ScalarType*, byte_size_type>;
 
     using ConstType = SoAConstParametersImpl<columnType, ValueType>;
@@ -275,7 +291,7 @@ namespace cms::soa {
     // constructor from address and stride packed in a tuple
     SOA_HOST_DEVICE SOA_INLINE constexpr SoAParametersImpl(TupleOrPointerType const& tuple)
         : stride_(std::get<1>(tuple)) {
-          data->data() = std::get<0>(tuple); 
+          data->data_ = std::get<0>(tuple); 
         }
 
     // constructor from a non-const parameter set
@@ -287,7 +303,7 @@ namespace cms::soa {
       return reinterpret_cast<intptr_t>(addr) % alignment;
     }
 
-    TupleOrPointerType tupleOrPointer() { return {data->data(), stride_}; }
+    TupleOrPointerType tupleOrPointer() { return {data->data_, stride_}; }
 
   public:
     // address, stride and size
@@ -344,7 +360,7 @@ namespace cms::soa {
     SOA_HOST_DEVICE SOA_INLINE SoAValue(size_type i, T* col) : idx_(i), col_(col) {}
 
     SOA_HOST_DEVICE SOA_INLINE SoAValue(size_type i, SoAParametersImpl<COLUMN_TYPE, T> params)
-        : idx_(i), col_(params.data->data()) {}
+        : idx_(i), col_(params.data->data_) {}
 
     SOA_HOST_DEVICE SOA_INLINE Ref operator()() {
       // Ptr type will add the restrict qualifyer if needed
@@ -415,11 +431,11 @@ namespace cms::soa {
           stride_(stride) {}
 
     SOA_HOST_DEVICE SOA_INLINE SoAValue(size_type i, SoAParametersImpl<SoAColumnType::eigen, C> params)
-        : val_(params.data->data() + i,
+        : val_(params.data->data_ + i,
                C::RowsAtCompileTime,
                C::ColsAtCompileTime,
                Eigen::InnerStride<Eigen::Dynamic>(params.stride_)),
-          crCol_(params.data->data()),
+          crCol_(params.data->data_),
           cVal_(crCol_ + i,
                 C::RowsAtCompileTime,
                 C::ColsAtCompileTime,
@@ -484,10 +500,10 @@ namespace cms::soa {
     SOA_HOST_DEVICE SOA_INLINE SoAConstValue(size_type i, const T* col) : idx_(i), col_(col) {}
 
     SOA_HOST_DEVICE SOA_INLINE SoAConstValue(size_type i, SoAParametersImpl<COLUMN_TYPE, T> params)
-        : idx_(i), col_(params.data->data()) {}
+        : idx_(i), col_(params.data->data_) {}
 
     SOA_HOST_DEVICE SOA_INLINE SoAConstValue(size_type i, SoAConstParametersImpl<COLUMN_TYPE, T> params)
-        : idx_(i), col_(params.data->data()) {}
+        : idx_(i), col_(params.data->data_) {}
 
     SOA_HOST_DEVICE SOA_INLINE RefToConst operator()() const {
       // Ptr type will add the restrict qualifyer if needed
@@ -536,7 +552,7 @@ namespace cms::soa {
           stride_(stride) {}
 
     SOA_HOST_DEVICE SOA_INLINE SoAConstValue(size_type i, SoAConstParametersImpl<SoAColumnType::eigen, C> params)
-        : crCol_(params.data->data()),
+        : crCol_(params.data->data_),
           cVal_(crCol_ + i,
                 C::RowsAtCompileTime,
                 C::ColsAtCompileTime,
@@ -645,11 +661,11 @@ namespace cms::soa {
   struct SoAColumnAccessorsImpl<T, SoAColumnType::column, SoAAccessType::mutableAccess, alignment, restrictQualify> {
     SOA_HOST_DEVICE SOA_INLINE SoAColumnAccessorsImpl(const SoAParametersImpl<SoAColumnType::column, T>& params)
         : params_(params) {}
-    SOA_HOST_DEVICE SOA_INLINE T* operator()() { return params_.data->data(); }
+    SOA_HOST_DEVICE SOA_INLINE T* operator()() { return params_.data->data_; }
 
     using NoParamReturnType = T*;
     using ParamReturnType = T&;
-    SOA_HOST_DEVICE SOA_INLINE T& operator()(size_type index) { return params_.data->data()[index]; }
+    SOA_HOST_DEVICE SOA_INLINE T& operator()(size_type index) { return params_.data->data_[index]; }
 
   private:
     SoAParametersImpl<SoAColumnType::column, T> params_;
@@ -660,10 +676,10 @@ namespace cms::soa {
   struct SoAColumnAccessorsImpl<T, SoAColumnType::column, SoAAccessType::constAccess, alignment, restrictQualify> {
     SOA_HOST_DEVICE SOA_INLINE SoAColumnAccessorsImpl(const SoAConstParametersImpl<SoAColumnType::column, T>& params)
         : params_(params) {}
-    SOA_HOST_DEVICE SOA_INLINE const T* operator()() const { return params_.data->data(); }
+    SOA_HOST_DEVICE SOA_INLINE const T* operator()() const { return params_.data->data_; }
     using NoParamReturnType = const T*;
     using ParamReturnType = const T&;
-    SOA_HOST_DEVICE SOA_INLINE T const& operator()(size_type index) const { return params_.data->data()[index]; }
+    SOA_HOST_DEVICE SOA_INLINE T const& operator()(size_type index) const { return params_.data->data_[index]; }
 
   private:
     SoAConstParametersImpl<SoAColumnType::column, T> params_;
@@ -674,7 +690,7 @@ namespace cms::soa {
   struct SoAColumnAccessorsImpl<T, SoAColumnType::scalar, SoAAccessType::mutableAccess, alignment, restrictQualify> {
     SOA_HOST_DEVICE SOA_INLINE SoAColumnAccessorsImpl(const SoAParametersImpl<SoAColumnType::scalar, T>& params)
         : params_(params) {}
-    SOA_HOST_DEVICE SOA_INLINE T& operator()() { return *params_.data->data(); }
+    SOA_HOST_DEVICE SOA_INLINE T& operator()() { return *params_.data->data_; }
     using NoParamReturnType = T&;
     using ParamReturnType = void;
     SOA_HOST_DEVICE SOA_INLINE void operator()(size_type index) const {
@@ -690,7 +706,7 @@ namespace cms::soa {
   struct SoAColumnAccessorsImpl<T, SoAColumnType::scalar, SoAAccessType::constAccess, alignment, restrictQualify> {
     SOA_HOST_DEVICE SOA_INLINE SoAColumnAccessorsImpl(const SoAConstParametersImpl<SoAColumnType::scalar, T>& params)
         : params_(params) {}
-    SOA_HOST_DEVICE SOA_INLINE T const& operator()() const { return *params_.data->data(); }
+    SOA_HOST_DEVICE SOA_INLINE T const& operator()() const { return *params_.data->data_; }
     using NoParamReturnType = T const&;
     using ParamReturnType = void;
     SOA_HOST_DEVICE SOA_INLINE void operator()(size_type index) const {
@@ -706,7 +722,7 @@ namespace cms::soa {
   struct SoAColumnAccessorsImpl<T, SoAColumnType::eigen, SoAAccessType::mutableAccess, alignment, restrictQualify> {
     SOA_HOST_DEVICE SOA_INLINE SoAColumnAccessorsImpl(const SoAParametersImpl<SoAColumnType::eigen, T>& params)
         : params_(params) {}
-    SOA_HOST_DEVICE SOA_INLINE typename T::Scalar* operator()() { return params_.data->data(); }
+    SOA_HOST_DEVICE SOA_INLINE typename T::Scalar* operator()() { return params_.data->data_; }
     using NoParamReturnType = typename T::Scalar*;
     using ParamReturnType = typename SoAValue<SoAColumnType::eigen, T, alignment, restrictQualify>::MapType;
     SOA_HOST_DEVICE SOA_INLINE ParamReturnType operator()(size_type index) {
@@ -722,7 +738,7 @@ namespace cms::soa {
   struct SoAColumnAccessorsImpl<T, SoAColumnType::eigen, SoAAccessType::constAccess, alignment, restrictQualify> {
     SOA_HOST_DEVICE SOA_INLINE SoAColumnAccessorsImpl(const SoAConstParametersImpl<SoAColumnType::eigen, T>& params)
         : params_(params) {}
-    SOA_HOST_DEVICE SOA_INLINE typename T::Scalar const* operator()() const { return params_.data->data(); }
+    SOA_HOST_DEVICE SOA_INLINE typename T::Scalar const* operator()() const { return params_.data->data_; }
     using NoParamReturnType = typename T::Scalar const*;
     using ParamReturnType = typename SoAValue<SoAColumnType::eigen, T, alignment, restrictQualify>::CMapType;
     SOA_HOST_DEVICE SOA_INLINE ParamReturnType operator()(size_type index) const {

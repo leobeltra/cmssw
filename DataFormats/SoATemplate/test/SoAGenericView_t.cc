@@ -65,6 +65,8 @@ TEST_CASE("SoAGenericView") {
   // fill up
   for (size_t i = 0; i < elems; i++) {
     positionView[i] = {i * 1.0f, i * 2.0f, i * 3.0f};
+    auto pcaView_i = positionView[i];
+    pcaView_i.x() = i * 1.0f;
   }
   positionView.detectorType() = 1;
 
