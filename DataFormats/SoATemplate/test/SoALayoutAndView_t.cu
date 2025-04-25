@@ -78,8 +78,7 @@ GENERATE_SOA_LAYOUT(TestSoALayoutNoColumn2, SOA_SCALAR(double, r), SOA_SCALAR(do
 __global__ void crossProduct(SoAHostDeviceView soa, const unsigned int numElements) {
   int i = blockIdx.x * blockDim.x + threadIdx.x;
   if (i >= numElements)
-    return;  
-  auto c = soa[i].x();  
+    return;
   auto si = soa[i];
   si.r() = si.a().cross(si.b());
 }
@@ -121,7 +120,7 @@ int main(void) {
   cudaCheck(cudaStreamCreateWithFlags(&stream, cudaStreamNonBlocking));
 
   // Non-aligned number of elements to check alignment features.
-  constexpr unsigned int numElements = 15;
+  constexpr unsigned int numElements = 65537;
 
   // Allocate buffer and store on host
   size_t hostDeviceSize = SoAHostDeviceLayout::computeDataSize(numElements);
@@ -129,11 +128,6 @@ int main(void) {
   cudaCheck(cudaMallocHost(&h_buf, hostDeviceSize));
   SoAHostDeviceLayout h_soahdLayout(h_buf, numElements);
   SoAHostDeviceView h_soahd(h_soahdLayout);
-
-  std::byte* h2_buf = nullptr;
-  cudaCheck(cudaMallocHost(&h2_buf, hostDeviceSize));
-  SoAHostDeviceLayout h2_soahdLayout(h2_buf, numElements);
-  SoAHostDeviceView h2_soahd(h2_soahdLayout);
 
   // Validation of range checking variants initialization
   SoAHostDeviceRangeCheckingView h_soahdrc(h_soahdLayout);
@@ -161,47 +155,47 @@ int main(void) {
   assert(0 == reinterpret_cast<uintptr_t>(h_soahd.metadata().addressOf_description()) % decltype(h_soahd)::alignment);
   assert(0 == reinterpret_cast<uintptr_t>(h_soahd.metadata().addressOf_someNumber()) % decltype(h_soahd)::alignment);
 
-  // assert(0 == reinterpret_cast<uintptr_t>(d_soahdLayout.metadata().addressOf_x()) % decltype(d_soahdLayout)::alignment);
-  // assert(0 == reinterpret_cast<uintptr_t>(d_soahdLayout.metadata().addressOf_y()) % decltype(d_soahdLayout)::alignment);
-  // assert(0 == reinterpret_cast<uintptr_t>(d_soahdLayout.metadata().addressOf_z()) % decltype(d_soahdLayout)::alignment);
-  // assert(0 == reinterpret_cast<uintptr_t>(d_soahdLayout.metadata().addressOf_a()) % decltype(d_soahdLayout)::alignment);
-  // assert(0 == reinterpret_cast<uintptr_t>(d_soahdLayout.metadata().addressOf_b()) % decltype(d_soahdLayout)::alignment);
-  // assert(0 == reinterpret_cast<uintptr_t>(d_soahdLayout.metadata().addressOf_r()) % decltype(d_soahdLayout)::alignment);
-  // assert(0 == reinterpret_cast<uintptr_t>(d_soahdLayout.metadata().addressOf_description()) %
-  //                 decltype(d_soahdLayout)::alignment);
-  // assert(0 == reinterpret_cast<uintptr_t>(d_soahdLayout.metadata().addressOf_someNumber()) %
-  //                 decltype(d_soahdLayout)::alignment);
+  assert(0 == reinterpret_cast<uintptr_t>(d_soahdLayout.metadata().addressOf_x()) % decltype(d_soahdLayout)::alignment);
+  assert(0 == reinterpret_cast<uintptr_t>(d_soahdLayout.metadata().addressOf_y()) % decltype(d_soahdLayout)::alignment);
+  assert(0 == reinterpret_cast<uintptr_t>(d_soahdLayout.metadata().addressOf_z()) % decltype(d_soahdLayout)::alignment);
+  assert(0 == reinterpret_cast<uintptr_t>(d_soahdLayout.metadata().addressOf_a()) % decltype(d_soahdLayout)::alignment);
+  assert(0 == reinterpret_cast<uintptr_t>(d_soahdLayout.metadata().addressOf_b()) % decltype(d_soahdLayout)::alignment);
+  assert(0 == reinterpret_cast<uintptr_t>(d_soahdLayout.metadata().addressOf_r()) % decltype(d_soahdLayout)::alignment);
+  assert(0 == reinterpret_cast<uintptr_t>(d_soahdLayout.metadata().addressOf_description()) %
+                  decltype(d_soahdLayout)::alignment);
+  assert(0 == reinterpret_cast<uintptr_t>(d_soahdLayout.metadata().addressOf_someNumber()) %
+                  decltype(d_soahdLayout)::alignment);
 
-  // assert(0 ==
-  //        reinterpret_cast<uintptr_t>(d_soadoLayout.metadata().addressOf_color()) % decltype(d_soadoLayout)::alignment);
-  // assert(0 ==
-  //        reinterpret_cast<uintptr_t>(d_soadoLayout.metadata().addressOf_value()) % decltype(d_soadoLayout)::alignment);
-  // assert(0 ==
-  //        reinterpret_cast<uintptr_t>(d_soadoLayout.metadata().addressOf_py()) % decltype(d_soadoLayout)::alignment);
-  // assert(0 ==
-  //        reinterpret_cast<uintptr_t>(d_soadoLayout.metadata().addressOf_count()) % decltype(d_soadoLayout)::alignment);
-  // assert(0 == reinterpret_cast<uintptr_t>(d_soadoLayout.metadata().addressOf_anotherCount()) %
-  //                 decltype(d_soadoLayout)::alignment);
+  assert(0 ==
+         reinterpret_cast<uintptr_t>(d_soadoLayout.metadata().addressOf_color()) % decltype(d_soadoLayout)::alignment);
+  assert(0 ==
+         reinterpret_cast<uintptr_t>(d_soadoLayout.metadata().addressOf_value()) % decltype(d_soadoLayout)::alignment);
+  assert(0 ==
+         reinterpret_cast<uintptr_t>(d_soadoLayout.metadata().addressOf_py()) % decltype(d_soadoLayout)::alignment);
+  assert(0 ==
+         reinterpret_cast<uintptr_t>(d_soadoLayout.metadata().addressOf_count()) % decltype(d_soadoLayout)::alignment);
+  assert(0 == reinterpret_cast<uintptr_t>(d_soadoLayout.metadata().addressOf_anotherCount()) %
+                  decltype(d_soadoLayout)::alignment);
 
-  // // Views should get the same alignment as the stores they refer to
-  // assert(0 == reinterpret_cast<uintptr_t>(d_soaFullView.metadata().addressOf_x()) % decltype(d_soaFullView)::alignment);
-  // assert(0 == reinterpret_cast<uintptr_t>(d_soaFullView.metadata().addressOf_y()) % decltype(d_soaFullView)::alignment);
-  // assert(0 == reinterpret_cast<uintptr_t>(d_soaFullView.metadata().addressOf_z()) % decltype(d_soaFullView)::alignment);
-  // // Limitation of views: we have to get scalar member addresses via metadata.
-  // assert(0 == reinterpret_cast<uintptr_t>(d_soaFullView.metadata().addressOf_description()) %
-  //                 decltype(d_soaFullView)::alignment);
-  // assert(0 == reinterpret_cast<uintptr_t>(d_soaFullView.metadata().addressOf_someNumber()) %
-  //                 decltype(d_soaFullView)::alignment);
-  // assert(0 ==
-  //        reinterpret_cast<uintptr_t>(d_soaFullView.metadata().addressOf_color()) % decltype(d_soaFullView)::alignment);
-  // assert(0 ==
-  //        reinterpret_cast<uintptr_t>(d_soaFullView.metadata().addressOf_value()) % decltype(d_soaFullView)::alignment);
-  // assert(0 ==
-  //        reinterpret_cast<uintptr_t>(d_soaFullView.metadata().addressOf_py()) % decltype(d_soaFullView)::alignment);
-  // assert(0 ==
-  //        reinterpret_cast<uintptr_t>(d_soaFullView.metadata().addressOf_count()) % decltype(d_soaFullView)::alignment);
-  // assert(0 == reinterpret_cast<uintptr_t>(d_soaFullView.metadata().addressOf_anotherCount()) %
-  //                 decltype(d_soaFullView)::alignment);
+  // Views should get the same alignment as the stores they refer to
+  assert(0 == reinterpret_cast<uintptr_t>(d_soaFullView.metadata().addressOf_x()) % decltype(d_soaFullView)::alignment);
+  assert(0 == reinterpret_cast<uintptr_t>(d_soaFullView.metadata().addressOf_y()) % decltype(d_soaFullView)::alignment);
+  assert(0 == reinterpret_cast<uintptr_t>(d_soaFullView.metadata().addressOf_z()) % decltype(d_soaFullView)::alignment);
+  // Limitation of views: we have to get scalar member addresses via metadata.
+  assert(0 == reinterpret_cast<uintptr_t>(d_soaFullView.metadata().addressOf_description()) %
+                  decltype(d_soaFullView)::alignment);
+  assert(0 == reinterpret_cast<uintptr_t>(d_soaFullView.metadata().addressOf_someNumber()) %
+                  decltype(d_soaFullView)::alignment);
+  assert(0 ==
+         reinterpret_cast<uintptr_t>(d_soaFullView.metadata().addressOf_color()) % decltype(d_soaFullView)::alignment);
+  assert(0 ==
+         reinterpret_cast<uintptr_t>(d_soaFullView.metadata().addressOf_value()) % decltype(d_soaFullView)::alignment);
+  assert(0 ==
+         reinterpret_cast<uintptr_t>(d_soaFullView.metadata().addressOf_py()) % decltype(d_soaFullView)::alignment);
+  assert(0 ==
+         reinterpret_cast<uintptr_t>(d_soaFullView.metadata().addressOf_count()) % decltype(d_soaFullView)::alignment);
+  assert(0 == reinterpret_cast<uintptr_t>(d_soaFullView.metadata().addressOf_anotherCount()) %
+                  decltype(d_soaFullView)::alignment);
 
   // Initialize and fill the host buffer
   std::memset(h_soahdLayout.metadata().data(), 0, hostDeviceSize);
@@ -227,7 +221,7 @@ int main(void) {
   cudaCheck(cudaMemcpyAsync(d_buf, h_buf, hostDeviceSize, cudaMemcpyDefault, stream));
 
   // Process on device
-  crossProduct<<<1, 1, 0, stream>>>(d_soahdView, numElements);
+  crossProduct<<<(numElements + 255) / 256, 256, 0, stream>>>(d_soahdView, numElements);
 
   // Paint the device only with 0xFF initially
   cudaCheck(cudaMemsetAsync(d_soadoLayout.metadata().data(), 0xFF, d_soadoLayout.metadata().byteSize(), stream));
