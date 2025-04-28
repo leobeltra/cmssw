@@ -124,7 +124,7 @@ namespace cms::soa {
 // clang-format off
 #define _DECLARE_VIEW_MEMBER_POINTERS_IMPL(LAYOUT_NAME, LAYOUT_MEMBER, LOCAL_NAME)                                     \
   SOA_HOST_DEVICE SOA_INLINE auto* BOOST_PP_CAT(addressOf_, LOCAL_NAME)() {                                            \
-    return BOOST_PP_CAT(parametersOf_, LOCAL_NAME)().addr_;                                                            \
+    return BOOST_PP_CAT(parametersOf_, LOCAL_NAME)().data_.data();                                                            \
   };
 // clang-format on
 
@@ -137,7 +137,7 @@ namespace cms::soa {
 // clang-format off
 #define _DECLARE_VIEW_MEMBER_CONST_POINTERS_IMPL(LAYOUT_NAME, LAYOUT_MEMBER, LOCAL_NAME)                               \
   SOA_HOST_DEVICE SOA_INLINE auto const* BOOST_PP_CAT(addressOf_, LOCAL_NAME)() const {                                \
-    return BOOST_PP_CAT(parametersOf_, LOCAL_NAME)().addr_;                                                            \
+    return BOOST_PP_CAT(parametersOf_, LOCAL_NAME)().data_.data();                                                            \
   };
 // clang-format on
 
@@ -171,7 +171,7 @@ namespace cms::soa {
   (BOOST_PP_CAT(NAME, Parameters_)([&]() -> auto {                                                                     \
     auto params = LAYOUT.metadata().BOOST_PP_CAT(parametersOf_, MEMBER)();                                             \
     if constexpr (alignmentEnforcement == AlignmentEnforcement::enforced)                                              \
-      if (reinterpret_cast<intptr_t>(params.addr_) % alignment)                                                        \
+      if (reinterpret_cast<intptr_t>(params.data_.data()) % alignment)                                                        \
         throw std::runtime_error("In constructor by layout: misaligned column: " #NAME);                               \
     return params;                                                                                                     \
   }()))
@@ -557,11 +557,11 @@ namespace cms::soa {
 // clang-format off
 #define _INITIALIZE_VIEW_PARAMETERS_AND_SIZE_IMPL(LAYOUT_NAME, LAYOUT_MEMBER, LOCAL_NAME)                              \
         if (not readyToSet) {                                                                                          \
-          base_type::elements_ = LOCAL_NAME.size_;                                                                     \
+          base_type::elements_ = LOCAL_NAME.data_.size();                                                              \
           readyToSet = true;                                                                                           \
         }                                                                                                              \
         auto BOOST_PP_CAT(LOCAL_NAME, _tmp) = [&]() -> auto {                                                          \
-          if (base_type::elements_ != LOCAL_NAME.size_)                                                                \
+          if (static_cast<std::size_t>(base_type::elements_) != LOCAL_NAME.data_.size())                               \
             throw std::runtime_error(                                                                                  \
               "In constructor by column pointers: number of elements not equal for every column: "                     \
               BOOST_PP_STRINGIZE(LOCAL_NAME));                                                                         \
@@ -579,11 +579,11 @@ namespace cms::soa {
 // clang-format off
 #define _INITIALIZE_CONST_VIEW_PARAMETERS_AND_SIZE_IMPL(LAYOUT_NAME, LAYOUT_MEMBER, LOCAL_NAME)                        \
         if (not readyToSet) {                                                                                          \
-          elements_ = LOCAL_NAME.size_;                                                                                \
+          elements_ = LOCAL_NAME.data_.size();                                                                         \
           readyToSet = true;                                                                                           \
         }                                                                                                              \
         auto BOOST_PP_CAT(LOCAL_NAME, _tmp) = [&]() -> auto {                                                          \
-          if (elements_ != LOCAL_NAME.size_)                                                                           \
+          if (static_cast<std::size_t>(elements_) != LOCAL_NAME.data_.size())                                          \
             throw std::runtime_error(                                                                                  \
               "In constructor by column pointers: number of elements not equal for every column: "                     \
               BOOST_PP_STRINGIZE(LOCAL_NAME));                                                                         \

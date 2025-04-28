@@ -104,7 +104,7 @@
       constexpr static cms::soa::SoAColumnType BOOST_PP_CAT(ColumnTypeOf_, NAME) = cms::soa::SoAColumnType::scalar;    \
       SOA_HOST_DEVICE SOA_INLINE                                                                                       \
       CPP_TYPE const* BOOST_PP_CAT(addressOf_, NAME)() const {                                                         \
-        return parent_.metadata().BOOST_PP_CAT(parametersOf_, NAME)().addr_;                                           \
+        return parent_.metadata().BOOST_PP_CAT(parametersOf_, NAME)().data_.data();                                           \
       }                                                                                                                \
       using BOOST_PP_CAT(ParametersTypeOf_, NAME) =                                                                    \
         cms::soa::SoAParameters_ColumnType<cms::soa::SoAColumnType::scalar>::DataType<CPP_TYPE>;                       \
@@ -114,7 +114,7 @@
       }                                                                                                                \
       SOA_HOST_DEVICE SOA_INLINE                                                                                       \
       CPP_TYPE* BOOST_PP_CAT(addressOf_, NAME)() {                                                                     \
-        return parent_.metadata().BOOST_PP_CAT(parametersOf_, NAME)().addr_;                                           \
+        return parent_.metadata().BOOST_PP_CAT(parametersOf_, NAME)().data_.data();                                           \
       },                                                                                                               \
       /* Column */                                                                                                     \
       using BOOST_PP_CAT(ParametersTypeOf_, NAME) =                                                                    \
@@ -125,11 +125,11 @@
       }                                                                                                                \
       SOA_HOST_DEVICE SOA_INLINE                                                                                       \
       CPP_TYPE const* BOOST_PP_CAT(addressOf_, NAME)() const {                                                         \
-        return parent_.metadata().BOOST_PP_CAT(parametersOf_, NAME)().addr_;                                           \
+        return parent_.metadata().BOOST_PP_CAT(parametersOf_, NAME)().data_.data();                                           \
       }                                                                                                                \
       SOA_HOST_DEVICE SOA_INLINE                                                                                       \
       CPP_TYPE* BOOST_PP_CAT(addressOf_, NAME)() {                                                                     \
-        return parent_.metadata().BOOST_PP_CAT(parametersOf_, NAME)().addr_;                                           \
+        return parent_.metadata().BOOST_PP_CAT(parametersOf_, NAME)().data_.data();                                           \
       }                                                                                                                \
       SOA_HOST_DEVICE SOA_INLINE                                                                                       \
       byte_size_type BOOST_PP_CAT(NAME, Pitch()) const {                                                               \
@@ -156,11 +156,11 @@
       constexpr static cms::soa::SoAColumnType BOOST_PP_CAT(ColumnTypeOf_, NAME) = cms::soa::SoAColumnType::eigen;     \
       SOA_HOST_DEVICE SOA_INLINE                                                                                       \
       CPP_TYPE::Scalar const* BOOST_PP_CAT(addressOf_, NAME)() const {                                                 \
-        return parent_.metadata().BOOST_PP_CAT(parametersOf_, NAME)().addr_;                                           \
+        return parent_.metadata().BOOST_PP_CAT(parametersOf_, NAME)().data_.data();                                           \
       }                                                                                                                \
       SOA_HOST_DEVICE SOA_INLINE                                                                                       \
       CPP_TYPE::Scalar* BOOST_PP_CAT(addressOf_, NAME)() {                                                             \
-        return parent_.metadata().BOOST_PP_CAT(parametersOf_, NAME)().addr_;                                           \
+        return parent_.metadata().BOOST_PP_CAT(parametersOf_, NAME)().data_.data();                                           \
       }                                                                                                                \
 )
 // clang-format on
