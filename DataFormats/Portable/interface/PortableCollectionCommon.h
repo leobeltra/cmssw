@@ -4,6 +4,8 @@
 #include <cstddef>
 #include <type_traits>
 #include <array>
+#include <tuple>
+#include <span>
 
 namespace portablecollection {
 

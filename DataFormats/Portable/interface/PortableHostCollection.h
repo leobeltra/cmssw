@@ -21,6 +21,27 @@ public:
   using ConstView = typename Layout::ConstView;
   using Buffer = cms::alpakatools::host_buffer<std::byte[]>;
   using ConstBuffer = cms::alpakatools::const_host_buffer<std::byte[]>;
+  using Descriptor = typename Layout::Descriptor;
+
+  template <typename... Ti>
+  using Data = std::tuple<std::span<Ti>...>;
+
+  template <typename... Ti>
+  using ConstData = std::tuple<std::span<const Ti>...>;
+
+  template <int I, typename... Ti>
+  void _deepCopy(Descriptor const& src) {
+    if constexpr(I < sizeof...(Ti)) {
+      assert(std::get<I>(desc_).size_bytes() == std::get<I>(src).size_bytes());
+      memcpy(std::get<I>(desc_).data(), std::get<I>(src).data(), std::get<I>(src).size_bytes());
+      _deepCopy<I+1>(src);
+    }
+  }
+
+  template <typename... Ti>
+  void deepCopy(Descriptor const& src) {
+      _deepCopy<0>(src);
+  }
 
   PortableHostCollection() = delete;
 
@@ -30,7 +51,8 @@ public:
       // allocate pageable host memory
       : buffer_{cms::alpakatools::make_host_buffer<std::byte[]>(Layout::computeDataSize(elements))},
         layout_{buffer_->data(), elements},
-        view_{layout_} {
+        view_{layout_},
+        desc_{view_} {
     // Alpaka set to a default alignment of 128 bytes defining ALPAKA_DEFAULT_HOST_MEMORY_ALIGNMENT=128
     assert(reinterpret_cast<uintptr_t>(buffer_->data()) % Layout::alignment == 0);
   }
@@ -40,7 +62,8 @@ public:
       // allocate pinned host memory associated to the given work queue, accessible by the queue's device
       : buffer_{cms::alpakatools::make_host_buffer<std::byte[]>(queue, Layout::computeDataSize(elements))},
         layout_{buffer_->data(), elements},
-        view_{layout_} {
+        view_{layout_},
+        desc_{view_} {
     // Alpaka set to a default alignment of 128 bytes defining ALPAKA_DEFAULT_HOST_MEMORY_ALIGNMENT=128
     assert(reinterpret_cast<uintptr_t>(buffer_->data()) % Layout::alignment == 0);
   }
@@ -96,12 +119,13 @@ public:
 
   // Copy column by column the content of the given view into this PortableHostCollection.
   // The view must point to data in host memory.
-  void deepCopy(ConstView const& view) { layout_.deepCopy(view); }
+  // void deepCopy(ConstView const& view) { layout_.deepCopy(view); }
 
 private:
   std::optional<Buffer> buffer_;  //!
   Layout layout_;                 //
   View view_;                     //!
+  Descriptor desc_;
 };
 
 // generic SoA-based product in host memory

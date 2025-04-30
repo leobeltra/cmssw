@@ -402,12 +402,12 @@
 #define _DECLARE_DESCRIPTOR_SPANS_IMPL(VALUE_TYPE, CPP_TYPE, NAME)                                    \
   _SWITCH_ON_TYPE(VALUE_TYPE,                                                                         \
     /* Scalar */                                                                                      \
-    (std::span<CPP_TYPE>)                                                                             \
+    (std::span<const CPP_TYPE>)                                                                             \
     ,                                                                                                 \
     /* Column */                                                                                      \
-    (std::span<CPP_TYPE>)                                                                             \
+    (std::span<const CPP_TYPE>)                                                                             \
     ,                                                                                                 \
-    (std::span<CPP_TYPE::Scalar>)                                                                     \
+    (std::span<const CPP_TYPE::Scalar>)                                                                     \
   )
 
 #define _DECLARE_DESCRIPTOR_SPANS(R, DATA, TYPE_NAME) BOOST_PP_EXPAND(_DECLARE_DESCRIPTOR_SPANS_IMPL TYPE_NAME)
@@ -415,14 +415,14 @@
 #define _ASSIGN_SPAN_TO_COLUMNS_IMPL(VALUE_TYPE, CPP_TYPE, NAME)                                      \
   _SWITCH_ON_TYPE(VALUE_TYPE,                                                                         \
     /* Scalar */                                                                                      \
-    (std::span<CPP_TYPE>(view.metadata().BOOST_PP_CAT(addressOf_, NAME)(),                            \
+    (std::span<const CPP_TYPE>(view.metadata().BOOST_PP_CAT(addressOf_, NAME)(),                            \
                     cms::soa::alignSize(sizeof(CPP_TYPE), alignment) / sizeof(CPP_TYPE)))             \
     ,                                                                                                 \
     /* Column */                                                                                      \
-    (std::span<CPP_TYPE>(view.metadata().BOOST_PP_CAT(addressOf_, NAME)(),                            \
+    (std::span<const CPP_TYPE>(view.metadata().BOOST_PP_CAT(addressOf_, NAME)(),                            \
                     cms::soa::alignSize(view.metadata().size() * sizeof(CPP_TYPE), alignment) / sizeof(CPP_TYPE))) \
     ,                                                                                                 \
-    (std::span<CPP_TYPE::Scalar>(view.metadata().BOOST_PP_CAT(addressOf_, NAME)(),                      \
+    (std::span<const CPP_TYPE::Scalar>(view.metadata().BOOST_PP_CAT(addressOf_, NAME)(),                      \
                     cms::soa::alignSize(view.metadata().size() * sizeof(CPP_TYPE::Scalar), alignment) *                    \
                     CPP_TYPE::RowsAtCompileTime * CPP_TYPE::ColsAtCompileTime / sizeof(CPP_TYPE::Scalar))) \
   )
@@ -572,7 +572,7 @@
     struct Descriptor {                                                                                                \
       std::tuple<_ITERATE_ON_ALL_COMMA(_DECLARE_DESCRIPTOR_SPANS, ~, __VA_ARGS__)> buff;                               \
                                                                                                                        \
-      Descriptor(View& view)                                                                                           \
+      Descriptor(ConstView& view)                                                                                           \
           : buff{ _ITERATE_ON_ALL_COMMA(_ASSIGN_SPAN_TO_COLUMNS, ~, __VA_ARGS__)} {}                                   \
                                                                                                                        \
       template <std::size_t Index>                                                                                     \

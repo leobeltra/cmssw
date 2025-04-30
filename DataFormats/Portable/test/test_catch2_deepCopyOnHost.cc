@@ -87,7 +87,9 @@ TEST_CASE("Deep copy from SoA Generic View") {
 
     // PortableHostCollection that will host the aggregated columns
     PortableHostCollection<GenericSoA> genericCollection(elems, cms::alpakatools::host());
-    genericCollection.deepCopy(genericView);
+    GenericSoA::Descriptor descriptor(genericView);
+    // genericCollection.deepCopy(genericView);
+    genericCollection.deepCopy(descriptor);
 
     // Check for inequality of memory addresses
     REQUIRE(genericCollection.view().metadata().addressOf_xPos() != positionCollectionView.metadata().addressOf_x());
@@ -114,7 +116,9 @@ TEST_CASE("Deep copy from SoA Generic View") {
 
     // PortableHostCollection that will host the aggregated columns
     PortableHostCollection<GenericSoA> genericCollection(elems, cms::alpakatools::host());
-    genericCollection.deepCopy(genericConstView);
+    GenericSoA::Descriptor descriptor(genericConstView);
+    // genericCollection.deepCopy(genericConstView);
+    genericCollection.deepCopy(descriptor);
 
     // Check for inequality of memory addresses
     REQUIRE(genericCollection.view().metadata().addressOf_xPos() != positionCollectionView.metadata().addressOf_x());
