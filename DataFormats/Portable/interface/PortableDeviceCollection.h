@@ -24,6 +24,28 @@ public:
   using ConstView = typename Layout::ConstView;
   using Buffer = cms::alpakatools::device_buffer<TDev, std::byte[]>;
   using ConstBuffer = cms::alpakatools::const_device_buffer<TDev, std::byte[]>;
+  using Descriptor = typename Layout::Descriptor;
+
+  template <typename... Ti>
+  using Data = std::tuple<std::span<Ti>...>;
+
+  template <typename... Ti>
+  using ConstData = std::tuple<std::span<const Ti>...>;
+
+  template <int I, typename TQueue>
+  void _deepCopy(Descriptor const& src, TQueue& queue) {
+    // std::cout << Descriptor::num_cols << " " << I << std::endl;
+    if constexpr(I < Descriptor::num_cols) {
+      alpaka::memcpy(queue, alpaka::createView(alpaka::getDev(queue), std::get<I>(desc_.buff).data(), std::get<I>(desc_.buff).size()),
+      alpaka::createView(alpaka::getDev(queue), std::get<I>(src.buff).data(), std::get<I>(src.buff).size()));
+     _deepCopy<I+1>(src, queue);    
+    }
+  }
+
+  template <typename TQueue> 
+  void deepCopy(Descriptor const& src, TQueue& queue) {
+      _deepCopy<0>(src, queue);
+  }
 
   PortableDeviceCollection() = delete;
 
@@ -32,7 +54,8 @@ public:
   PortableDeviceCollection(int32_t elements, TDev const& device)
       : buffer_{cms::alpakatools::make_device_buffer<std::byte[]>(device, Layout::computeDataSize(elements))},
         layout_{buffer_->data(), elements},
-        view_{layout_} {
+        view_{layout_},
+        desc_{view_} {
     // Alpaka set to a default alignment of 128 bytes defining ALPAKA_DEFAULT_HOST_MEMORY_ALIGNMENT=128
     assert(reinterpret_cast<uintptr_t>(buffer_->data()) % Layout::alignment == 0);
   }
@@ -41,7 +64,8 @@ public:
   PortableDeviceCollection(int32_t elements, TQueue const& queue)
       : buffer_{cms::alpakatools::make_device_buffer<std::byte[]>(queue, Layout::computeDataSize(elements))},
         layout_{buffer_->data(), elements},
-        view_{layout_} {
+        view_{layout_},
+        desc_{view_} {
     // Alpaka set to a default alignment of 128 bytes defining ALPAKA_DEFAULT_HOST_MEMORY_ALIGNMENT=128
     assert(reinterpret_cast<uintptr_t>(buffer_->data()) % Layout::alignment == 0);
   }
@@ -83,6 +107,7 @@ private:
   std::optional<Buffer> buffer_;  //!
   Layout layout_;                 //
   View view_;                     //!
+  Descriptor desc_;               //!
 };
 
 // generic SoA-based product in device memory

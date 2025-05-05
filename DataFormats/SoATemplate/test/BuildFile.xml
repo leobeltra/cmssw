@@ -27,11 +27,11 @@
   <use name="eigen"/>
 </bin>
 
-<!-- <bin file="SoADescriptor.cc" name="SoADescriptor">
+<bin file="SoADescriptor.cc" name="SoADescriptor">
   <use name="boost"/>
   <use name="catch2"/>
   <use name="eigen"/>
-</bin> -->
+</bin>
 
 <!-- This test triggers a bug in ROOT, so it's kept disabled
 <bin file="SoAStreamer_t.cpp" name="SoAStreamer_t">

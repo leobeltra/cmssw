@@ -3,9 +3,10 @@
   <use name="DataFormats/SoATemplate"/>
   <use name="catch2"/>
   <use name="eigen"/>
+  <!-- <use name="alpaka"/> -->
 </bin>
 
-<bin name="TestDataFormatsPortableHeterogenous" file="alpaka/test_catch2_aggregateCollection.dev.cc">
+<bin name="TestDataFormatsPortableHeterogenous" file="alpaka/test_catch2_*.dev.cc">
   <use name="DataFormats/Portable"/>
   <use name="DataFormats/SoATemplate"/>
   <use name="catch2"/>

@@ -4,6 +4,8 @@
 #include <cassert>
 #include <optional>
 
+#include <tuple>
+
 #include <alpaka/alpaka.hpp>
 
 #include "DataFormats/Common/interface/Uninitialized.h"
@@ -28,20 +30,6 @@ public:
 
   template <typename... Ti>
   using ConstData = std::tuple<std::span<const Ti>...>;
-
-  template <int I, typename... Ti>
-  void _deepCopy(Descriptor const& src) {
-    if constexpr(I < sizeof...(Ti)) {
-      assert(std::get<I>(desc_).size_bytes() == std::get<I>(src).size_bytes());
-      memcpy(std::get<I>(desc_).data(), std::get<I>(src).data(), std::get<I>(src).size_bytes());
-      _deepCopy<I+1>(src);
-    }
-  }
-
-  template <typename... Ti>
-  void deepCopy(Descriptor const& src) {
-      _deepCopy<0>(src);
-  }
 
   PortableHostCollection() = delete;
 
@@ -95,6 +83,8 @@ public:
   ConstBuffer buffer() const { return *buffer_; }
   ConstBuffer const_buffer() const { return *buffer_; }
 
+  Descriptor& descriptor() { return desc_; }
+
   // erases the data in the Buffer by writing zeros (bytes containing '\0') to it
   void zeroInitialise() {
     std::memset(std::data(*buffer_), 0x00, alpaka::getExtentProduct(*buffer_) * sizeof(std::byte));
@@ -120,6 +110,31 @@ public:
   // Copy column by column the content of the given view into this PortableHostCollection.
   // The view must point to data in host memory.
   // void deepCopy(ConstView const& view) { layout_.deepCopy(view); }
+
+  // template <int I, typename TQueue>
+  // void _deepCopy(Descriptor const& src, TQueue const& queue) {
+  //   // std::cout << Descriptor::num_cols << " " << I << std::endl;
+  //   if constexpr(I < Descriptor::num_cols) {
+  //     assert(std::get<I>(desc_.buff).size_bytes() == std::get<I>(src.buff).size_bytes());
+  //     memcpy(std::get<I>(desc_.buff).data(), std::get<I>(src.buff).data(), std::get<I>(src.buff).size());
+  //     _deepCopy<I+1>(src, queue);
+  //   }
+  // }
+
+  template <int I, typename TQueue>
+  void _deepCopy(Descriptor const& src, TQueue& queue) {
+    // std::cout << Descriptor::num_cols << " " << I << std::endl;
+    if constexpr(I < Descriptor::num_cols) {
+      alpaka::memcpy(queue, alpaka::createView(alpaka::getDev(queue), std::get<I>(desc_.buff).data(), std::get<I>(desc_.buff).size()),
+      alpaka::createView(alpaka::getDev(queue), std::get<I>(src.buff).data(), std::get<I>(src.buff).size()));
+     _deepCopy<I+1>(src, queue);    
+    }
+  }
+
+  template <typename TQueue> 
+  void deepCopy(Descriptor const& src, TQueue& queue) {
+      _deepCopy<0>(src, queue);
+  }
 
 private:
   std::optional<Buffer> buffer_;  //!
