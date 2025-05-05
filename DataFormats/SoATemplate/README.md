@@ -16,6 +16,13 @@ invalidation), range checking.
 Macro generation allows generating code that provides a clear and concise access of data when used. The code
 generation uses the Boost Preprocessing library.
 
+You can use the following command to generate a file containing the preprocessed code:
+```bash
+clang++ -I$CMSSW_BASE/src -I/cvmfs/cms.cern.ch/el9_amd64_gcc12/cms/cmssw/CMSSW_15_0_0_pre2/src -I/cvmfs/cms.cern.ch/el9_amd64_gcc12/external/alpaka/1.1.0-2560ffd67f3c41494a937fa07d3ecdb6/include -I/cvmfs/cms.cern.ch/el9_amd64_gcc12/external/pcre/8.43-e34796d17981e9b6d174328c69446455/include -isystem/cvmfs/cms.cern.ch/el9_amd64_gcc12/external/boost/1.80.0-53d9ca725637486ff435c5f07081110a/include -I/cvmfs/cms.cern.ch/el9_amd64_gcc12/external/cuda/12.4.1-8b491273511f117bf853a3f82dc2d34f/include -isystem/cvmfs/cms.cern.ch/el9_amd64_gcc12/lcg/root/6.30.09-3de410abaee49ca44c9accc4e505a619/include -I/cvmfs/cms.cern.ch/el9_amd64_gcc12/external/eigen/3bb6a48d8c171cf20b5f8e48bfb4e424fbd4f79e-39786ff94f8aa2f543922cad720e1b32/include -I/cvmfs/cms.cern.ch/el8_amd64_gcc12/external/catch2/2.13.6-17102db92de47c6a473c6e67627c548a/include -I/cvmfs/cms.cern.ch/el9_amd64_gcc12/external/eigen/3bb6a48d8c171cf20b5f8e48bfb4e424fbd4f79e-39786ff94f8aa2f543922cad720e1b32/include/eigen3 --gcc-toolchain=/cvmfs/cms.cern.ch/el9_amd64_gcc12/external/gcc/12.3.1-40d504be6370b5a30e3947a6e575ca28 -E -P -fkeep-system-includes file_name > generated_code
+```
+
+Followed by `clang-format -i generated_code`.
+
 ## Layout
 
 `SoALayout` is a macro generated templated class that subdivides a provided buffer into a collection of columns,
