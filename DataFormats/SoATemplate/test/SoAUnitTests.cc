@@ -8,10 +8,11 @@
 
 // clang-format off
 GENERATE_SOA_LAYOUT(SimpleLayoutTemplate,
+  SOA_BLOCK_0(
   SOA_COLUMN(float, x),
   SOA_COLUMN(float, y),
   SOA_COLUMN(float, z),
-  SOA_COLUMN(float, t))
+  SOA_COLUMN(float, t)))
 // clang-format on
 
 using SimpleLayout = SimpleLayoutTemplate<>;

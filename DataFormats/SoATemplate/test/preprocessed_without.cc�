@@ -1,0 +1,394 @@
+#include <memory> /* clang -E -fkeep-system-includes */
+#include <tuple> /* clang -E -fkeep-system-includes */
+
+
+
+#include <cstdint> /* clang -E -fkeep-system-includes */
+#include <cassert> /* clang -E -fkeep-system-includes */
+#include <cstring> /* clang -E -fkeep-system-includes */
+
+#include <memory> /* clang -E -fkeep-system-includes */
+#include <ostream> /* clang -E -fkeep-system-includes */
+#include <tuple> /* clang -E -fkeep-system-includes */
+#include <type_traits> /* clang -E -fkeep-system-includes */
+#include <boost/preprocessor.hpp> /* clang -E -fkeep-system-includes */
+
+typedef signed char cms_int8_t;
+typedef unsigned char cms_uint8_t;
+typedef short cms_int16_t;
+typedef unsigned short cms_uint16_t;
+typedef int cms_int32_t;
+typedef unsigned int cms_uint32_t;
+typedef long long cms_int64_t;
+typedef unsigned long long cms_uint64_t;
+namespace cms::soa {
+  using size_type = cms_int32_t;
+  using byte_size_type = std::size_t;
+  enum class SoAColumnType {
+    scalar = 0,
+    column = 1,
+    eigen = 2
+  };
+  namespace RestrictQualify {
+    constexpr bool enabled = true;
+    constexpr bool disabled = false;
+    constexpr bool Default = enabled;
+  }
+  namespace RangeChecking {
+    constexpr bool enabled = true;
+    constexpr bool disabled = false;
+    constexpr bool Default = enabled;
+  }
+  template <typename T, bool RESTRICT_QUALIFY>
+  struct add_restrict {};
+  template <typename T>
+  struct add_restrict<T, RestrictQualify::enabled> {
+    using Value = T;
+    using Pointer = T* __restrict__;
+    using Reference = T& __restrict__;
+    using ConstValue = const T;
+    using PointerToConst = const T* __restrict__;
+    using ReferenceToConst = const T& __restrict__;
+  };
+  template <typename T>
+  struct add_restrict<T, RestrictQualify::disabled> {
+    using Value = T;
+    using Pointer = T*;
+    using Reference = T&;
+    using ConstValue = const T;
+    using PointerToConst = const T*;
+    using ReferenceToConst = const T&;
+  };
+  template <SoAColumnType COLUMN_TYPE, typename T>
+  struct SoAConstParametersImpl;
+  template <SoAColumnType COLUMN_TYPE, typename T>
+  struct SoAParametersImpl;
+  template <SoAColumnType COLUMN_TYPE, typename T>
+  struct SoAConstParametersImpl {
+    static constexpr SoAColumnType columnType = COLUMN_TYPE;
+    using ValueType = T;
+    using ScalarType = T;
+    using TupleOrPointerType = const ValueType*;
+    SoAConstParametersImpl() = default;
+                    inline __attribute__((always_inline)) constexpr SoAConstParametersImpl(ValueType const* addr, size_type size)
+        : addr_(addr), size_{size} {}
+                    inline __attribute__((always_inline)) constexpr SoAConstParametersImpl(SoAParametersImpl<columnType, ValueType> const& o)
+        : addr_{o.addr_}, size_{o.size_} {}
+    static constexpr bool checkAlignment(ValueType* addr, byte_size_type alignment) {
+      return reinterpret_cast<intptr_t>(addr) % alignment;
+    }
+    TupleOrPointerType tupleOrPointer() { return addr_; }
+  public:
+    ValueType const* addr_ = nullptr;
+    size_type size_ = 0;
+  };
+  template <typename T>
+  struct SoAConstParametersImpl<SoAColumnType::eigen, T> {
+    static constexpr SoAColumnType columnType = SoAColumnType::eigen;
+    using ValueType = T;
+    using ScalarType = typename T::Scalar;
+    using TupleOrPointerType = std::tuple<ScalarType*, byte_size_type>;
+    SoAConstParametersImpl() = default;
+                    inline __attribute__((always_inline)) constexpr SoAConstParametersImpl(ScalarType const* addr,
+                                                                byte_size_type stride,
+                                                                size_type size)
+        : addr_(addr), stride_(stride), size_{size} {}
+                    inline __attribute__((always_inline)) constexpr SoAConstParametersImpl(TupleOrPointerType const& tuple)
+        : addr_(std::get<0>(tuple)), stride_(std::get<1>(tuple)) {}
+                    inline __attribute__((always_inline)) constexpr SoAConstParametersImpl(SoAParametersImpl<columnType, ValueType> const& o)
+        : addr_{o.addr_}, stride_{o.stride_}, size_{o.size_} {}
+    static constexpr bool checkAlignment(TupleOrPointerType const& tuple, byte_size_type alignment) {
+      const auto& [addr, stride] = tuple;
+      return reinterpret_cast<intptr_t>(addr) % alignment;
+    }
+    TupleOrPointerType tupleOrPointer() { return {addr_, stride_}; }
+  public:
+    ScalarType const* addr_ = nullptr;
+    byte_size_type stride_ = 0;
+    size_type size_ = 0;
+  };
+  template <SoAColumnType COLUMN_TYPE>
+  struct SoAConstParameters_ColumnType {
+    template <typename T>
+    using DataType = SoAConstParametersImpl<COLUMN_TYPE, T>;
+  };
+  template <SoAColumnType COLUMN_TYPE, typename T>
+  struct SoAParametersImpl {
+    static constexpr SoAColumnType columnType = COLUMN_TYPE;
+    using ValueType = T;
+    using ScalarType = T;
+    using TupleOrPointerType = ValueType*;
+    using ConstType = SoAConstParametersImpl<columnType, ValueType>;
+    friend ConstType;
+    SoAParametersImpl() = default;
+                    inline __attribute__((always_inline)) constexpr SoAParametersImpl(ValueType* addr, size_type size)
+        : addr_(addr), size_{size} {}
+    static constexpr bool checkAlignment(ValueType* addr, byte_size_type alignment) {
+      return reinterpret_cast<intptr_t>(addr) % alignment;
+    }
+    TupleOrPointerType tupleOrPointer() { return addr_; }
+  public:
+    ValueType* addr_ = nullptr;
+    size_type size_ = 0;
+  };
+  template <typename T>
+  struct SoAParametersImpl<SoAColumnType::eigen, T> {
+    static constexpr SoAColumnType columnType = SoAColumnType::eigen;
+    using ValueType = T;
+    using ScalarType = typename T::Scalar;
+    using TupleOrPointerType = std::tuple<ScalarType*, byte_size_type>;
+    using ConstType = SoAConstParametersImpl<columnType, ValueType>;
+    friend ConstType;
+    SoAParametersImpl() = default;
+                    inline __attribute__((always_inline)) constexpr SoAParametersImpl(ScalarType* addr, byte_size_type stride, size_type size)
+        : addr_(addr), stride_(stride), size_(size) {}
+                    inline __attribute__((always_inline)) constexpr SoAParametersImpl(TupleOrPointerType const& tuple)
+        : addr_(std::get<0>(tuple)), stride_(std::get<1>(tuple)) {}
+    static constexpr bool checkAlignment(TupleOrPointerType const& tuple, byte_size_type alignment) {
+      const auto& [addr, stride] = tuple;
+      return reinterpret_cast<intptr_t>(addr) % alignment;
+    }
+    TupleOrPointerType tupleOrPointer() { return {addr_, stride_}; }
+  public:
+    ScalarType* addr_ = nullptr;
+    byte_size_type stride_ = 0;
+    size_type size_ = 0;
+  };
+  template <SoAColumnType COLUMN_TYPE>
+  struct SoAParameters_ColumnType {
+    template <typename T>
+    using DataType = SoAParametersImpl<COLUMN_TYPE, T>;
+  };
+  namespace {
+    template <typename T>
+    constexpr inline std::remove_const_t<T>* non_const_ptr(T* p) {
+      return const_cast<std::remove_const_t<T>*>(p);
+    }
+  }
+  template <SoAColumnType COLUMN_TYPE, typename T>
+                  inline __attribute__((always_inline)) constexpr SoAParametersImpl<COLUMN_TYPE, T> const_cast_SoAParametersImpl(
+      SoAConstParametersImpl<COLUMN_TYPE, T> const& o) {
+    return SoAParametersImpl<COLUMN_TYPE, T>{non_const_ptr(o.addr_), o.size_};
+  }
+  template <typename T>
+                  inline __attribute__((always_inline)) constexpr SoAParametersImpl<SoAColumnType::eigen, T> const_cast_SoAParametersImpl(
+      SoAConstParametersImpl<SoAColumnType::eigen, T> const& o) {
+    return SoAParametersImpl<SoAColumnType::eigen, T>{non_const_ptr(o.addr_), o.stride_, o.size_};
+  }
+  template <SoAColumnType COLUMN_TYPE,
+            typename T,
+            byte_size_type ALIGNMENT,
+            bool RESTRICT_QUALIFY = RestrictQualify::disabled>
+  class SoAValue {
+    static_assert(COLUMN_TYPE != SoAColumnType::eigen);
+  public:
+    using Restr = add_restrict<T, RESTRICT_QUALIFY>;
+    using Val = typename Restr::Value;
+    using Ptr = typename Restr::Pointer;
+    using Ref = typename Restr::Reference;
+    using PtrToConst = typename Restr::PointerToConst;
+    using RefToConst = typename Restr::ReferenceToConst;
+                    inline __attribute__((always_inline)) SoAValue(size_type i, T* col) : idx_(i), col_(col) {}
+                    inline __attribute__((always_inline)) SoAValue(size_type i, SoAParametersImpl<COLUMN_TYPE, T> params)
+        : idx_(i), col_(params.addr_) {}
+                    inline __attribute__((always_inline)) Ref operator()() {
+      Ptr col = col_;
+      return col[idx_];
+    }
+                    inline __attribute__((always_inline)) RefToConst operator()() const {
+      PtrToConst col = col_;
+      return col[idx_];
+    }
+                    inline __attribute__((always_inline)) Ptr operator&() { return &col_[idx_]; }
+                    inline __attribute__((always_inline)) PtrToConst operator&() const { return &col_[idx_]; }
+    using valueType = Val;
+    static constexpr auto valueSize = sizeof(T);
+  private:
+    size_type idx_;
+    T* col_;
+  };
+  template <class C, byte_size_type ALIGNMENT, bool RESTRICT_QUALIFY>
+  class SoAValue<SoAColumnType::eigen, C, ALIGNMENT, RESTRICT_QUALIFY> {
+    static_assert(!sizeof(C),
+                  "Eigen/Core should be pre-included before the SoA headers to enable support for Eigen columns.");
+  };
+  template <SoAColumnType COLUMN_TYPE,
+            typename T,
+            byte_size_type ALIGNMENT,
+            bool RESTRICT_QUALIFY = RestrictQualify::disabled>
+  class SoAConstValue {
+    static_assert(COLUMN_TYPE != SoAColumnType::eigen);
+  public:
+    using Restr = add_restrict<T, RESTRICT_QUALIFY>;
+    using Val = typename Restr::Value;
+    using Ptr = typename Restr::Pointer;
+    using Ref = typename Restr::Reference;
+    using PtrToConst = typename Restr::PointerToConst;
+    using RefToConst = typename Restr::ReferenceToConst;
+    using Params = SoAParametersImpl<COLUMN_TYPE, T>;
+    using ConstParams = SoAConstParametersImpl<COLUMN_TYPE, T>;
+                    inline __attribute__((always_inline)) SoAConstValue(size_type i, const T* col) : idx_(i), col_(col) {}
+                    inline __attribute__((always_inline)) SoAConstValue(size_type i, SoAParametersImpl<COLUMN_TYPE, T> params)
+        : idx_(i), col_(params.addr_) {}
+                    inline __attribute__((always_inline)) SoAConstValue(size_type i, SoAConstParametersImpl<COLUMN_TYPE, T> params)
+        : idx_(i), col_(params.addr_) {}
+                    inline __attribute__((always_inline)) RefToConst operator()() const {
+      PtrToConst col = col_;
+      return col[idx_];
+    }
+                    inline __attribute__((always_inline)) const T* operator&() const { return &col_[idx_]; }
+    using valueType = T;
+    static constexpr auto valueSize = sizeof(T);
+  private:
+    size_type idx_;
+    const T* col_;
+  };
+  template <class C, byte_size_type ALIGNMENT, bool RESTRICT_QUALIFY>
+  class SoAConstValue<SoAColumnType::eigen, C, ALIGNMENT, RESTRICT_QUALIFY> {
+    static_assert(!sizeof(C),
+                  "Eigen/Core should be pre-included before the SoA headers to enable support for Eigen columns.");
+  };
+  template <class C>
+  struct EigenConstMapMaker {
+    static_assert(!sizeof(C),
+                  "Eigen/Core should be pre-included before the SoA headers to enable support for Eigen columns.");
+  };
+  constexpr inline byte_size_type alignSize(byte_size_type size, byte_size_type alignment) {
+    return ((size + alignment - 1) / alignment) * alignment;
+  }
+}
+namespace cms::soa {
+  enum class SoAAccessType : bool { mutableAccess, constAccess };
+  template <typename, SoAColumnType, SoAAccessType, byte_size_type, bool>
+  struct SoAColumnAccessorsImpl {};
+  template <typename T, byte_size_type alignment, bool restrictQualify>
+  struct SoAColumnAccessorsImpl<T, SoAColumnType::column, SoAAccessType::mutableAccess, alignment, restrictQualify> {
+                    inline __attribute__((always_inline)) SoAColumnAccessorsImpl(const SoAParametersImpl<SoAColumnType::column, T>& params)
+        : params_(params) {}
+                    inline __attribute__((always_inline)) T* operator()() { return params_.addr_; }
+    using NoParamReturnType = T*;
+    using ParamReturnType = T&;
+                    inline __attribute__((always_inline)) T& operator()(size_type index) { return params_.addr_[index]; }
+  private:
+    SoAParametersImpl<SoAColumnType::column, T> params_;
+  };
+  template <typename T, byte_size_type alignment, bool restrictQualify>
+  struct SoAColumnAccessorsImpl<T, SoAColumnType::column, SoAAccessType::constAccess, alignment, restrictQualify> {
+                    inline __attribute__((always_inline)) SoAColumnAccessorsImpl(const SoAConstParametersImpl<SoAColumnType::column, T>& params)
+        : params_(params) {}
+                    inline __attribute__((always_inline)) const T* operator()() const { return params_.addr_; }
+    using NoParamReturnType = const T*;
+    using ParamReturnType = const T&;
+                    inline __attribute__((always_inline)) T const& operator()(size_type index) const { return params_.addr_[index]; }
+  private:
+    SoAConstParametersImpl<SoAColumnType::column, T> params_;
+  };
+  template <typename T, byte_size_type alignment, bool restrictQualify>
+  struct SoAColumnAccessorsImpl<T, SoAColumnType::scalar, SoAAccessType::mutableAccess, alignment, restrictQualify> {
+                    inline __attribute__((always_inline)) SoAColumnAccessorsImpl(const SoAParametersImpl<SoAColumnType::scalar, T>& params)
+        : params_(params) {}
+                    inline __attribute__((always_inline)) T& operator()() { return *params_.addr_; }
+    using NoParamReturnType = T&;
+    using ParamReturnType = void;
+                    inline __attribute__((always_inline)) void operator()(size_type index) const {
+      (static_cast <bool> (false && "Indexed access impossible for SoA scalars.") ? void (0) : __assert_fail ("false && \"Indexed access impossible for SoA scalars.\"", "/data/lebeltra/deep/CMSSW_15_1_X_2025-05-06-1100/src/DataFormats/SoATemplate/interface/SoACommon.h", 691, __extension__ __PRETTY_FUNCTION__));
+    }
+  private:
+    SoAParametersImpl<SoAColumnType::scalar, T> params_;
+  };
+  template <typename T, byte_size_type alignment, bool restrictQualify>
+  struct SoAColumnAccessorsImpl<T, SoAColumnType::scalar, SoAAccessType::constAccess, alignment, restrictQualify> {
+                    inline __attribute__((always_inline)) SoAColumnAccessorsImpl(const SoAConstParametersImpl<SoAColumnType::scalar, T>& params)
+        : params_(params) {}
+                    inline __attribute__((always_inline)) T const& operator()() const { return *params_.addr_; }
+    using NoParamReturnType = T const&;
+    using ParamReturnType = void;
+                    inline __attribute__((always_inline)) void operator()(size_type index) const {
+      (static_cast <bool> (false && "Indexed access impossible for SoA scalars.") ? void (0) : __assert_fail ("false && \"Indexed access impossible for SoA scalars.\"", "/data/lebeltra/deep/CMSSW_15_1_X_2025-05-06-1100/src/DataFormats/SoATemplate/interface/SoACommon.h", 707, __extension__ __PRETTY_FUNCTION__));
+    }
+  private:
+    SoAConstParametersImpl<SoAColumnType::scalar, T> params_;
+  };
+  template <typename T, byte_size_type alignment, bool restrictQualify>
+  struct SoAColumnAccessorsImpl<T, SoAColumnType::eigen, SoAAccessType::mutableAccess, alignment, restrictQualify> {
+                    inline __attribute__((always_inline)) SoAColumnAccessorsImpl(const SoAParametersImpl<SoAColumnType::eigen, T>& params)
+        : params_(params) {}
+                    inline __attribute__((always_inline)) typename T::Scalar* operator()() { return params_.addr_; }
+    using NoParamReturnType = typename T::Scalar*;
+    using ParamReturnType = typename SoAValue<SoAColumnType::eigen, T, alignment, restrictQualify>::MapType;
+                    inline __attribute__((always_inline)) ParamReturnType operator()(size_type index) {
+      return SoAValue<SoAColumnType::eigen, T, alignment, restrictQualify>(index, params_)();
+    }
+  private:
+    SoAParametersImpl<SoAColumnType::eigen, T> params_;
+  };
+  template <typename T, byte_size_type alignment, bool restrictQualify>
+  struct SoAColumnAccessorsImpl<T, SoAColumnType::eigen, SoAAccessType::constAccess, alignment, restrictQualify> {
+                    inline __attribute__((always_inline)) SoAColumnAccessorsImpl(const SoAConstParametersImpl<SoAColumnType::eigen, T>& params)
+        : params_(params) {}
+                    inline __attribute__((always_inline)) typename T::Scalar const* operator()() const { return params_.addr_; }
+    using NoParamReturnType = typename T::Scalar const*;
+    using ParamReturnType = typename SoAValue<SoAColumnType::eigen, T, alignment, restrictQualify>::CMapType;
+                    inline __attribute__((always_inline)) ParamReturnType operator()(size_type index) const {
+      return SoAConstValue<SoAColumnType::eigen, T, alignment, restrictQualify>(index, params_)();
+    }
+  private:
+    SoAConstParametersImpl<SoAColumnType::eigen, T> params_;
+  };
+  template <typename T>
+  struct SoAAccessors {
+    template <auto columnType>
+    struct ColumnType {
+      template <auto accessType>
+      struct AccessType {
+        template <auto alignment>
+        struct Alignment {
+          template <auto restrictQualify>
+          struct RestrictQualifier
+              : public SoAColumnAccessorsImpl<T, columnType, accessType, alignment, restrictQualify> {
+            using SoAColumnAccessorsImpl<T, columnType, accessType, alignment, restrictQualify>::SoAColumnAccessorsImpl;
+          };
+        };
+      };
+    };
+  };
+  struct AlignmentEnforcement {
+    static constexpr bool relaxed = false;
+    static constexpr bool enforced = true;
+  };
+  struct CacheLineSize {
+    static constexpr byte_size_type NvidiaGPU = 128;
+    static constexpr byte_size_type IntelCPU = 64;
+    static constexpr byte_size_type AMDCPU = 64;
+    static constexpr byte_size_type ARMCPU = 64;
+    static constexpr byte_size_type defaultSize = NvidiaGPU;
+  };
+}
+template <typename SOA,
+          typename SFINAE =
+              typename std::enable_if_t<std::is_invocable_v<decltype(&SOA::soaToStreamInternal), SOA&, std::ostream&>>>
+              std::ostream& operator<<(std::ostream& os, const SOA& soa) {
+  soa.soaToStreamInternal(os);
+  return os;
+}
+namespace cms::soa {
+  template <class C, SoAColumnType COLUMN_TYPE>
+  struct ConstValueTraits : public C {
+    using C::C;
+  };
+  template <class C>
+  struct ConstValueTraits<C, SoAColumnType::scalar> {
+                    inline __attribute__((always_inline)) ConstValueTraits(size_type, const typename C::valueType*) {}
+                    inline __attribute__((always_inline)) ConstValueTraits(size_type, const typename C::Params&) {}
+                    inline __attribute__((always_inline)) ConstValueTraits(size_type, const typename C::ConstParams&) {}
+  };
+}
+template <std::size_t ALIGNMENT = cms::soa::CacheLineSize::defaultSize, bool ALIGNMENT_ENFORCEMENT = cms::soa::AlignmentEnforcement::relaxed> struct SoABlockTemplate { using self_type = SoABlockTemplate; using AlignmentEnforcement = cms::soa::AlignmentEnforcement; (1, float, x, ~), (1, float, y, ~), (1, float, z, ~), (1, float, t, ~) ((0, size_t, scalar, ~)) using size_type = cms::soa::size_type; using byte_size_type = cms::soa::byte_size_type; constexpr static byte_size_type defaultAlignment = 128; constexpr static byte_size_type alignment = ALIGNMENT; constexpr static bool alignmentEnforcement = ALIGNMENT_ENFORCEMENT; constexpr static byte_size_type conditionalAlignment = alignmentEnforcement == cms::soa::AlignmentEnforcement::enforced ? alignment : 0; template <cms::soa::SoAColumnType COLUMN_TYPE, class C> using SoAValueWithConf = cms::soa::SoAValue<COLUMN_TYPE, C, conditionalAlignment>; template <cms::soa::SoAColumnType COLUMN_TYPE, class C> using SoAConstValueWithConf = cms::soa::SoAConstValue<COLUMN_TYPE, C, conditionalAlignment>; template <std::size_t VIEW_ALIGNMENT = cms::soa::CacheLineSize::defaultSize, bool VIEW_ALIGNMENT_ENFORCEMENT = cms::soa::AlignmentEnforcement::relaxed, bool RESTRICT_QUALIFY = cms::soa::RestrictQualify::Default, bool RANGE_CHECKING = cms::soa::RangeChecking::Default> struct ViewTemplateFreeParams; void soaToStreamInternal(std::ostream & _soa_impl_os) const { _soa_impl_os << "SoABlockTemplate" "(" << elements_ << " elements, byte alignement= " << alignment << ", @"<< mem_ <<"): " << std::endl; _soa_impl_os << "  sizeof(" "SoABlockTemplate" "): " << sizeof(SoABlockTemplate) << std::endl; byte_size_type _soa_impl_offset = 0; _soa_impl_os << "Final offset = " << _soa_impl_offset << " computeDataSize(...): " << computeDataSize(elements_) << std::endl; _soa_impl_os << std::endl; } static constexpr byte_size_type computeDataSize(size_type elements) { byte_size_type _soa_impl_ret = 0; return _soa_impl_ret; } struct Metadata { friend SoABlockTemplate; inline __attribute__((always_inline)) size_type size() const { return parent_.elements_; } inline __attribute__((always_inline)) byte_size_type byteSize() const { return parent_.byteSize_; } inline __attribute__((always_inline)) byte_size_type alignment() const { return SoABlockTemplate::alignment; } inline __attribute__((always_inline)) std::byte* data() { return parent_.mem_; } inline __attribute__((always_inline)) const std::byte* data() const { return parent_.mem_; } inline __attribute__((always_inline)) std::byte* nextByte() const { return parent_.mem_ + parent_.byteSize_; } inline __attribute__((always_inline)) SoABlockTemplate cloneToNewAddress(std::byte* _soa_impl_addr) const { return SoABlockTemplate(_soa_impl_addr, parent_.elements_); } struct value_element { inline __attribute__((always_inline)) value_element () {} }; Metadata& operator=(const Metadata&) = delete; Metadata(const Metadata&) = delete; private: inline __attribute__((always_inline)) Metadata(const SoABlockTemplate& _soa_impl_parent) : parent_(_soa_impl_parent) {} const SoABlockTemplate& parent_; using ParentClass = SoABlockTemplate; }; friend Metadata; inline __attribute__((always_inline)) const Metadata metadata() const { return Metadata(*this); } inline __attribute__((always_inline)) Metadata metadata() { return Metadata(*this); } template <std::size_t VIEW_ALIGNMENT, bool VIEW_ALIGNMENT_ENFORCEMENT, bool RESTRICT_QUALIFY, bool RANGE_CHECKING> struct ConstViewTemplateFreeParams { using self_type = ConstViewTemplateFreeParams; using SoABlockTemplate_parametrized = SoABlockTemplate<VIEW_ALIGNMENT, VIEW_ALIGNMENT_ENFORCEMENT>; using size_type = cms::soa::size_type; using byte_size_type = cms::soa::byte_size_type; using AlignmentEnforcement = cms::soa::AlignmentEnforcement; template <std::size_t, bool, bool, bool> friend struct ViewTemplateFreeParams; template <std::size_t, bool, bool, bool> friend struct ConstViewTemplateFreeParams; constexpr static byte_size_type defaultAlignment = cms::soa::CacheLineSize::defaultSize; constexpr static byte_size_type alignment = VIEW_ALIGNMENT; constexpr static bool alignmentEnforcement = VIEW_ALIGNMENT_ENFORCEMENT; constexpr static byte_size_type conditionalAlignment = alignmentEnforcement == AlignmentEnforcement::enforced ? alignment : 0; constexpr static bool restrictQualify = RESTRICT_QUALIFY; constexpr static bool rangeChecking = RANGE_CHECKING; template <cms::soa::SoAColumnType COLUMN_TYPE, class C> using SoAValueWithConf = cms::soa::SoAValue<COLUMN_TYPE, C, conditionalAlignment, restrictQualify>; template <cms::soa::SoAColumnType COLUMN_TYPE, class C> using SoAConstValueWithConf = cms::soa::SoAConstValue<COLUMN_TYPE, C, conditionalAlignment, restrictQualify>; struct Metadata { friend ConstViewTemplateFreeParams; inline __attribute__((always_inline)) size_type size() const { return parent_.elements_; } using TypeOf_instance_SoABlockTemplate = SoABlockTemplate_parametrized; _DECLARE_VIEW_MEMBER_TYPE_ALIAS_IMPL BOOST_PP_IIF_BOOST_PP_BOOL_BOOST_PP_INC_BOOST_PP_IIF_BOOST_PP_BOOL_BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0(BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0, 1)(BOOST_PP_ARRAY_DATA, BOOST_PP_ARRAY_TO_TUPLE_EMPTY) ((BOOST_PP_INC_BOOST_PP_IIF_BOOST_PP_BOOL_BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0(BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0, 1), (BOOST_PP_IIF_BOOST_PP_BOOL_BOOST_PP_IIF_BOOST_PP_BOOL_BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0(BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0, 1)(BOOST_PP_ARRAY_DETAIL_GET_DATA_ANY, BOOST_PP_ARRAY_DETAIL_GET_DATA_NONE) (BOOST_PP_IIF_BOOST_PP_BOOL_BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0(BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0, 1),BOOST_PP_SEQ_ENUM_0) BOOST_PP_IIF_BOOST_PP_BOOL_BOOST_PP_IIF_BOOST_PP_BOOL_BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0(BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0, 1)(BOOST_PP_COMMA, BOOST_PP_EMPTY)() ))) _DECLARE_VIEW_MEMBER_CONST_POINTERS_IMPL BOOST_PP_SEQ_ENUM_0 Metadata& operator=(const Metadata&) = delete; Metadata(const Metadata&) = delete; private: inline __attribute__((always_inline)) Metadata(const ConstViewTemplateFreeParams& _soa_impl_parent) : parent_(_soa_impl_parent) {} const ConstViewTemplateFreeParams& parent_; }; friend Metadata; struct Metarecords { friend ConstViewTemplateFreeParams; Metarecords(const ConstViewTemplateFreeParams& _soa_impl_parent) : parent_(_soa_impl_parent), BOOST_PP_SEQ_ENUM_0 _STRUCT_ELEMENT_INITIALIZERS_IMPL BOOST_PP_SEQ_ENUM_0 _STRUCT_ELEMENT_INITIALIZERS_IMPL BOOST_PP_SEQ_ENUM_0 {} _CONST_ACCESSORS_STRUCT_MEMBERS_IMPL BOOST_PP_SEQ_ENUM_0 private: const ConstViewTemplateFreeParams& parent_; _DECLARE_STRUCT_CONST_DATA_MEMBER_IMPL BOOST_PP_SEQ_ENUM_0 }; inline __attribute__((always_inline)) const Metadata metadata() const { return Metadata(*this); } inline __attribute__((always_inline)) const Metarecords records() const { return Metarecords(*this); } ConstViewTemplateFreeParams() = default; ConstViewTemplateFreeParams(const SoABlockTemplate_parametrized & instance_SoABlockTemplate) : elements_([&]() -> size_type { bool set = false; size_type ret = 0; if (set) { if (ret != instance_SoABlockTemplate.metadata().size()) throw std::runtime_error("In constructor by layout: different sizes from layouts."); } else { ret = instance_SoABlockTemplate.metadata().size(); set = true; } return ret; }()), BOOST_PP_SEQ_ENUM_0 _DECLARE_VIEW_MEMBER_INITIALIZERS_IMPL BOOST_PP_SEQ_ENUM_0 _DECLARE_VIEW_MEMBER_INITIALIZERS_IMPL BOOST_PP_SEQ_ENUM_0 {} ConstViewTemplateFreeParams(size_type _soa_impl_elements, BOOST_PP_SEQ_ENUM_0 _DECLARE_VIEW_CONSTRUCTION_BYCOLUMN_PARAMETERS_IMPL BOOST_PP_IIF_BOOST_PP_BOOL_BOOST_PP_INC_BOOST_PP_IIF_BOOST_PP_BOOL_BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0(BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0, 1)(BOOST_PP_ARRAY_DATA, BOOST_PP_ARRAY_TO_TUPLE_EMPTY) ((BOOST_PP_INC_BOOST_PP_IIF_BOOST_PP_BOOL_BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0(BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0, 1), (BOOST_PP_IIF_BOOST_PP_BOOL_BOOST_PP_IIF_BOOST_PP_BOOL_BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0(BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0, 1)(BOOST_PP_ARRAY_DETAIL_GET_DATA_ANY, BOOST_PP_ARRAY_DETAIL_GET_DATA_NONE) (BOOST_PP_IIF_BOOST_PP_BOOL_BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0(BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0, 1),BOOST_PP_SEQ_ENUM_0) BOOST_PP_IIF_BOOST_PP_BOOL_BOOST_PP_IIF_BOOST_PP_BOOL_BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0(BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0, 1)(BOOST_PP_COMMA, BOOST_PP_EMPTY)() const))) _DECLARE_VIEW_CONSTRUCTION_BYCOLUMN_PARAMETERS_IMPL BOOST_PP_IIF_BOOST_PP_BOOL_BOOST_PP_INC_BOOST_PP_IIF_BOOST_PP_BOOL_BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0(BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0, 1)(BOOST_PP_ARRAY_DATA, BOOST_PP_ARRAY_TO_TUPLE_EMPTY) ((BOOST_PP_INC_BOOST_PP_IIF_BOOST_PP_BOOL_BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0(BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0, 1), (BOOST_PP_IIF_BOOST_PP_BOOL_BOOST_PP_IIF_BOOST_PP_BOOL_BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0(BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0, 1)(BOOST_PP_ARRAY_DETAIL_GET_DATA_ANY, BOOST_PP_ARRAY_DETAIL_GET_DATA_NONE) (BOOST_PP_IIF_BOOST_PP_BOOL_BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0(BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0, 1),BOOST_PP_SEQ_ENUM_0) BOOST_PP_IIF_BOOST_PP_BOOL_BOOST_PP_IIF_BOOST_PP_BOOL_BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0(BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0, 1)(BOOST_PP_COMMA, BOOST_PP_EMPTY)() const)))) : elements_(_soa_impl_elements), BOOST_PP_SEQ_ENUM_0 _DECLARE_VIEW_MEMBER_INITIALIZERS_BYCOLUMN_IMPL BOOST_PP_SEQ_ENUM_0 _DECLARE_VIEW_MEMBER_INITIALIZERS_BYCOLUMN_IMPL BOOST_PP_SEQ_ENUM_0 {} ConstViewTemplateFreeParams(BOOST_PP_SEQ_ENUM_0 _DECLARE_CONST_VIEW_CONSTRUCTOR_COLUMNS_IMPL BOOST_PP_SEQ_ENUM_0 _DECLARE_CONST_VIEW_CONSTRUCTOR_COLUMNS_IMPL BOOST_PP_SEQ_ENUM_0) { bool readyToSet = false; _INITIALIZE_CONST_VIEW_PARAMETERS_AND_SIZE_IMPL BOOST_PP_SEQ_ENUM_0 } ConstViewTemplateFreeParams(ConstViewTemplateFreeParams const&) = default; ConstViewTemplateFreeParams& operator=(ConstViewTemplateFreeParams const&) = default; template <std::size_t OTHER_VIEW_ALIGNMENT, bool OTHER_VIEW_ALIGNMENT_ENFORCEMENT, bool OTHER_RESTRICT_QUALIFY, bool OTHER_RANGE_CHECKING> ConstViewTemplateFreeParams(ConstViewTemplateFreeParams<OTHER_VIEW_ALIGNMENT, OTHER_VIEW_ALIGNMENT_ENFORCEMENT, OTHER_RESTRICT_QUALIFY, OTHER_RANGE_CHECKING> const& other): ConstViewTemplateFreeParams{other.elements_, BOOST_PP_SEQ_ENUM_0 _DECLARE_VIEW_OTHER_MEMBER_LIST_IMPL BOOST_PP_SEQ_ENUM_0 _DECLARE_VIEW_OTHER_MEMBER_LIST_IMPL BOOST_PP_SEQ_ENUM_0 } {} template <std::size_t OTHER_VIEW_ALIGNMENT, bool OTHER_VIEW_ALIGNMENT_ENFORCEMENT, bool OTHER_RESTRICT_QUALIFY, bool OTHER_RANGE_CHECKING> ConstViewTemplateFreeParams& operator=(ConstViewTemplateFreeParams<OTHER_VIEW_ALIGNMENT, OTHER_VIEW_ALIGNMENT_ENFORCEMENT, OTHER_RESTRICT_QUALIFY, OTHER_RANGE_CHECKING> const& other) { *this = other; } ConstViewTemplateFreeParams(ConstViewTemplateFreeParams &&) = default; ConstViewTemplateFreeParams& operator=(ConstViewTemplateFreeParams &&) = default; ~ConstViewTemplateFreeParams() = default; struct const_element { inline __attribute__((always_inline)) const_element(size_type _soa_impl_index, BOOST_PP_SEQ_ENUM_0 _DECLARE_CONST_VIEW_ELEMENT_VALUE_ARG_IMPL BOOST_PP_IIF_BOOST_PP_BOOL_BOOST_PP_INC_BOOST_PP_IIF_BOOST_PP_BOOL_BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0(BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0, 1)(BOOST_PP_ARRAY_DATA, BOOST_PP_ARRAY_TO_TUPLE_EMPTY) ((BOOST_PP_INC_BOOST_PP_IIF_BOOST_PP_BOOL_BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0(BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0, 1), (BOOST_PP_IIF_BOOST_PP_BOOL_BOOST_PP_IIF_BOOST_PP_BOOL_BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0(BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0, 1)(BOOST_PP_ARRAY_DETAIL_GET_DATA_ANY, BOOST_PP_ARRAY_DETAIL_GET_DATA_NONE) (BOOST_PP_IIF_BOOST_PP_BOOL_BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0(BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0, 1),BOOST_PP_SEQ_ENUM_0) BOOST_PP_IIF_BOOST_PP_BOOL_BOOST_PP_IIF_BOOST_PP_BOOL_BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0(BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0, 1)(BOOST_PP_COMMA, BOOST_PP_EMPTY)() const))) _DECLARE_CONST_VIEW_ELEMENT_VALUE_ARG_IMPL BOOST_PP_IIF_BOOST_PP_BOOL_BOOST_PP_INC_BOOST_PP_IIF_BOOST_PP_BOOL_BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0(BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0, 1)(BOOST_PP_ARRAY_DATA, BOOST_PP_ARRAY_TO_TUPLE_EMPTY) ((BOOST_PP_INC_BOOST_PP_IIF_BOOST_PP_BOOL_BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0(BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0, 1), (BOOST_PP_IIF_BOOST_PP_BOOL_BOOST_PP_IIF_BOOST_PP_BOOL_BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0(BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0, 1)(BOOST_PP_ARRAY_DETAIL_GET_DATA_ANY, BOOST_PP_ARRAY_DETAIL_GET_DATA_NONE) (BOOST_PP_IIF_BOOST_PP_BOOL_BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0(BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0, 1),BOOST_PP_SEQ_ENUM_0) BOOST_PP_IIF_BOOST_PP_BOOL_BOOST_PP_IIF_BOOST_PP_BOOL_BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0(BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0, 1)(BOOST_PP_COMMA, BOOST_PP_EMPTY)() const)))) : BOOST_PP_SEQ_ENUM_0 _DECLARE_VIEW_CONST_ELEM_MEMBER_INIT_IMPL BOOST_PP_IIF_BOOST_PP_BOOL_BOOST_PP_INC_BOOST_PP_IIF_BOOST_PP_BOOL_BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0(BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0, 1)(BOOST_PP_ARRAY_DATA, BOOST_PP_ARRAY_TO_TUPLE_EMPTY) ((BOOST_PP_INC_BOOST_PP_IIF_BOOST_PP_BOOL_BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0(BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0, 1), (BOOST_PP_IIF_BOOST_PP_BOOL_BOOST_PP_IIF_BOOST_PP_BOOL_BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0(BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0, 1)(BOOST_PP_ARRAY_DETAIL_GET_DATA_ANY, BOOST_PP_ARRAY_DETAIL_GET_DATA_NONE) (BOOST_PP_IIF_BOOST_PP_BOOL_BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0(BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0, 1),BOOST_PP_SEQ_ENUM_0) BOOST_PP_IIF_BOOST_PP_BOOL_BOOST_PP_IIF_BOOST_PP_BOOL_BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0(BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0, 1)(BOOST_PP_COMMA, BOOST_PP_EMPTY)() _soa_impl_index))) _DECLARE_VIEW_CONST_ELEM_MEMBER_INIT_IMPL BOOST_PP_IIF_BOOST_PP_BOOL_BOOST_PP_INC_BOOST_PP_IIF_BOOST_PP_BOOL_BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0(BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0, 1)(BOOST_PP_ARRAY_DATA, BOOST_PP_ARRAY_TO_TUPLE_EMPTY) ((BOOST_PP_INC_BOOST_PP_IIF_BOOST_PP_BOOL_BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0(BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0, 1), (BOOST_PP_IIF_BOOST_PP_BOOL_BOOST_PP_IIF_BOOST_PP_BOOL_BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0(BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0, 1)(BOOST_PP_ARRAY_DETAIL_GET_DATA_ANY, BOOST_PP_ARRAY_DETAIL_GET_DATA_NONE) (BOOST_PP_IIF_BOOST_PP_BOOL_BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0(BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0, 1),BOOST_PP_SEQ_ENUM_0) BOOST_PP_IIF_BOOST_PP_BOOL_BOOST_PP_IIF_BOOST_PP_BOOL_BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0(BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0, 1)(BOOST_PP_COMMA, BOOST_PP_EMPTY)() _soa_impl_index))) {} _DECLARE_VIEW_CONST_ELEMENT_ACCESSOR_IMPL BOOST_PP_SEQ_ENUM_0 private: _DECLARE_VIEW_CONST_ELEMENT_VALUE_MEMBER_IMPL BOOST_PP_SEQ_ENUM_0 }; inline __attribute__((always_inline)) const_element operator[](size_type _soa_impl_index) const { if constexpr (rangeChecking == cms::soa::RangeChecking::enabled) { if (_soa_impl_index >= elements_ or _soa_impl_index < 0) { throw std::out_of_range("Out of range index in " "ConstViewTemplateFreeParams" "::operator[]"); } } return const_element{ _soa_impl_index, BOOST_PP_SEQ_ENUM_0 _DECLARE_VIEW_CONST_ELEMENT_CONSTR_CALL_IMPL BOOST_PP_SEQ_ENUM_0 _DECLARE_VIEW_CONST_ELEMENT_CONSTR_CALL_IMPL BOOST_PP_SEQ_ENUM_0 }; } _DECLARE_VIEW_SOA_CONST_ACCESSOR_IMPL BOOST_PP_SEQ_ENUM_0 template <typename T> friend void dump(); private: size_type elements_ = 0; _DECLARE_CONST_VIEW_SOA_MEMBER_IMPL BOOST_PP_IIF_BOOST_PP_BOOL_BOOST_PP_INC_BOOST_PP_IIF_BOOST_PP_BOOL_BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0(BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0, 1)(BOOST_PP_ARRAY_DATA, BOOST_PP_ARRAY_TO_TUPLE_EMPTY) ((BOOST_PP_INC_BOOST_PP_IIF_BOOST_PP_BOOL_BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0(BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0, 1), (BOOST_PP_IIF_BOOST_PP_BOOL_BOOST_PP_IIF_BOOST_PP_BOOL_BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0(BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0, 1)(BOOST_PP_ARRAY_DETAIL_GET_DATA_ANY, BOOST_PP_ARRAY_DETAIL_GET_DATA_NONE) (BOOST_PP_IIF_BOOST_PP_BOOL_BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0(BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0, 1),BOOST_PP_SEQ_ENUM_0) BOOST_PP_IIF_BOOST_PP_BOOL_BOOST_PP_IIF_BOOST_PP_BOOL_BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0(BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0, 1)(BOOST_PP_COMMA, BOOST_PP_EMPTY)() const))) }; template <bool RESTRICT_QUALIFY, bool RANGE_CHECKING> using ConstViewTemplate = ConstViewTemplateFreeParams<ALIGNMENT, ALIGNMENT_ENFORCEMENT, RESTRICT_QUALIFY, RANGE_CHECKING>; using ConstView = ConstViewTemplate<cms::soa::RestrictQualify::Default, cms::soa::RangeChecking::Default>; template <std::size_t VIEW_ALIGNMENT, bool VIEW_ALIGNMENT_ENFORCEMENT, bool RESTRICT_QUALIFY, bool RANGE_CHECKING> struct ViewTemplateFreeParams : public ConstViewTemplateFreeParams<VIEW_ALIGNMENT, VIEW_ALIGNMENT_ENFORCEMENT, RESTRICT_QUALIFY, RANGE_CHECKING> { using self_type = ViewTemplateFreeParams; using base_type = ConstViewTemplateFreeParams<VIEW_ALIGNMENT, VIEW_ALIGNMENT_ENFORCEMENT, RESTRICT_QUALIFY, RANGE_CHECKING>; using SoABlockTemplate_parametrized = SoABlockTemplate<VIEW_ALIGNMENT, VIEW_ALIGNMENT_ENFORCEMENT>; using size_type = cms::soa::size_type; using byte_size_type = cms::soa::byte_size_type; using AlignmentEnforcement = cms::soa::AlignmentEnforcement; constexpr static byte_size_type defaultAlignment = cms::soa::CacheLineSize::defaultSize; constexpr static byte_size_type alignment = VIEW_ALIGNMENT; constexpr static bool alignmentEnforcement = VIEW_ALIGNMENT_ENFORCEMENT; constexpr static byte_size_type conditionalAlignment = alignmentEnforcement == AlignmentEnforcement::enforced ? alignment : 0; constexpr static bool restrictQualify = RESTRICT_QUALIFY; constexpr static bool rangeChecking = RANGE_CHECKING; template <cms::soa::SoAColumnType COLUMN_TYPE, class C> using SoAValueWithConf = cms::soa::SoAValue<COLUMN_TYPE, C, conditionalAlignment, restrictQualify>; template <cms::soa::SoAColumnType COLUMN_TYPE, class C> using SoAConstValueWithConf = cms::soa::SoAConstValue<COLUMN_TYPE, C, conditionalAlignment, restrictQualify>; template <std::size_t, bool, bool, bool> friend struct ViewTemplateFreeParams; struct Metadata { friend ViewTemplateFreeParams; inline __attribute__((always_inline)) size_type size() const { return parent_.elements_; } using TypeOf_instance_SoABlockTemplate = SoABlockTemplate_parametrized; _DECLARE_VIEW_MEMBER_TYPE_ALIAS_IMPL BOOST_PP_IIF_BOOST_PP_BOOL_BOOST_PP_INC_BOOST_PP_IIF_BOOST_PP_BOOL_BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0(BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0, 1)(BOOST_PP_ARRAY_DATA, BOOST_PP_ARRAY_TO_TUPLE_EMPTY) ((BOOST_PP_INC_BOOST_PP_IIF_BOOST_PP_BOOL_BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0(BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0, 1), (BOOST_PP_IIF_BOOST_PP_BOOL_BOOST_PP_IIF_BOOST_PP_BOOL_BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0(BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0, 1)(BOOST_PP_ARRAY_DETAIL_GET_DATA_ANY, BOOST_PP_ARRAY_DETAIL_GET_DATA_NONE) (BOOST_PP_IIF_BOOST_PP_BOOL_BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0(BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0, 1),BOOST_PP_SEQ_ENUM_0) BOOST_PP_IIF_BOOST_PP_BOOL_BOOST_PP_IIF_BOOST_PP_BOOL_BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0(BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0, 1)(BOOST_PP_COMMA, BOOST_PP_EMPTY)() const_cast_SoAParametersImpl))) _DECLARE_VIEW_MEMBER_POINTERS_IMPL BOOST_PP_SEQ_ENUM_0 _DECLARE_VIEW_MEMBER_CONST_POINTERS_IMPL BOOST_PP_SEQ_ENUM_0 Metadata& operator=(const Metadata&) = delete; Metadata(const Metadata&) = delete; private: inline __attribute__((always_inline)) Metadata(const ViewTemplateFreeParams& _soa_impl_parent) : parent_(_soa_impl_parent) {} const ViewTemplateFreeParams& parent_; }; friend Metadata; struct Metarecords { friend ViewTemplateFreeParams; Metarecords(const ViewTemplateFreeParams& _soa_impl_parent) : parent_(_soa_impl_parent), BOOST_PP_SEQ_ENUM_0 _STRUCT_ELEMENT_INITIALIZERS_IMPL BOOST_PP_SEQ_ENUM_0 _STRUCT_ELEMENT_INITIALIZERS_IMPL BOOST_PP_SEQ_ENUM_0 {} _ACCESSORS_STRUCT_MEMBERS_IMPL BOOST_PP_SEQ_ENUM_0 private: const ViewTemplateFreeParams& parent_; _DECLARE_STRUCT_DATA_MEMBER_IMPL BOOST_PP_SEQ_ENUM_0 }; inline __attribute__((always_inline)) const Metadata metadata() const { return Metadata(*this); } inline __attribute__((always_inline)) Metadata metadata() { return Metadata(*this); } inline __attribute__((always_inline)) const Metarecords records() const { return Metarecords(*this); } inline __attribute__((always_inline)) Metarecords records() { return Metarecords(*this); } ViewTemplateFreeParams() = default; ViewTemplateFreeParams(SoABlockTemplate_parametrized & instance_SoABlockTemplate) : base_type{instance_SoABlockTemplate} {} ViewTemplateFreeParams(size_type _soa_impl_elements, BOOST_PP_SEQ_ENUM_0 _DECLARE_VIEW_CONSTRUCTION_BYCOLUMN_PARAMETERS_IMPL BOOST_PP_IIF_BOOST_PP_BOOL_BOOST_PP_INC_BOOST_PP_IIF_BOOST_PP_BOOL_BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0(BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0, 1)(BOOST_PP_ARRAY_DATA, BOOST_PP_ARRAY_TO_TUPLE_EMPTY) ((BOOST_PP_INC_BOOST_PP_IIF_BOOST_PP_BOOL_BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0(BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0, 1), (BOOST_PP_IIF_BOOST_PP_BOOL_BOOST_PP_IIF_BOOST_PP_BOOL_BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0(BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0, 1)(BOOST_PP_ARRAY_DETAIL_GET_DATA_ANY, BOOST_PP_ARRAY_DETAIL_GET_DATA_NONE) (BOOST_PP_IIF_BOOST_PP_BOOL_BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0(BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0, 1),BOOST_PP_SEQ_ENUM_0) BOOST_PP_IIF_BOOST_PP_BOOL_BOOST_PP_IIF_BOOST_PP_BOOL_BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0(BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0, 1)(BOOST_PP_COMMA, BOOST_PP_EMPTY)() ))) _DECLARE_VIEW_CONSTRUCTION_BYCOLUMN_PARAMETERS_IMPL BOOST_PP_IIF_BOOST_PP_BOOL_BOOST_PP_INC_BOOST_PP_IIF_BOOST_PP_BOOL_BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0(BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0, 1)(BOOST_PP_ARRAY_DATA, BOOST_PP_ARRAY_TO_TUPLE_EMPTY) ((BOOST_PP_INC_BOOST_PP_IIF_BOOST_PP_BOOL_BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0(BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0, 1), (BOOST_PP_IIF_BOOST_PP_BOOL_BOOST_PP_IIF_BOOST_PP_BOOL_BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0(BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0, 1)(BOOST_PP_ARRAY_DETAIL_GET_DATA_ANY, BOOST_PP_ARRAY_DETAIL_GET_DATA_NONE) (BOOST_PP_IIF_BOOST_PP_BOOL_BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0(BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0, 1),BOOST_PP_SEQ_ENUM_0) BOOST_PP_IIF_BOOST_PP_BOOL_BOOST_PP_IIF_BOOST_PP_BOOL_BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0(BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0, 1)(BOOST_PP_COMMA, BOOST_PP_EMPTY)() )))) : base_type{_soa_impl_elements, BOOST_PP_SEQ_ENUM_0 _DECLARE_VIEW_MEMBER_LIST_IMPL BOOST_PP_SEQ_ENUM_0 _DECLARE_VIEW_MEMBER_LIST_IMPL BOOST_PP_SEQ_ENUM_0 } {} ViewTemplateFreeParams(BOOST_PP_SEQ_ENUM_0 _DECLARE_VIEW_CONSTRUCTOR_COLUMNS_IMPL BOOST_PP_SEQ_ENUM_0 _DECLARE_VIEW_CONSTRUCTOR_COLUMNS_IMPL BOOST_PP_SEQ_ENUM_0) { bool readyToSet = false; _INITIALIZE_VIEW_PARAMETERS_AND_SIZE_IMPL BOOST_PP_SEQ_ENUM_0 } ViewTemplateFreeParams(ViewTemplateFreeParams const&) = default; ViewTemplateFreeParams& operator=(ViewTemplateFreeParams const&) = default; template <std::size_t OTHER_VIEW_ALIGNMENT, bool OTHER_VIEW_ALIGNMENT_ENFORCEMENT, bool OTHER_RESTRICT_QUALIFY, bool OTHER_RANGE_CHECKING> ViewTemplateFreeParams(ViewTemplateFreeParams<OTHER_VIEW_ALIGNMENT, OTHER_VIEW_ALIGNMENT_ENFORCEMENT, OTHER_RESTRICT_QUALIFY, OTHER_RANGE_CHECKING> const& other): base_type{other.elements_, BOOST_PP_SEQ_ENUM_0 _DECLARE_VIEW_OTHER_MEMBER_LIST_IMPL BOOST_PP_SEQ_ENUM_0 _DECLARE_VIEW_OTHER_MEMBER_LIST_IMPL BOOST_PP_SEQ_ENUM_0 } {} template <std::size_t OTHER_VIEW_ALIGNMENT, bool OTHER_VIEW_ALIGNMENT_ENFORCEMENT, bool OTHER_RESTRICT_QUALIFY, bool OTHER_RANGE_CHECKING> ViewTemplateFreeParams& operator=(ViewTemplateFreeParams<OTHER_VIEW_ALIGNMENT, OTHER_VIEW_ALIGNMENT_ENFORCEMENT, OTHER_RESTRICT_QUALIFY, OTHER_RANGE_CHECKING> const& other) { static_cast<base_type>(*this) = static_cast<base_type>(other); } ViewTemplateFreeParams(ViewTemplateFreeParams &&) = default; ViewTemplateFreeParams& operator=(ViewTemplateFreeParams &&) = default; ~ViewTemplateFreeParams() = default; using const_element = typename base_type::const_element; using base_type::operator[]; struct element { inline __attribute__((always_inline)) element(size_type _soa_impl_index, BOOST_PP_SEQ_ENUM_0 _DECLARE_VIEW_ELEMENT_VALUE_ARG_IMPL BOOST_PP_IIF_BOOST_PP_BOOL_BOOST_PP_INC_BOOST_PP_IIF_BOOST_PP_BOOL_BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0(BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0, 1)(BOOST_PP_ARRAY_DATA, BOOST_PP_ARRAY_TO_TUPLE_EMPTY) ((BOOST_PP_INC_BOOST_PP_IIF_BOOST_PP_BOOL_BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0(BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0, 1), (BOOST_PP_IIF_BOOST_PP_BOOL_BOOST_PP_IIF_BOOST_PP_BOOL_BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0(BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0, 1)(BOOST_PP_ARRAY_DETAIL_GET_DATA_ANY, BOOST_PP_ARRAY_DETAIL_GET_DATA_NONE) (BOOST_PP_IIF_BOOST_PP_BOOL_BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0(BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0, 1),BOOST_PP_SEQ_ENUM_0) BOOST_PP_IIF_BOOST_PP_BOOL_BOOST_PP_IIF_BOOST_PP_BOOL_BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0(BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0, 1)(BOOST_PP_COMMA, BOOST_PP_EMPTY)() ))) _DECLARE_VIEW_ELEMENT_VALUE_ARG_IMPL BOOST_PP_IIF_BOOST_PP_BOOL_BOOST_PP_INC_BOOST_PP_IIF_BOOST_PP_BOOL_BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0(BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0, 1)(BOOST_PP_ARRAY_DATA, BOOST_PP_ARRAY_TO_TUPLE_EMPTY) ((BOOST_PP_INC_BOOST_PP_IIF_BOOST_PP_BOOL_BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0(BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0, 1), (BOOST_PP_IIF_BOOST_PP_BOOL_BOOST_PP_IIF_BOOST_PP_BOOL_BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0(BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0, 1)(BOOST_PP_ARRAY_DETAIL_GET_DATA_ANY, BOOST_PP_ARRAY_DETAIL_GET_DATA_NONE) (BOOST_PP_IIF_BOOST_PP_BOOL_BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0(BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0, 1),BOOST_PP_SEQ_ENUM_0) BOOST_PP_IIF_BOOST_PP_BOOL_BOOST_PP_IIF_BOOST_PP_BOOL_BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0(BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0, 1)(BOOST_PP_COMMA, BOOST_PP_EMPTY)() )))) : BOOST_PP_SEQ_ENUM_0 _DECLARE_VIEW_ELEM_MEMBER_INIT_IMPL BOOST_PP_IIF_BOOST_PP_BOOL_BOOST_PP_INC_BOOST_PP_IIF_BOOST_PP_BOOL_BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0(BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0, 1)(BOOST_PP_ARRAY_DATA, BOOST_PP_ARRAY_TO_TUPLE_EMPTY) ((BOOST_PP_INC_BOOST_PP_IIF_BOOST_PP_BOOL_BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0(BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0, 1), (BOOST_PP_IIF_BOOST_PP_BOOL_BOOST_PP_IIF_BOOST_PP_BOOL_BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0(BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0, 1)(BOOST_PP_ARRAY_DETAIL_GET_DATA_ANY, BOOST_PP_ARRAY_DETAIL_GET_DATA_NONE) (BOOST_PP_IIF_BOOST_PP_BOOL_BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0(BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0, 1),BOOST_PP_SEQ_ENUM_0) BOOST_PP_IIF_BOOST_PP_BOOL_BOOST_PP_IIF_BOOST_PP_BOOL_BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0(BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0, 1)(BOOST_PP_COMMA, BOOST_PP_EMPTY)() _soa_impl_index))) _DECLARE_VIEW_ELEM_MEMBER_INIT_IMPL BOOST_PP_IIF_BOOST_PP_BOOL_BOOST_PP_INC_BOOST_PP_IIF_BOOST_PP_BOOL_BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0(BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0, 1)(BOOST_PP_ARRAY_DATA, BOOST_PP_ARRAY_TO_TUPLE_EMPTY) ((BOOST_PP_INC_BOOST_PP_IIF_BOOST_PP_BOOL_BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0(BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0, 1), (BOOST_PP_IIF_BOOST_PP_BOOL_BOOST_PP_IIF_BOOST_PP_BOOL_BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0(BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0, 1)(BOOST_PP_ARRAY_DETAIL_GET_DATA_ANY, BOOST_PP_ARRAY_DETAIL_GET_DATA_NONE) (BOOST_PP_IIF_BOOST_PP_BOOL_BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0(BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0, 1),BOOST_PP_SEQ_ENUM_0) BOOST_PP_IIF_BOOST_PP_BOOL_BOOST_PP_IIF_BOOST_PP_BOOL_BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0(BOOST_PP_VARIADIC_SIZE BOOST_PP_SEQ_ENUM_0, 1)(BOOST_PP_COMMA, BOOST_PP_EMPTY)() _soa_impl_index))) {} inline __attribute__((always_inline)) element& operator=(const element& _soa_impl_other) { _DECLARE_VIEW_ELEMENT_VALUE_COPY_IMPL BOOST_PP_SEQ_ENUM_0 return *this; } inline __attribute__((always_inline)) element& operator=(const const_element& _soa_impl_other) { _DECLARE_VIEW_ELEMENT_VALUE_COPY_IMPL BOOST_PP_SEQ_ENUM_0 return *this; } inline __attribute__((always_inline)) constexpr element & operator=(const typename SoABlockTemplate_parametrized::Metadata::value_element _soa_impl_value) { return *this; } _DECLARE_VIEW_ELEMENT_VALUE_MEMBER_IMPL BOOST_PP_SEQ_ENUM_0 }; inline __attribute__((always_inline)) element operator[](size_type _soa_impl_index) { if constexpr (rangeChecking == cms::soa::RangeChecking::enabled) { if (_soa_impl_index >= base_type::elements_ or _soa_impl_index < 0) { throw std::out_of_range("Out of range index in " "ViewTemplateFreeParams" "::operator[]"); } } return element{_soa_impl_index, BOOST_PP_SEQ_ENUM_0 _DECLARE_VIEW_ELEMENT_CONSTR_CALL_IMPL BOOST_PP_SEQ_ENUM_0 _DECLARE_VIEW_ELEMENT_CONSTR_CALL_IMPL BOOST_PP_SEQ_ENUM_0}; } _DECLARE_VIEW_SOA_ACCESSOR_IMPL BOOST_PP_SEQ_ENUM_0 template <typename T> friend void dump(); }; template <bool RESTRICT_QUALIFY, bool RANGE_CHECKING> using ViewTemplate = ViewTemplateFreeParams<ALIGNMENT, ALIGNMENT_ENFORCEMENT, RESTRICT_QUALIFY, RANGE_CHECKING>; using View = ViewTemplate<cms::soa::RestrictQualify::Default, cms::soa::RangeChecking::Default>; SoABlockTemplate() : mem_(nullptr), elements_(0), byteSize_(0), BOOST_PP_SEQ_ENUM_0 {} SoABlockTemplate(std::byte* mem, size_type elements) : mem_(mem), elements_(elements), byteSize_(0) { organizeColumnsFromBuffer(); } SoABlockTemplate(SoABlockTemplate const& _soa_impl_other) : mem_(_soa_impl_other.mem_), elements_(_soa_impl_other.elements_), byteSize_(_soa_impl_other.byteSize_), BOOST_PP_SEQ_ENUM_0 {} SoABlockTemplate& operator=(SoABlockTemplate const& _soa_impl_other) { mem_ = _soa_impl_other.mem_; elements_ = _soa_impl_other.elements_; byteSize_ = _soa_impl_other.byteSize_; return *this; } void deepCopy(ConstView const& view) { if (elements_ < view.metadata().size()) throw std::runtime_error( "In ""SoABlockTemplate" "::deepCopy method: number of elements mismatch "); } template <typename T> void ROOTReadStreamer(T & onfile) { } void ROOTStreamerCleaner() { } template <typename T> friend void dump(); private: void organizeColumnsFromBuffer() { if constexpr (alignmentEnforcement == cms::soa::AlignmentEnforcement::enforced) if (reinterpret_cast<intptr_t>(mem_) % alignment) throw std::runtime_error("In " "SoABlockTemplate" "::" "SoABlockTemplate" ": misaligned buffer"); auto _soa_impl_curMem = mem_; byteSize_ = computeDataSize(elements_); if (mem_ + byteSize_ != _soa_impl_curMem) throw std::runtime_error("In " "SoABlockTemplate" "::" "SoABlockTemplate" ": unexpected end pointer."); } static constexpr std::pair<size_type, size_type> computeMethodsNumber() { size_type _soa_methods_count = 0; size_type _soa_const_methods_count = 0; return {_soa_methods_count, _soa_const_methods_count}; } static_assert(computeMethodsNumber().first <= 1, "There can be at most one SOA_METHODS macro. Please declare all your methods inside the same macro."); static_assert(computeMethodsNumber().second <= 1, "There can be at most one SOA_CONST_METHODS macro. Please declare all your methods inside the same macro."); std::byte* mem_ ; size_type elements_; size_type const scalar_ = 1; byte_size_type byteSize_ ; };
+using SoABlock = SoABlockTemplate<>;
+static void ____C_A_T_C_H____T_E_S_T____0();
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wexit-time-destructors"
+#pragma clang diagnostic ignored "-Wglobal-constructors"
+ namespace{ Catch::AutoReg autoRegistrar1( Catch::makeTestInvoker( &____C_A_T_C_H____T_E_S_T____0 ), ::Catch::SourceLineInfo( "SoABlock.cc", static_cast<std::size_t>( 23 ) ), Catch::StringRef(), Catch::NameAndTags{ "SoATemplate" } ); }
+#pragma clang diagnostic pop
+ static void ____C_A_T_C_H____T_E_S_T____0() {}
