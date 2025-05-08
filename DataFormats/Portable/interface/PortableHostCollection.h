@@ -24,6 +24,7 @@ public:
   using Buffer = cms::alpakatools::host_buffer<std::byte[]>;
   using ConstBuffer = cms::alpakatools::const_host_buffer<std::byte[]>;
   using Descriptor = typename Layout::Descriptor;
+  using ConstDescriptor = typename Layout::ConstDescriptor;
 
   template <typename... Ti>
   using Data = std::tuple<std::span<Ti>...>;
@@ -83,7 +84,7 @@ public:
   ConstBuffer buffer() const { return *buffer_; }
   ConstBuffer const_buffer() const { return *buffer_; }
 
-  Descriptor& descriptor() { return desc_; }
+  ConstDescriptor& Constdescriptor() { return desc_; }
 
   // erases the data in the Buffer by writing zeros (bytes containing '\0') to it
   void zeroInitialise() {
@@ -112,9 +113,9 @@ public:
   // void deepCopy(ConstView const& view) { layout_.deepCopy(view); }
 
   // template <int I, typename TQueue>
-  // void _deepCopy(Descriptor const& src, TQueue const& queue) {
-  //   // std::cout << Descriptor::num_cols << " " << I << std::endl;
-  //   if constexpr(I < Descriptor::num_cols) {
+  // void _deepCopy(ConstDescriptor const& src, TQueue const& queue) {
+  //   // std::cout << ConstDescriptor::num_cols << " " << I << std::endl;
+  //   if constexpr(I < ConstDescriptor::num_cols) {
   //     assert(std::get<I>(desc_.buff).size_bytes() == std::get<I>(src.buff).size_bytes());
   //     memcpy(std::get<I>(desc_.buff).data(), std::get<I>(src.buff).data(), std::get<I>(src.buff).size());
   //     _deepCopy<I+1>(src, queue);
@@ -122,9 +123,8 @@ public:
   // }
 
   template <int I, typename TQueue>
-  void _deepCopy(Descriptor const& src, TQueue& queue) {
-    // std::cout << Descriptor::num_cols << " " << I << std::endl;
-    if constexpr(I < Descriptor::num_cols) {
+  void _deepCopy(ConstDescriptor const& src, TQueue& queue) {
+    if constexpr(I < ConstDescriptor::num_cols) {
       alpaka::memcpy(queue, alpaka::createView(alpaka::getDev(queue), std::get<I>(desc_.buff).data(), std::get<I>(desc_.buff).size()),
       alpaka::createView(alpaka::getDev(queue), std::get<I>(src.buff).data(), std::get<I>(src.buff).size()));
      _deepCopy<I+1>(src, queue);    
@@ -132,7 +132,7 @@ public:
   }
 
   template <typename TQueue> 
-  void deepCopy(Descriptor const& src, TQueue& queue) {
+  void deepCopy(ConstDescriptor const& src, TQueue& queue) {
       _deepCopy<0>(src, queue);
   }
 

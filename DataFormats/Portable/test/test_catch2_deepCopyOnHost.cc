@@ -97,33 +97,11 @@ TEST_CASE("Deep copy from SoA Generic View") {
 
     // PortableHostCollection that will host the aggregated columns
     PortableHostCollection<GenericSoA> genericCollection(elems, cms::alpakatools::host());
-    GenericSoA::Descriptor descriptor(genericView);
-
-    // print descriptor
-    std::cout << "GenericSoA descriptor" << std::endl;
-    for (size_t i = 0; i < elems; i++) {
-      std::cout << descriptor.data<0>()[i] << " "
-                << descriptor.data<1>()[i] << " "
-                << descriptor.data<2>()[i] << " ";
-                for (unsigned int j = 0; j < 3; j++) {
-                  std::cout << descriptor.data<3>()[i + j*16] << " ";
-                }
-      std::cout << std::endl;
-    }
+    GenericSoA::ConstDescriptor descriptor(genericView);
 
     // genericCollection.deepCopy(genericView);
     genericCollection.deepCopy(descriptor, queue);
-    
-    // print soa
-    std::cout << "GenericSoA" << std::endl;
-    for (size_t i = 0; i < elems; i++) {
-      std::cout << genericCollection.descriptor().data<0>()[i] << " "
-                << genericCollection.descriptor().data<1>()[i] << " "
-                << genericCollection.descriptor().data<2>()[i] << " "
-                << genericCollection.view()[i].candidateDirection()(0) << " "
-                << genericCollection.view()[i].candidateDirection()(1) << " "
-                << genericCollection.view()[i].candidateDirection()(2) << std::endl;
-    }
+
     // Check for inequality of memory addresses
     REQUIRE(genericCollection.view().metadata().addressOf_xPos() != positionCollectionView.metadata().addressOf_x());
     REQUIRE(genericCollection.view().metadata().addressOf_yPos() != positionCollectionView.metadata().addressOf_y());
@@ -132,17 +110,17 @@ TEST_CASE("Deep copy from SoA Generic View") {
             pcaCollectionView.metadata().addressOf_candidateDirection());
 
     // Check for equality of the content
-    // const GenericSoAConstView& genericViewCollection = genericCollection.const_view();
-    // const SoAPositionConstView& positionViewCollection = positionCollection.const_view();
-    // const SoAPCAConstView& pcaViewCollection = pcaCollection.const_view();
-    // for (size_t i = 0; i < elems; i++) {
-    //   REQUIRE(genericViewCollection[i].xPos() == positionViewCollection[i].x());
-    //   REQUIRE(genericViewCollection[i].yPos() == positionViewCollection[i].y());
-    //   REQUIRE(genericViewCollection[i].zPos() == positionViewCollection[i].z());
-    //   REQUIRE(genericViewCollection[i].candidateDirection()(0) == pcaViewCollection[i].candidateDirection()(0));
-    //   REQUIRE(genericViewCollection[i].candidateDirection()(1) == pcaViewCollection[i].candidateDirection()(1));
-    //   REQUIRE(genericViewCollection[i].candidateDirection()(2) == pcaViewCollection[i].candidateDirection()(2));
-    // }            
+    const GenericSoAConstView& genericViewCollection = genericCollection.const_view();
+    const SoAPositionConstView& positionViewCollection = positionCollection.const_view();
+    const SoAPCAConstView& pcaViewCollection = pcaCollection.const_view();
+    for (size_t i = 0; i < elems; i++) {
+      REQUIRE(genericViewCollection[i].xPos() == positionViewCollection[i].x());
+      REQUIRE(genericViewCollection[i].yPos() == positionViewCollection[i].y());
+      REQUIRE(genericViewCollection[i].zPos() == positionViewCollection[i].z());
+      REQUIRE(genericViewCollection[i].candidateDirection()(0) == pcaViewCollection[i].candidateDirection()(0));
+      REQUIRE(genericViewCollection[i].candidateDirection()(1) == pcaViewCollection[i].candidateDirection()(1));
+      REQUIRE(genericViewCollection[i].candidateDirection()(2) == pcaViewCollection[i].candidateDirection()(2));
+    }            
   }
 
   SECTION("Deep copy the ConstView") {
@@ -162,7 +140,7 @@ TEST_CASE("Deep copy from SoA Generic View") {
 
     // PortableHostCollection that will host the aggregated columns
     PortableHostCollection<GenericSoA> genericCollection(elems, cms::alpakatools::host());
-    GenericSoA::Descriptor descriptor(genericConstView);
+    GenericSoA::ConstDescriptor descriptor(genericConstView);
     // genericCollection.deepCopy(genericConstView);
     genericCollection.deepCopy(descriptor, queue);
 

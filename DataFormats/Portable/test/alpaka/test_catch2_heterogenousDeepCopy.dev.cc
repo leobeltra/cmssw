@@ -53,7 +53,7 @@ struct FillSoA
   template <typename TAcc, typename PositionView, typename PCAView>
   ALPAKA_FN_ACC void operator()(TAcc const &acc, PositionView positionView, PCAView pcaView) const {
 
-    if (cms::alpakatools::once_per_grid(acc)) 
+    if (cms::alpakatools::once_per_grid(acc))
       positionView.detectorType() = 1;
 
     for (auto local_idx : cms::alpakatools::uniform_elements(acc, positionView.metadata().size())) {
@@ -103,34 +103,25 @@ TEST_CASE("Aggregate from SoA Customized View") {
     // fill up
     auto blockSize = 64;
     auto numberOfBlocks = cms::alpakatools::divide_up_by(elems, blockSize);
-    
+
     const auto workDiv = cms::alpakatools::make_workdiv<Acc1D>(numberOfBlocks, blockSize);
-    
+
     alpaka::exec<Acc1D>(
         queue,
         workDiv,
         FillSoA{},
         positionCollectionView,
         pcaCollectionView);
-    
+
     alpaka::wait(queue);
 
-    SECTION("Aggregate the View") {
+    SECTION("Aggregate the View host to host and device to device") {
       // addresses and size of the SoA columns
       const auto posRecs = positionCollectionView.records();
       const auto pcaRecs = pcaCollectionView.records();
 
       // building the View with runtime check for the size
       CustomizedSoAView customView(posRecs.x(), posRecs.y(), posRecs.z(), pcaRecs.candidateDirection());
-
-      // for (size_t i = 0; i < elems; i++) {
-      //   std::cout << customView.x()[i] << " "
-      //             << customView.y()[i] << " "
-      //             << customView.z()[i] << " "
-      //             << customView[i].candidateDirection()(0) << " "
-      //             << customView[i].candidateDirection()(1) << " "
-      //             << customView[i].candidateDirection()(2) << std::endl;
-      // }
 
       // Check for equality of memory addresses
       REQUIRE(customView.metadata().addressOf_x() == positionCollectionView.metadata().addressOf_x());
@@ -141,7 +132,7 @@ TEST_CASE("Aggregate from SoA Customized View") {
 
       // PortableCollection that will host the aggregated columns
       PortableCollection<CustomizedSoA, Device> customCollection(elems, queue);
-      CustomizedSoA::Descriptor descriptor(customView);
+      CustomizedSoA::ConstDescriptor descriptor(customView);
       customCollection.deepCopy(descriptor, queue);
 
       // Check for inequality of memory addresses
@@ -169,7 +160,7 @@ TEST_CASE("Aggregate from SoA Customized View") {
 
       // PortableCollection that will host the aggregated columns
       PortableCollection<CustomizedSoA, Device> customCollection(elems, queue);
-      CustomizedSoA::Descriptor descriptor(customConstView);
+      CustomizedSoA::ConstDescriptor descriptor(customConstView);
       customCollection.deepCopy(descriptor, queue);
 
       // Check for inequality of memory addresses
@@ -179,13 +170,15 @@ TEST_CASE("Aggregate from SoA Customized View") {
       REQUIRE(customCollection.view().metadata().addressOf_candidateDirection() !=
               pcaCollectionView.metadata().addressOf_candidateDirection());
 
-      PortableHostCollection<CustomizedSoA> customHostCollection(elems, devHost);
-      PortableHostCollection<SoAPosition> positionHostCollection(elems, devHost);
-      PortableHostCollection<SoAPCA> pcaHostCollection(elems, devHost);
+      PortableHostCollection<CustomizedSoA> customHostCollection(elems, queue);
+      PortableHostCollection<SoAPosition> positionHostCollection(elems, queue);
+      PortableHostCollection<SoAPCA> pcaHostCollection(elems, queue);
 
       alpaka::memcpy(queue, customHostCollection.buffer(), customCollection.buffer());
       alpaka::memcpy(queue, positionHostCollection.buffer(), positionCollection.buffer());
       alpaka::memcpy(queue, pcaHostCollection.buffer(), pcaCollection.buffer());
+
+      alpaka::wait(queue);
 
       const CustomizedSoAConstView& customizedViewHostCollection = customHostCollection.const_view();
       const SoAPositionConstView& positionViewHostCollection = positionHostCollection.const_view();
@@ -198,7 +191,7 @@ TEST_CASE("Aggregate from SoA Customized View") {
         REQUIRE(customizedViewHostCollection[i].candidateDirection()(0) == pcaViewHostCollection[i].candidateDirection()(0));
         REQUIRE(customizedViewHostCollection[i].candidateDirection()(1) == pcaViewHostCollection[i].candidateDirection()(1));
         REQUIRE(customizedViewHostCollection[i].candidateDirection()(2) == pcaViewHostCollection[i].candidateDirection()(2));
-      }                      
+      }
     }
 
     SECTION("Aggregate the View device to host") {
@@ -218,9 +211,9 @@ TEST_CASE("Aggregate from SoA Customized View") {
 
       // PortableCollection that will host the aggregated columns
       PortableHostCollection<CustomizedSoA> customCollection(elems, queue);
-      CustomizedSoA::Descriptor descriptor(customConstView);
+      CustomizedSoA::ConstDescriptor descriptor(customConstView);
       customCollection.deepCopy(descriptor, queue);
-      
+
       // Check for inequality of memory addresses
       REQUIRE(customCollection.view().metadata().addressOf_x() != positionCollectionView.metadata().addressOf_x());
       REQUIRE(customCollection.view().metadata().addressOf_y() != positionCollectionView.metadata().addressOf_y());
@@ -228,11 +221,13 @@ TEST_CASE("Aggregate from SoA Customized View") {
       REQUIRE(customCollection.view().metadata().addressOf_candidateDirection() !=
               pcaCollectionView.metadata().addressOf_candidateDirection());
 
-      PortableHostCollection<SoAPosition> positionHostCollection(elems, devHost);
-      PortableHostCollection<SoAPCA> pcaHostCollection(elems, devHost);
+      PortableHostCollection<SoAPosition> positionHostCollection(elems, queue);
+      PortableHostCollection<SoAPCA> pcaHostCollection(elems, queue);
 
       alpaka::memcpy(queue, positionHostCollection.buffer(), positionCollection.buffer());
       alpaka::memcpy(queue, pcaHostCollection.buffer(), pcaCollection.buffer());
+
+      alpaka::wait(queue);
 
       const CustomizedSoAConstView& customizedViewCollection = customCollection.const_view();
       const SoAPositionConstView& positionViewHostCollection = positionHostCollection.const_view();
@@ -245,7 +240,7 @@ TEST_CASE("Aggregate from SoA Customized View") {
         REQUIRE(customizedViewCollection[i].candidateDirection()(0) == pcaViewHostCollection[i].candidateDirection()(0));
         REQUIRE(customizedViewCollection[i].candidateDirection()(1) == pcaViewHostCollection[i].candidateDirection()(1));
         REQUIRE(customizedViewCollection[i].candidateDirection()(2) == pcaViewHostCollection[i].candidateDirection()(2));
-      }      
+      }
     }
 
     SECTION("Aggregate the View host to device") {
@@ -274,7 +269,7 @@ TEST_CASE("Aggregate from SoA Customized View") {
 
       // PortableCollection that will host the aggregated columns
       PortableCollection<CustomizedSoA, Device> customCollection(elems, queue);
-      CustomizedSoA::Descriptor descriptor(customConstView);
+      CustomizedSoA::ConstDescriptor descriptor(customConstView);
       customCollection.deepCopy(descriptor, queue);
 
       // Check for inequality of memory addresses
@@ -282,11 +277,13 @@ TEST_CASE("Aggregate from SoA Customized View") {
       REQUIRE(customCollection.view().metadata().addressOf_y() != positionViewHostCollection.metadata().addressOf_y());
       REQUIRE(customCollection.view().metadata().addressOf_z() != positionViewHostCollection.metadata().addressOf_z());
       REQUIRE(customCollection.view().metadata().addressOf_candidateDirection() !=
-              pcaViewHostCollection.metadata().addressOf_candidateDirection());    
-              
-      PortableHostCollection<CustomizedSoA> customHostCollection(elems, devHost);
+              pcaViewHostCollection.metadata().addressOf_candidateDirection());
+
+      PortableHostCollection<CustomizedSoA> customHostCollection(elems, queue);
 
       alpaka::memcpy(queue, customHostCollection.buffer(), customCollection.buffer());
+
+      alpaka::wait(queue);
 
       const CustomizedSoAConstView& customizedViewHostCollection = customHostCollection.const_view();
 
@@ -297,7 +294,7 @@ TEST_CASE("Aggregate from SoA Customized View") {
         REQUIRE(customizedViewHostCollection[i].candidateDirection()(0) == pcaViewHostCollection[i].candidateDirection()(0));
         REQUIRE(customizedViewHostCollection[i].candidateDirection()(1) == pcaViewHostCollection[i].candidateDirection()(1));
         REQUIRE(customizedViewHostCollection[i].candidateDirection()(2) == pcaViewHostCollection[i].candidateDirection()(2));
-      }                     
+      }
     }
   }
 }

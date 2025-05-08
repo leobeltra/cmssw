@@ -399,6 +399,19 @@
 
 #define _COPY_VIEW_COLUMNS(R, DATA, TYPE_NAME) BOOST_PP_EXPAND(_COPY_VIEW_COLUMNS_IMPL TYPE_NAME)
 
+#define _DECLARE_CONST_DESCRIPTOR_SPANS_IMPL(VALUE_TYPE, CPP_TYPE, NAME)                                    \
+  _SWITCH_ON_TYPE(VALUE_TYPE,                                                                         \
+    /* Scalar */                                                                                      \
+    (std::span<std::add_const_t<CPP_TYPE>>)                                                                             \
+    ,                                                                                                 \
+    /* Column */                                                                                      \
+    (std::span<std::add_const_t<CPP_TYPE>>)                                                                             \
+    ,                                                                                                 \
+    (std::span<std::add_const_t<CPP_TYPE::Scalar>>)                                                                     \
+  )
+
+#define _DECLARE_CONST_DESCRIPTOR_SPANS(R, DATA, TYPE_NAME) BOOST_PP_EXPAND(_DECLARE_CONST_DESCRIPTOR_SPANS_IMPL TYPE_NAME)
+
 #define _DECLARE_DESCRIPTOR_SPANS_IMPL(VALUE_TYPE, CPP_TYPE, NAME)                                    \
   _SWITCH_ON_TYPE(VALUE_TYPE,                                                                         \
     /* Scalar */                                                                                      \
@@ -415,24 +428,7 @@
 #define _ASSIGN_SPAN_TO_COLUMNS_IMPL(VALUE_TYPE, CPP_TYPE, NAME)                                      \
   _SWITCH_ON_TYPE(VALUE_TYPE,                                                                         \
     /* Scalar */                                                                                      \
-    (std::span(cms::soa::non_const_ptr(view.metadata().BOOST_PP_CAT(addressOf_, NAME)()),                            \
-                    cms::soa::alignSize(sizeof(CPP_TYPE), alignment) / sizeof(CPP_TYPE)))             \
-    ,                                                                                                 \
-    /* Column */                                                                                      \
-    (std::span(cms::soa::non_const_ptr(view.metadata().BOOST_PP_CAT(addressOf_, NAME)()),                            \
-                    cms::soa::alignSize(view.metadata().size() * sizeof(CPP_TYPE), alignment) / sizeof(CPP_TYPE))) \
-    ,                                                                                                 \
-    (std::span(cms::soa::non_const_ptr(view.metadata().BOOST_PP_CAT(addressOf_, NAME)()),                      \
-                    cms::soa::alignSize(view.metadata().size() * sizeof(CPP_TYPE::Scalar), alignment) *                    \
-                    CPP_TYPE::RowsAtCompileTime * CPP_TYPE::ColsAtCompileTime / sizeof(CPP_TYPE::Scalar))) \
-  )
-
-#define _ASSIGN_SPAN_TO_COLUMNS(R, DATA, TYPE_NAME) BOOST_PP_EXPAND(_ASSIGN_SPAN_TO_COLUMNS_IMPL TYPE_NAME)
-
-#define _ASSIGN_SPAN_TO_CONST_COLUMNS_IMPL(VALUE_TYPE, CPP_TYPE, NAME)                                      \
-  _SWITCH_ON_TYPE(VALUE_TYPE,                                                                         \
-    /* Scalar */                                                                                      \
-    (std::span<CPP_TYPE>(view.metadata().BOOST_PP_CAT(addressOf_, NAME)(),                            \
+    (std::span(view.metadata().BOOST_PP_CAT(addressOf_, NAME)(),                            \
                     cms::soa::alignSize(sizeof(CPP_TYPE), alignment) / sizeof(CPP_TYPE)))             \
     ,                                                                                                 \
     /* Column */                                                                                      \
@@ -444,7 +440,7 @@
                     CPP_TYPE::RowsAtCompileTime * CPP_TYPE::ColsAtCompileTime / sizeof(CPP_TYPE::Scalar))) \
   )
 
-#define _ASSIGN_SPAN_TO_CONST_COLUMNS(R, DATA, TYPE_NAME) BOOST_PP_EXPAND(_ASSIGN_SPAN_TO_CONST_COLUMNS_IMPL TYPE_NAME)
+#define _ASSIGN_SPAN_TO_COLUMNS(R, DATA, TYPE_NAME) BOOST_PP_EXPAND(_ASSIGN_SPAN_TO_COLUMNS_IMPL TYPE_NAME)
 
 #ifdef DEBUG
 #define _DO_RANGECHECK true
@@ -586,26 +582,22 @@
                                                                                                                        \
     using View = ViewTemplate<cms::soa::RestrictQualify::Default, cms::soa::RangeChecking::Default>;                   \
                                                                                                                        \
+    struct ConstDescriptor {                                                                                                \
+      std::tuple<_ITERATE_ON_ALL_COMMA(_DECLARE_CONST_DESCRIPTOR_SPANS, ~, __VA_ARGS__)> buff;                               \
+      static constexpr size_type num_cols = std::tuple_size<std::tuple<_ITERATE_ON_ALL_COMMA(_DECLARE_CONST_DESCRIPTOR_SPANS, ~, __VA_ARGS__)>>::value;    \
+                                                                                                                        \
+      ConstDescriptor(ConstView const& view)                                                                                           \
+          : buff{ _ITERATE_ON_ALL_COMMA(_ASSIGN_SPAN_TO_COLUMNS, ~, __VA_ARGS__)} {}                                   \
+      };                                                                                                                \
+                                                                                                                      \
     struct Descriptor {                                                                                                \
       std::tuple<_ITERATE_ON_ALL_COMMA(_DECLARE_DESCRIPTOR_SPANS, ~, __VA_ARGS__)> buff;                               \
       static constexpr size_type num_cols = std::tuple_size<std::tuple<_ITERATE_ON_ALL_COMMA(_DECLARE_DESCRIPTOR_SPANS, ~, __VA_ARGS__)>>::value;    \
-                                                                                                                       \
-      Descriptor(ConstView const& view)                                                                                           \
+                                                                                                                        \
+      Descriptor(View& view)                                                                                           \
           : buff{ _ITERATE_ON_ALL_COMMA(_ASSIGN_SPAN_TO_COLUMNS, ~, __VA_ARGS__)} {}                                   \
-                                                                                                                       \
-      /* Descriptor(ConstView& view) */                                                                                     \
-      /*    : buff{ _ITERATE_ON_ALL_COMMA(_ASSIGN_SPAN_TO_CONST_COLUMNS, ~, __VA_ARGS__)} {} */                                   \
-                                                                                                                       \
-      template <std::size_t Index>                                                                                     \
-      auto operator()() -> std::span<std::tuple_element_t<Index,                                                       \
-                                     std::tuple<_ITERATE_ON_ALL_COMMA(_DECLARE_DESCRIPTOR_SPANS, ~, __VA_ARGS__)>>> {  \
-          return std::get<Index>(buff);                                                                                \
-      }                                                                                                                \
-                                                                                                                       \
-      template <std::size_t Index>                                                                                     \
-      auto* data() { return std::get<Index>(buff).data(); }                                                            \
-    };                                                                                                                 \
-                                                                                                                       \
+      };                                                                                                                \
+                                                                                                                      \
     /* Trivial constuctor */                                                                                           \
     CLASS()                                                                                                            \
         : mem_(nullptr),                                                                                               \
