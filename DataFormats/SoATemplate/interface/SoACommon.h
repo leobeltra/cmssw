@@ -10,6 +10,7 @@
 #include <cstring>
 #include <memory>
 #include <ostream>
+#include <span>
 #include <tuple>
 #include <type_traits>
 
