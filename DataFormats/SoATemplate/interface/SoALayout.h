@@ -132,7 +132,7 @@
         return parent_.metadata().BOOST_PP_CAT(parametersOf_, NAME)().addr_;                                           \
       }                                                                                                                \
       using BOOST_PP_CAT(ParametersTypeOf_, NAME) =                                                                    \
-        typename cms::soa::SoAParameters_Alignment<ALIGNMENT>::template SoAParameters_ColumnType<cms::soa::SoAColumnType::scalar>::DataType<CPP_TYPE>;                       \
+        typename cms::soa::SoAParameters_Alignment<ALIGNMENT>::template SoAParameters_ColumnType<cms::soa::SoAColumnType::scalar>::template DataType<CPP_TYPE>;                       \
       SOA_HOST_DEVICE SOA_INLINE                                                                                       \
       BOOST_PP_CAT(ParametersTypeOf_, NAME) BOOST_PP_CAT(parametersOf_, NAME)() const {                                \
         return  BOOST_PP_CAT(ParametersTypeOf_, NAME) (parent_.BOOST_PP_CAT(NAME, _), parent_.metadata().size());      \
@@ -143,7 +143,7 @@
       },                                                                                                               \
       /* Column */                                                                                                     \
       using BOOST_PP_CAT(ParametersTypeOf_, NAME) =                                                                    \
-         typename cms::soa::SoAParameters_Alignment<ALIGNMENT>::template SoAParameters_ColumnType<cms::soa::SoAColumnType::column>::DataType<CPP_TYPE>;                      \
+         typename cms::soa::SoAParameters_Alignment<ALIGNMENT>::template SoAParameters_ColumnType<cms::soa::SoAColumnType::column>::template DataType<CPP_TYPE>;                      \
       SOA_HOST_DEVICE SOA_INLINE                                                                                       \
       BOOST_PP_CAT(ParametersTypeOf_, NAME) BOOST_PP_CAT(parametersOf_, NAME)() const {                                \
         return  BOOST_PP_CAT(ParametersTypeOf_, NAME) (parent_.BOOST_PP_CAT(NAME, _), parent_.metadata().size());      \
@@ -164,7 +164,7 @@
       constexpr static cms::soa::SoAColumnType BOOST_PP_CAT(ColumnTypeOf_, NAME) = cms::soa::SoAColumnType::column;,   \
       /* Eigen column */                                                                                               \
       using BOOST_PP_CAT(ParametersTypeOf_, NAME) =                                                                    \
-          typename cms::soa::SoAParameters_Alignment<ALIGNMENT>::template SoAParameters_ColumnType<cms::soa::SoAColumnType::eigen>::DataType<CPP_TYPE>;                      \
+          typename cms::soa::SoAParameters_Alignment<ALIGNMENT>::template SoAParameters_ColumnType<cms::soa::SoAColumnType::eigen>::template DataType<CPP_TYPE>;                      \
       SOA_HOST_DEVICE SOA_INLINE                                                                                       \
       BOOST_PP_CAT(ParametersTypeOf_, NAME) BOOST_PP_CAT(parametersOf_, NAME)() const {                                \
         return BOOST_PP_CAT(ParametersTypeOf_, NAME) (                                                                 \

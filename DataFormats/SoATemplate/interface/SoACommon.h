@@ -143,6 +143,14 @@ namespace cms::soa {
     SOA_HOST_DEVICE SOA_INLINE constexpr SoAConstParametersImpl(SoAParametersImpl<ALIGNMENT, columnType, ValueType> const& o)
         : addr_{o.addr_}, size_{o.size_} {}
 
+    template <CMS_SOA_BYTE_SIZE_TYPE ALIGNMENT2>
+    SOA_HOST_DEVICE SOA_INLINE constexpr SoAConstParametersImpl(SoAParametersImpl<ALIGNMENT2, columnType, ValueType> const& o)
+      : addr_{o.addr_}, size_{o.size_} {}    
+
+    template <CMS_SOA_BYTE_SIZE_TYPE ALIGNMENT2>
+    SOA_HOST_DEVICE SOA_INLINE constexpr SoAConstParametersImpl(SoAConstParametersImpl<ALIGNMENT2, columnType, ValueType> const& o)
+      : addr_{o.addr_}, size_{o.size_} {}   
+
     static constexpr bool checkAlignment(ValueType* addr, byte_size_type alignment) {
       return reinterpret_cast<intptr_t>(addr) % alignment;
     }
@@ -181,6 +189,14 @@ namespace cms::soa {
     // constructor from a non-const parameter set
     SOA_HOST_DEVICE SOA_INLINE constexpr SoAConstParametersImpl(SoAParametersImpl<ALIGNMENT, columnType, ValueType> const& o)
         : addr_{o.addr_}, stride_{o.stride_}, size_{o.size_} {}
+
+    template <CMS_SOA_BYTE_SIZE_TYPE ALIGNMENT2>
+    SOA_HOST_DEVICE SOA_INLINE constexpr SoAConstParametersImpl(SoAParametersImpl<ALIGNMENT2, columnType, ValueType> const& o)
+      : addr_{o.addr_}, stride_{o.stride_}, size_{o.size_} {}    
+
+    template <CMS_SOA_BYTE_SIZE_TYPE ALIGNMENT2>
+    SOA_HOST_DEVICE SOA_INLINE constexpr SoAConstParametersImpl(SoAConstParametersImpl<ALIGNMENT2, columnType, ValueType> const& o)
+      : addr_{o.addr_}, stride_{o.stride_}, size_{o.size_} {}     
 
     static constexpr bool checkAlignment(TupleOrPointerType const& tuple, byte_size_type alignment) {
       const auto& [addr, stride] = tuple;
@@ -226,6 +242,10 @@ namespace cms::soa {
     SOA_HOST_DEVICE SOA_INLINE constexpr SoAParametersImpl(ValueType* addr, size_type size)
         : addr_(addr), size_{size} {}
 
+    template <CMS_SOA_BYTE_SIZE_TYPE ALIGNMENT2>
+    SOA_HOST_DEVICE SOA_INLINE constexpr SoAParametersImpl(SoAParametersImpl<ALIGNMENT2, columnType, ValueType> const& o)
+      : addr_{o.addr_}, size_{o.size_} {}        
+
     static constexpr bool checkAlignment(ValueType* addr, byte_size_type alignment) {
       return reinterpret_cast<intptr_t>(addr) % alignment;
     }
@@ -257,6 +277,10 @@ namespace cms::soa {
     // constructor from individual address, stride and size
     SOA_HOST_DEVICE SOA_INLINE constexpr SoAParametersImpl(ScalarType* addr, byte_size_type stride, size_type size)
         : addr_(addr), stride_(stride), size_(size) {}
+     
+    template <CMS_SOA_BYTE_SIZE_TYPE ALIGNMENT2>
+    SOA_HOST_DEVICE SOA_INLINE constexpr SoAParametersImpl(SoAParametersImpl<ALIGNMENT2, columnType, ValueType> const& o)
+      : addr_{o.addr_}, stride_{o.stride_}, size_{o.size_} {}       
 
     // constructor from address and stride packed in a tuple
     SOA_HOST_DEVICE SOA_INLINE constexpr SoAParametersImpl(TupleOrPointerType const& tuple)
