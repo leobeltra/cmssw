@@ -83,20 +83,28 @@ public:
     alpaka::memset(std::forward<TQueue>(queue), *buffer_, 0x00);
   }
 
-  // Copy column by column heterogeneously for host to device and device to device data transfer.
-  template <int I, typename TQueue>
-  void _deepCopy(ConstDescriptor const& src, TQueue& queue) {
-    if constexpr(I < ConstDescriptor::num_cols) {
-      assert(std::get<I>(desc_.buff).size() == std::get<I>(src.buff).size());
-      alpaka::memcpy(queue, alpaka::createView(alpaka::getDev(queue), std::get<I>(desc_.buff).data(), std::get<I>(desc_.buff).size()),
-      alpaka::createView(alpaka::getDev(queue), std::get<I>(src.buff).data(), std::get<I>(src.buff).size()));
-     _deepCopy<I+1>(src, queue);    
-    }
-  }
-
+  // Copy column by column heterogeneously for device to host data transfer.
   template <typename TQueue> 
   void deepCopy(ConstDescriptor const& src, TQueue& queue) {
       _deepCopy<0>(src, queue);
+  }
+
+  template <int I, typename TQueue>
+  void _deepCopy(ConstDescriptor const& src, TQueue& queue) {
+    if constexpr (I < ConstDescriptor::num_cols) {
+      if constexpr (portablecollection::matches_index<ConstDescriptor::eigenColsCount>(ConstDescriptor::eigenIndexes, I)) {
+        for (int j = 0; j < ConstDescriptor::eigenIndexes[0].second; j++) {
+            alpaka::memcpy(queue, alpaka::createView(alpaka::getDev(queue), std::get<I>(desc_.buff).data() + j * std::get<I>(desc_.buff).size() / ConstDescriptor::eigenIndexes[0].second, std::get<I>(desc_.buff).size() / ConstDescriptor::eigenIndexes[0].second),
+                                  alpaka::createView(alpaka::getDev(queue), std::get<I>(src.buff).data() + j * std::get<I>(src.buff).size() / ConstDescriptor::eigenIndexes[0].second, std::get<I>(desc_.buff).size() / ConstDescriptor::eigenIndexes[0].second));
+          }
+        }
+      else {  
+      assert(std::get<I>(desc_.buff).size_bytes() == std::get<I>(src.buff).size_bytes());
+      alpaka::memcpy(queue, alpaka::createView(alpaka::getDev(queue), std::get<I>(desc_.buff).data(), std::get<I>(desc_.buff).size()),
+      alpaka::createView(alpaka::getDev(queue), std::get<I>(src.buff).data(), std::get<I>(src.buff).size())); 
+      }
+      _deepCopy<I+1>(src, queue);    
+    } 
   }
 
 private:

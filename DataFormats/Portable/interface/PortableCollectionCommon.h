@@ -16,6 +16,14 @@ namespace portablecollection {
     }
   }
 
+  template<int N>
+  constexpr bool matches_index(const std::array<std::pair<int, int>, N>& indices, int i) {
+      for (auto index : indices) {
+          if (index.first == i) return true;
+      }
+      return false;
+  }
+
   template <std::size_t Idx, typename T>
   struct CollectionLeaf {
     CollectionLeaf() = default;

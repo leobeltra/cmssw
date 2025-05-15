@@ -3,6 +3,7 @@
 
 #include <cassert>
 #include <optional>
+#include <iostream>
 
 #include <alpaka/alpaka.hpp>
 
@@ -110,12 +111,22 @@ public:
 
   template <int I, typename TQueue>
   void _deepCopy(ConstDescriptor const& src, TQueue& queue) {
-    if constexpr(I < ConstDescriptor::num_cols) {
-      assert(std::get<I>(desc_.buff).size() == std::get<I>(src.buff).size());
+    if constexpr (I < ConstDescriptor::num_cols) {
+      if constexpr (portablecollection::matches_index<ConstDescriptor::eigenColsCount>(ConstDescriptor::eigenIndexes, I)) {
+        for (int j = 0; j < ConstDescriptor::eigenIndexes[0].second; j++) {
+          std::cout << "Copying eigen column of desc_ " << j << " of size " << std::get<I>(desc_.buff).size() / ConstDescriptor::eigenIndexes[0].second << std::endl;
+          std::cout << "Copying eigen column of src " << j << " of size " << std::get<I>(src.buff).size() / ConstDescriptor::eigenIndexes[0].second << std::endl;
+          alpaka::memcpy(queue, alpaka::createView(alpaka::getDev(queue), std::get<I>(desc_.buff).data() + j * std::get<I>(desc_.buff).size() / ConstDescriptor::eigenIndexes[0].second, std::get<I>(desc_.buff).size() / ConstDescriptor::eigenIndexes[0].second),
+          alpaka::createView(alpaka::getDev(queue), std::get<I>(src.buff).data() + j * std::get<I>(src.buff).size() / ConstDescriptor::eigenIndexes[0].second, std::get<I>(src.buff).size() / ConstDescriptor::eigenIndexes[0].second));
+        }
+        }
+      else {  
+      assert(std::get<I>(desc_.buff).size_bytes() == std::get<I>(src.buff).size_bytes());
       alpaka::memcpy(queue, alpaka::createView(alpaka::getDev(queue), std::get<I>(desc_.buff).data(), std::get<I>(desc_.buff).size()),
-      alpaka::createView(alpaka::getDev(queue), std::get<I>(src.buff).data(), std::get<I>(src.buff).size()));
-     _deepCopy<I+1>(src, queue);    
-    }
+      alpaka::createView(alpaka::getDev(queue), std::get<I>(src.buff).data(), std::get<I>(src.buff).size())); 
+      }
+      _deepCopy<I+1>(src, queue);    
+    } 
   }
 
 private:

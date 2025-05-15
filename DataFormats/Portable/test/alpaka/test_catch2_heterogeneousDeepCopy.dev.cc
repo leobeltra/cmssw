@@ -161,8 +161,6 @@ TEST_CASE("Deep copy from SoA Generic View") {
       // PortableCollection that will host the aggregated columns
       PortableCollection<GenericSoA, Device> genericCollection(elems, queue);
       GenericSoA::ConstDescriptor descriptor(genericConstView);
-
-      std::cout << "sizes: " << std::get<3>(descriptor.buff).size_bytes() << std::endl;
       genericCollection.deepCopy(descriptor, queue);
 
       // Check for inequality of memory addresses

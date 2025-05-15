@@ -95,12 +95,12 @@ namespace cms::soa {
   using BOOST_PP_CAT(ConstAccessorOf_, LOCAL_NAME) =                                                                   \
     typename cms::soa::SoAAccessors<typename BOOST_PP_CAT(Metadata::TypeOf_, LOCAL_NAME)>::                            \
         template ColumnType<BOOST_PP_CAT(ColumnTypeOf_, LOCAL_NAME)>::template AccessType<                             \
-            cms::soa::SoAAccessType::constAccess>::template Alignment<conditionalAlignment>::                          \
+            cms::soa::SoAAccessType::constAccess>::template Alignment<alignment>::                          \
                 template RestrictQualifier<restrictQualify> ;                                                          \
   using BOOST_PP_CAT(MutableAccessorOf_, LOCAL_NAME) =                                                                 \
     typename cms::soa::SoAAccessors<typename BOOST_PP_CAT(Metadata::TypeOf_, LOCAL_NAME)>::                            \
         template ColumnType<BOOST_PP_CAT(ColumnTypeOf_, LOCAL_NAME)>::template AccessType<                             \
-            cms::soa::SoAAccessType::mutableAccess>::template Alignment<conditionalAlignment>::                        \
+            cms::soa::SoAAccessType::mutableAccess>::template Alignment<alignment>::                        \
                 template RestrictQualifier<restrictQualify> ;                                                          \
   SOA_HOST_DEVICE SOA_INLINE                                                                                           \
   const auto BOOST_PP_CAT(parametersOf_, LOCAL_NAME)() const {                                                         \
@@ -383,19 +383,19 @@ namespace cms::soa {
   SOA_HOST_DEVICE SOA_INLINE                                                                                           \
   typename cms::soa::SoAAccessors<typename BOOST_PP_CAT(Metadata::TypeOf_, LOCAL_NAME)>::                              \
         template ColumnType<BOOST_PP_CAT(Metadata::ColumnTypeOf_, LOCAL_NAME)>::template AccessType<                   \
-            cms::soa::SoAAccessType::mutableAccess>::template Alignment<conditionalAlignment>::                        \
+            cms::soa::SoAAccessType::mutableAccess>::template Alignment<alignment>::                        \
                  template RestrictQualifier<restrictQualify>::NoParamReturnType                                        \
   LOCAL_NAME() {                                                                                                       \
     return typename cms::soa::SoAAccessors<typename BOOST_PP_CAT(Metadata::TypeOf_, LOCAL_NAME)>::                     \
         template ColumnType<BOOST_PP_CAT(Metadata::ColumnTypeOf_, LOCAL_NAME)>::template AccessType<                   \
-            cms::soa::SoAAccessType::mutableAccess>::template Alignment<conditionalAlignment>::                        \
+            cms::soa::SoAAccessType::mutableAccess>::template Alignment<alignment>::                        \
                 template RestrictQualifier<restrictQualify>(const_cast_SoAParametersImpl(                              \
                     base_type:: BOOST_PP_CAT(LOCAL_NAME, Parameters_)))();                                             \
   }                                                                                                                    \
   SOA_HOST_DEVICE SOA_INLINE                                                                                           \
   typename cms::soa::SoAAccessors<typename BOOST_PP_CAT(Metadata::TypeOf_, LOCAL_NAME)>::                              \
         template ColumnType<BOOST_PP_CAT(Metadata::ColumnTypeOf_, LOCAL_NAME)>::template AccessType<                   \
-            cms::soa::SoAAccessType::mutableAccess>::template Alignment<conditionalAlignment>::                        \
+            cms::soa::SoAAccessType::mutableAccess>::template Alignment<alignment>::                        \
                  template RestrictQualifier<restrictQualify>::ParamReturnType                                          \
   LOCAL_NAME(size_type _soa_impl_index) {                                                                              \
     if constexpr (rangeChecking == cms::soa::RangeChecking::enabled) {                                                 \
@@ -404,7 +404,7 @@ namespace cms::soa {
     }                                                                                                                  \
     return typename cms::soa::SoAAccessors<typename BOOST_PP_CAT(Metadata::TypeOf_, LOCAL_NAME)>::                     \
         template ColumnType<BOOST_PP_CAT(Metadata::ColumnTypeOf_, LOCAL_NAME)>::template AccessType<                   \
-            cms::soa::SoAAccessType::mutableAccess>::template Alignment<conditionalAlignment>::                        \
+            cms::soa::SoAAccessType::mutableAccess>::template Alignment<alignment>::                        \
                 template RestrictQualifier<restrictQualify>(const_cast_SoAParametersImpl(                              \
                     base_type:: BOOST_PP_CAT(LOCAL_NAME, Parameters_)))(_soa_impl_index);                              \
   }
@@ -422,18 +422,18 @@ namespace cms::soa {
   SOA_HOST_DEVICE SOA_INLINE                                                                                           \
   typename cms::soa::SoAAccessors<typename BOOST_PP_CAT(Metadata::TypeOf_, LOCAL_NAME)>::                              \
         template ColumnType<BOOST_PP_CAT(Metadata::ColumnTypeOf_, LOCAL_NAME)>::template AccessType<                   \
-            cms::soa::SoAAccessType::constAccess>::template Alignment<conditionalAlignment>::                          \
+            cms::soa::SoAAccessType::constAccess>::template Alignment<alignment>::                          \
                 template RestrictQualifier<restrictQualify>::NoParamReturnType                                         \
   LOCAL_NAME() const {                                                                                                 \
     return typename cms::soa::SoAAccessors<typename BOOST_PP_CAT(Metadata::TypeOf_, LOCAL_NAME)>::                     \
         template ColumnType<BOOST_PP_CAT(Metadata::ColumnTypeOf_, LOCAL_NAME)>::template AccessType<                   \
-            cms::soa::SoAAccessType::constAccess>::template Alignment<conditionalAlignment>::                          \
+            cms::soa::SoAAccessType::constAccess>::template Alignment<alignment>::                          \
                 template RestrictQualifier<restrictQualify>(BOOST_PP_CAT(LOCAL_NAME, Parameters_))();                  \
   }                                                                                                                    \
   SOA_HOST_DEVICE SOA_INLINE                                                                                           \
   typename cms::soa::SoAAccessors<typename BOOST_PP_CAT(Metadata::TypeOf_, LOCAL_NAME)>::                              \
         template ColumnType<BOOST_PP_CAT(Metadata::ColumnTypeOf_, LOCAL_NAME)>::template AccessType<                   \
-            cms::soa::SoAAccessType::constAccess>::template Alignment<conditionalAlignment>::                          \
+            cms::soa::SoAAccessType::constAccess>::template Alignment<alignment>::                          \
                 template RestrictQualifier<restrictQualify>::ParamReturnType                                           \
   LOCAL_NAME(size_type _soa_impl_index) const {                                                                        \
     if constexpr (rangeChecking == cms::soa::RangeChecking::enabled) {                                                 \
@@ -442,7 +442,7 @@ namespace cms::soa {
     }                                                                                                                  \
     return typename cms::soa::SoAAccessors<typename BOOST_PP_CAT(Metadata::TypeOf_, LOCAL_NAME)>::                     \
         template ColumnType<BOOST_PP_CAT(Metadata::ColumnTypeOf_, LOCAL_NAME)>::template AccessType<                   \
-            cms::soa::SoAAccessType::constAccess>::template Alignment<conditionalAlignment>::                          \
+            cms::soa::SoAAccessType::constAccess>::template Alignment<alignment>::                          \
                 template RestrictQualifier<restrictQualify>(BOOST_PP_CAT(LOCAL_NAME, Parameters_))(_soa_impl_index);   \
   }
 // clang-format on
@@ -650,10 +650,10 @@ namespace cms::soa {
     constexpr static bool rangeChecking = RANGE_CHECKING;                                                              \
     /* Those typedefs avoid having commas in macros (which is problematic) */                                          \
     template <cms::soa::SoAColumnType COLUMN_TYPE, class C>                                                            \
-    using SoAValueWithConf = cms::soa::SoAValue<COLUMN_TYPE, C, conditionalAlignment, restrictQualify>;                \
+    using SoAValueWithConf = cms::soa::SoAValue<COLUMN_TYPE, C, alignment, restrictQualify>;                \
                                                                                                                        \
     template <cms::soa::SoAColumnType COLUMN_TYPE, class C>                                                            \
-    using SoAConstValueWithConf = cms::soa::SoAConstValue<COLUMN_TYPE, C, conditionalAlignment, restrictQualify>;      \
+    using SoAConstValueWithConf = cms::soa::SoAConstValue<COLUMN_TYPE, C, alignment, restrictQualify>;      \
                                                                                                                        \
     template <CMS_SOA_BYTE_SIZE_TYPE, bool, bool, bool>                                                                \
     friend struct VIEW;                                                                                                \
@@ -695,6 +695,7 @@ namespace cms::soa {
       private:                                                                                                         \
         const VIEW& parent_;                                                                                           \
         _ITERATE_ON_ALL(_DECLARE_STRUCT_DATA_MEMBER, ~, VALUE_LIST)                                                    \
+        constexpr static byte_size_type alignment = VIEW::alignment;                                                   \
     };                                                                                                                 \
                                                                                                                        \
     SOA_HOST_DEVICE SOA_INLINE const Metadata metadata() const { return Metadata(*this); }                             \
@@ -852,10 +853,10 @@ namespace cms::soa {
     constexpr static bool rangeChecking = RANGE_CHECKING;                                                              \
     /* Those typedefs avoid having commas in macros (which is problematic) */                                          \
     template <cms::soa::SoAColumnType COLUMN_TYPE, class C>                                                            \
-    using SoAValueWithConf = cms::soa::SoAValue<COLUMN_TYPE, C, conditionalAlignment, restrictQualify>;                \
+    using SoAValueWithConf = cms::soa::SoAValue<COLUMN_TYPE, C, alignment, restrictQualify>;                \
                                                                                                                        \
     template <cms::soa::SoAColumnType COLUMN_TYPE, class C>                                                            \
-    using SoAConstValueWithConf = cms::soa::SoAConstValue<COLUMN_TYPE, C, conditionalAlignment, restrictQualify>;      \
+    using SoAConstValueWithConf = cms::soa::SoAConstValue<COLUMN_TYPE, C, alignment, restrictQualify>;      \
                                                                                                                        \
     /**                                                                                                                \
      * Helper/friend class allowing SoA introspection.                                                                 \
@@ -893,6 +894,7 @@ namespace cms::soa {
       private:                                                                                                         \
         const CONST_VIEW& parent_;                                                                                     \
         _ITERATE_ON_ALL(_DECLARE_STRUCT_CONST_DATA_MEMBER, ~, VALUE_LIST)                                              \
+        constexpr static byte_size_type alignment = CONST_VIEW::alignment;                                             \
     };                                                                                                                 \
     SOA_HOST_DEVICE SOA_INLINE const Metadata metadata() const { return Metadata(*this); }                             \
     SOA_HOST_DEVICE SOA_INLINE const Metarecords records() const { return Metarecords(*this); }                        \
