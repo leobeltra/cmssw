@@ -54,6 +54,12 @@
 #define _VALUE_TYPE_EIGEN_COLUMN 2
 #define _VALUE_TYPE_METHOD 3
 #define _VALUE_TYPE_CONST_METHOD 4
+#define _VALUE_TYPE_BLOCK_0 5
+#define _VALUE_TYPE_BLOCK_1 6
+#define _VALUE_TYPE_BLOCK_2 7
+#define _VALUE_TYPE_BLOCK_3 8
+#define _VALUE_TYPE_BLOCK_4 9
+#define _VALUE_TYPE_BLOCK_5 10
 
 /* declare the value of last valid column */
 #define _VALUE_LAST_COLUMN_TYPE _VALUE_TYPE_EIGEN_COLUMN
@@ -584,6 +590,13 @@ namespace cms::soa {
 #define SOA_EIGEN_COLUMN(TYPE, NAME) (_VALUE_TYPE_EIGEN_COLUMN, TYPE, NAME, ~)
 #define SOA_ELEMENT_METHODS(...) (_VALUE_TYPE_METHOD, _, _, (__VA_ARGS__))
 #define SOA_CONST_ELEMENT_METHODS(...) (_VALUE_TYPE_CONST_METHOD, _, _, (__VA_ARGS__))
+// #define SOA_BLOCK(...) (_VALUE_TYPE_BLOCK, _, _, (__VA_ARGS__)) 
+#define SOA_BLOCK_0(...) (_VALUE_TYPE_BLOCK_0, _, _, (__VA_ARGS__))
+#define SOA_BLOCK_1(...) (_VALUE_TYPE_BLOCK_1, _, _, (__VA_ARGS__))
+#define SOA_BLOCK_2(...) (_VALUE_TYPE_BLOCK_2, _, _, (__VA_ARGS__))
+#define SOA_BLOCK_3(...) (_VALUE_TYPE_BLOCK_3, _, _, (__VA_ARGS__))
+#define SOA_BLOCK_4(...) (_VALUE_TYPE_BLOCK_4, _, _, (__VA_ARGS__))
+#define SOA_BLOCK_5(...) (_VALUE_TYPE_BLOCK_5, _, _, (__VA_ARGS__))
 
 /* Macro generating customized methods for the element */
 #define GENERATE_METHODS(R, DATA, FIELD)                                         \
@@ -595,6 +608,26 @@ namespace cms::soa {
 #define GENERATE_CONST_METHODS(R, DATA, FIELD)                                         \
   BOOST_PP_IF(BOOST_PP_EQUAL(BOOST_PP_TUPLE_ELEM(0, FIELD), _VALUE_TYPE_CONST_METHOD), \
               BOOST_PP_TUPLE_ELEM(3, FIELD),                                           \
+              BOOST_PP_EMPTY())
+             
+#define GENERATE_BLOCK(R, DATA, FIELD)                                         \
+  BOOST_PP_IF(BOOST_PP_LESS(BOOST_PP_TUPLE_ELEM(0, FIELD), _VALUE_TYPE_METHOD), \
+              FIELD,                                     \
+              BOOST_PP_EMPTY())              
+             
+#define GENERATE_BLOCK_0(R, DATA, FIELD)                                         \
+  BOOST_PP_IF(BOOST_PP_EQUAL(BOOST_PP_TUPLE_ELEM(0, FIELD), _VALUE_TYPE_BLOCK_0), \
+              BOOST_PP_TUPLE_ELEM(3, FIELD),                                     \
+              BOOST_PP_EMPTY())    
+  
+#define GENERATE_BLOCK_1(R, DATA, FIELD)                                         \
+  BOOST_PP_IF(BOOST_PP_EQUAL(BOOST_PP_TUPLE_ELEM(0, FIELD), _VALUE_TYPE_BLOCK_1), \
+              BOOST_PP_TUPLE_ELEM(3, FIELD),                                     \
+              BOOST_PP_EMPTY())
+              
+#define GENERATE_BLOCK_2(R, DATA, FIELD)                                         \
+  BOOST_PP_IF(BOOST_PP_EQUAL(BOOST_PP_TUPLE_ELEM(0, FIELD), _VALUE_TYPE_BLOCK_2), \
+              BOOST_PP_TUPLE_ELEM(3, FIELD),                                     \
               BOOST_PP_EMPTY())
 
 /* Preprocessing loop for managing functions generation: only macros containing valid content are expanded */

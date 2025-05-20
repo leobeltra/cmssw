@@ -110,9 +110,11 @@
 
 // clang-format off
 #define _DECLARE_SOA_STREAM_INFO(R, DATA, TYPE_NAME)                                                                   \
-  BOOST_PP_IF(BOOST_PP_GREATER(BOOST_PP_TUPLE_ELEM(0, TYPE_NAME), _VALUE_LAST_COLUMN_TYPE),                            \
-              BOOST_PP_EMPTY(),                                                                                        \
-              BOOST_PP_EXPAND(_DECLARE_SOA_STREAM_INFO_IMPL TYPE_NAME))
+BOOST_PP_IF(BOOST_PP_EQUAL(BOOST_PP_VARIADIC_SIZE(TYPE_NAME), 0), \
+            BOOST_PP_EMPTY(), \
+            BOOST_PP_IF(BOOST_PP_GREATER(BOOST_PP_TUPLE_ELEM(0, TYPE_NAME), _VALUE_LAST_COLUMN_TYPE),                            \
+                          BOOST_PP_EMPTY(),                                                                                        \
+                          BOOST_PP_EXPAND(_DECLARE_SOA_STREAM_INFO_IMPL TYPE_NAME)))
 // clang-format on
 
 /**
@@ -192,9 +194,11 @@
 
 // clang-format off
 #define _DEFINE_METADATA_MEMBERS(R, DATA, TYPE_NAME)                                                                   \
+BOOST_PP_IF(BOOST_PP_EQUAL(BOOST_PP_VARIADIC_SIZE(TYPE_NAME), 0), \
+            BOOST_PP_EMPTY(), \
   BOOST_PP_IF(BOOST_PP_GREATER(BOOST_PP_TUPLE_ELEM(0, TYPE_NAME), _VALUE_LAST_COLUMN_TYPE),                            \
               BOOST_PP_EMPTY(),                                                                                        \
-              BOOST_PP_EXPAND(_DEFINE_METADATA_MEMBERS_IMPL TYPE_NAME))
+              BOOST_PP_EXPAND(_DEFINE_METADATA_MEMBERS_IMPL TYPE_NAME)))
 // clang-format on
 
 // clang-format off
@@ -213,9 +217,11 @@
 
 // clang-format off
 #define _DECLARE_MEMBER_TRIVIAL_CONSTRUCTION(R, DATA, TYPE_NAME)                                                       \
+BOOST_PP_IF(BOOST_PP_EQUAL(BOOST_PP_VARIADIC_SIZE(TYPE_NAME), 0), \
+            BOOST_PP_EMPTY(), \
   BOOST_PP_IF(BOOST_PP_GREATER(BOOST_PP_TUPLE_ELEM(0, TYPE_NAME), _VALUE_LAST_COLUMN_TYPE),                            \
               BOOST_PP_EMPTY(),                                                                                        \
-              BOOST_PP_EXPAND(_DECLARE_MEMBER_TRIVIAL_CONSTRUCTION_IMPL TYPE_NAME))
+              BOOST_PP_EXPAND(_DECLARE_MEMBER_TRIVIAL_CONSTRUCTION_IMPL TYPE_NAME)))
 // clang-format on            
               
 // clang-format off
@@ -234,9 +240,11 @@
 
 // clang-format off
 #define _DECLARE_MEMBER_COPY_CONSTRUCTION(R, DATA, TYPE_NAME)                                                          \
+BOOST_PP_IF(BOOST_PP_EQUAL(BOOST_PP_VARIADIC_SIZE(TYPE_NAME), 0), \
+            BOOST_PP_EMPTY(), \
   BOOST_PP_IF(BOOST_PP_GREATER(BOOST_PP_TUPLE_ELEM(0, TYPE_NAME), _VALUE_LAST_COLUMN_TYPE),                            \
               BOOST_PP_EMPTY(),                                                                                        \
-              BOOST_PP_EXPAND(_DECLARE_MEMBER_COPY_CONSTRUCTION_IMPL TYPE_NAME))
+              BOOST_PP_EXPAND(_DECLARE_MEMBER_COPY_CONSTRUCTION_IMPL TYPE_NAME)))
 // clang-format on
 
 // clang-format off
@@ -255,9 +263,11 @@
 
 // clang-format off
 #define _DECLARE_MEMBER_ASSIGNMENT(R, DATA, TYPE_NAME)                                                                 \
+BOOST_PP_IF(BOOST_PP_EQUAL(BOOST_PP_VARIADIC_SIZE(TYPE_NAME), 0), \
+            BOOST_PP_EMPTY(), \
   BOOST_PP_IF(BOOST_PP_GREATER(BOOST_PP_TUPLE_ELEM(0, TYPE_NAME), _VALUE_LAST_COLUMN_TYPE),                            \
               BOOST_PP_EMPTY(),                                                                                        \
-              BOOST_PP_EXPAND(_DECLARE_MEMBER_ASSIGNMENT_IMPL TYPE_NAME))
+              BOOST_PP_EXPAND(_DECLARE_MEMBER_ASSIGNMENT_IMPL TYPE_NAME)))
 // clang-format on
 
 /**
@@ -278,9 +288,11 @@
 
 // clang-format off
 #define _DEFINE_VALUE_ELEMENT_MEMBERS(R, DATA, TYPE_NAME)                                                              \
+BOOST_PP_IF(BOOST_PP_EQUAL(BOOST_PP_VARIADIC_SIZE(TYPE_NAME), 0), \
+            BOOST_PP_EMPTY(), \
   BOOST_PP_IF(BOOST_PP_GREATER(BOOST_PP_TUPLE_ELEM(0, TYPE_NAME), _VALUE_LAST_COLUMN_TYPE),                            \
               BOOST_PP_EMPTY(),                                                                                        \
-              BOOST_PP_EXPAND(_DEFINE_VALUE_ELEMENT_MEMBERS_IMPL TYPE_NAME))
+              BOOST_PP_EXPAND(_DEFINE_VALUE_ELEMENT_MEMBERS_IMPL TYPE_NAME)))
 // clang-format on
 
 /**
@@ -300,9 +312,11 @@
 
 // clang-format off
 #define _VALUE_ELEMENT_CTOR_ARGS(R, DATA, TYPE_NAME)                                                                   \
+BOOST_PP_IF(BOOST_PP_EQUAL(BOOST_PP_VARIADIC_SIZE(TYPE_NAME), 0), \
+            BOOST_PP_EMPTY(), \
   BOOST_PP_IF(BOOST_PP_GREATER(BOOST_PP_TUPLE_ELEM(0, TYPE_NAME), _VALUE_LAST_COLUMN_TYPE),                            \
               BOOST_PP_EMPTY(),                                                                                        \
-              BOOST_PP_EXPAND(_VALUE_ELEMENT_CTOR_ARGS_IMPL TYPE_NAME))
+              BOOST_PP_EXPAND(_VALUE_ELEMENT_CTOR_ARGS_IMPL TYPE_NAME)))
 // clang-format on
 
 /**
@@ -322,9 +336,11 @@
 
 // clang-format off
 #define _VALUE_ELEMENT_INITIALIZERS(R, DATA, TYPE_NAME)                                                                \
+BOOST_PP_IF(BOOST_PP_EQUAL(BOOST_PP_VARIADIC_SIZE(TYPE_NAME), 0), \
+            BOOST_PP_EMPTY(), \
   BOOST_PP_IF(BOOST_PP_GREATER(BOOST_PP_TUPLE_ELEM(0, TYPE_NAME), _VALUE_LAST_COLUMN_TYPE),                            \
               BOOST_PP_EMPTY(),                                                                                        \
-              BOOST_PP_EXPAND(_VALUE_ELEMENT_INITIALIZERS_IMPL TYPE_NAME))
+              BOOST_PP_EXPAND(_VALUE_ELEMENT_INITIALIZERS_IMPL TYPE_NAME)))
 // clang-format on
 
 /**
@@ -338,9 +354,11 @@
 
 // clang-format off
 #define _ROOT_FREE_SOA_COLUMN_OR_SCALAR(R, DATA, TYPE_NAME)                                                            \
+BOOST_PP_IF(BOOST_PP_EQUAL(BOOST_PP_VARIADIC_SIZE(TYPE_NAME), 0), \
+            BOOST_PP_EMPTY(), \
   BOOST_PP_IF(BOOST_PP_GREATER(BOOST_PP_TUPLE_ELEM(0, TYPE_NAME), _VALUE_LAST_COLUMN_TYPE),                            \
               BOOST_PP_EMPTY(),                                                                                        \
-              BOOST_PP_EXPAND(_ROOT_FREE_SOA_COLUMN_OR_SCALAR_IMPL TYPE_NAME))
+              BOOST_PP_EXPAND(_ROOT_FREE_SOA_COLUMN_OR_SCALAR_IMPL TYPE_NAME)))
 // clang-format on
 
 /**
@@ -373,9 +391,11 @@
 
 // clang-format off
 #define _ASSIGN_SOA_COLUMN_OR_SCALAR(R, DATA, TYPE_NAME)                                                               \
+BOOST_PP_IF(BOOST_PP_EQUAL(BOOST_PP_VARIADIC_SIZE(TYPE_NAME), 0), \
+            BOOST_PP_EMPTY(), \
   BOOST_PP_IF(BOOST_PP_GREATER(BOOST_PP_TUPLE_ELEM(0, TYPE_NAME), _VALUE_LAST_COLUMN_TYPE),                            \
               BOOST_PP_EMPTY(),                                                                                        \
-              BOOST_PP_EXPAND(_ASSIGN_SOA_COLUMN_OR_SCALAR_IMPL TYPE_NAME))
+              BOOST_PP_EXPAND(_ASSIGN_SOA_COLUMN_OR_SCALAR_IMPL TYPE_NAME)))
 // clang-format on
 
 /**
@@ -398,9 +418,11 @@
 
 // clang-format off
 #define _ACCUMULATE_SOA_ELEMENT(R, DATA, TYPE_NAME)                                                                    \
+BOOST_PP_IF(BOOST_PP_EQUAL(BOOST_PP_VARIADIC_SIZE(TYPE_NAME), 0), \
+            BOOST_PP_EMPTY(), \
   BOOST_PP_IF(BOOST_PP_GREATER(BOOST_PP_TUPLE_ELEM(0, TYPE_NAME), _VALUE_LAST_COLUMN_TYPE),                            \
               BOOST_PP_EMPTY(),                                                                                        \
-              BOOST_PP_EXPAND(_ACCUMULATE_SOA_ELEMENT_IMPL TYPE_NAME))
+              BOOST_PP_EXPAND(_ACCUMULATE_SOA_ELEMENT_IMPL TYPE_NAME)))
 // clang-format on
 
 /**
@@ -426,9 +448,11 @@
 
 // clang-format off
 #define _DECLARE_SOA_ACCESSOR(R, DATA, TYPE_NAME)                                                                      \
+BOOST_PP_IF(BOOST_PP_EQUAL(BOOST_PP_VARIADIC_SIZE(TYPE_NAME), 0), \
+            BOOST_PP_EMPTY(), \
   BOOST_PP_IF(BOOST_PP_GREATER(BOOST_PP_TUPLE_ELEM(0, TYPE_NAME), _VALUE_LAST_COLUMN_TYPE),                            \
               BOOST_PP_EMPTY(),                                                                                        \
-              BOOST_PP_EXPAND(_DECLARE_SOA_ACCESSOR_IMPL TYPE_NAME))
+              BOOST_PP_EXPAND(_DECLARE_SOA_ACCESSOR_IMPL TYPE_NAME)))
 // clang-format on
 
 /**
@@ -454,9 +478,11 @@
 
 // clang-format off
 #define _DECLARE_SOA_CONST_ACCESSOR(R, DATA, TYPE_NAME)                                                                \
+BOOST_PP_IF(BOOST_PP_EQUAL(BOOST_PP_VARIADIC_SIZE(TYPE_NAME), 0), \
+            BOOST_PP_EMPTY(), \
   BOOST_PP_IF(BOOST_PP_GREATER(BOOST_PP_TUPLE_ELEM(0, TYPE_NAME), _VALUE_LAST_COLUMN_TYPE),                            \
               BOOST_PP_EMPTY(),                                                                                        \
-              BOOST_PP_EXPAND(_DECLARE_SOA_CONST_ACCESSOR_IMPL TYPE_NAME))
+              BOOST_PP_EXPAND(_DECLARE_SOA_CONST_ACCESSOR_IMPL TYPE_NAME)))
 // clang-format on
 
 /**
@@ -479,9 +505,11 @@
 
 // clang-format off
 #define _STREAMER_READ_SOA_DATA_MEMBER(R, DATA, TYPE_NAME)                                                             \
+BOOST_PP_IF(BOOST_PP_EQUAL(BOOST_PP_VARIADIC_SIZE(TYPE_NAME), 0), \
+            BOOST_PP_EMPTY(), \
   BOOST_PP_IF(BOOST_PP_GREATER(BOOST_PP_TUPLE_ELEM(0, TYPE_NAME), _VALUE_LAST_COLUMN_TYPE),                            \
               BOOST_PP_EMPTY(),                                                                                        \
-              BOOST_PP_EXPAND(_STREAMER_READ_SOA_DATA_MEMBER_IMPL TYPE_NAME))
+              BOOST_PP_EXPAND(_STREAMER_READ_SOA_DATA_MEMBER_IMPL TYPE_NAME)))
 // clang-format on
 
 /**
@@ -505,9 +533,11 @@
 
 // clang-format off
 #define _DECLARE_SOA_DATA_MEMBER(R, DATA, TYPE_NAME)                                                                   \
+BOOST_PP_IF(BOOST_PP_EQUAL(BOOST_PP_VARIADIC_SIZE(TYPE_NAME), 0), \
+            BOOST_PP_EMPTY(), \
   BOOST_PP_IF(BOOST_PP_GREATER(BOOST_PP_TUPLE_ELEM(0, TYPE_NAME), _VALUE_LAST_COLUMN_TYPE),                            \
               BOOST_PP_EMPTY(),                                                                                        \
-              BOOST_PP_EXPAND(_DECLARE_SOA_DATA_MEMBER_IMPL TYPE_NAME))
+              BOOST_PP_EXPAND(_DECLARE_SOA_DATA_MEMBER_IMPL TYPE_NAME)))
 // clang-format on
 
 #define _COPY_VIEW_COLUMNS_IMPL(VALUE_TYPE, CPP_TYPE, NAME, ARGS)                                    \
@@ -528,9 +558,11 @@
       })
 
 #define _COPY_VIEW_COLUMNS(R, DATA, TYPE_NAME)                                              \
+BOOST_PP_IF(BOOST_PP_EQUAL(BOOST_PP_VARIADIC_SIZE(TYPE_NAME), 0), \
+            BOOST_PP_EMPTY(), \
   BOOST_PP_IF(BOOST_PP_GREATER(BOOST_PP_TUPLE_ELEM(0, TYPE_NAME), _VALUE_LAST_COLUMN_TYPE), \
               BOOST_PP_EMPTY(),                                                             \
-              BOOST_PP_EXPAND(_COPY_VIEW_COLUMNS_IMPL TYPE_NAME))
+              BOOST_PP_EXPAND(_COPY_VIEW_COLUMNS_IMPL TYPE_NAME)))
 
 #ifdef DEBUG
 #define _DO_RANGECHECK true
@@ -581,7 +613,9 @@
          << std::endl;                                                                                                 \
       _soa_impl_os << "  sizeof(" #CLASS "): " << sizeof(CLASS) << std::endl;                                          \
       byte_size_type _soa_impl_offset = 0;                                                                             \
-      _ITERATE_ON_ALL(_DECLARE_SOA_STREAM_INFO, ~, __VA_ARGS__)                                                        \
+      _ITERATE_ON_ALL(_DECLARE_SOA_STREAM_INFO, ~, ENUM_IF_VALID(_ITERATE_ON_ALL(GENERATE_BLOCK, ~, __VA_ARGS__)))                                                        \
+      _ITERATE_ON_ALL(_DECLARE_SOA_STREAM_INFO, ~, ENUM_IF_VALID(_ITERATE_ON_ALL(GENERATE_BLOCK_0, ~, __VA_ARGS__)))                                                        \
+      _ITERATE_ON_ALL(_DECLARE_SOA_STREAM_INFO, ~, ENUM_IF_VALID(_ITERATE_ON_ALL(GENERATE_BLOCK_1, ~, __VA_ARGS__)))                                                        \
       _soa_impl_os << "Final offset = " << _soa_impl_offset << " computeDataSize(...): " << computeDataSize(elements_) \
               << std::endl;                                                                                            \
       _soa_impl_os << std::endl;                                                                                       \
@@ -590,7 +624,8 @@
     /* Helper function used by caller to externally allocate the storage */                                            \
     static constexpr byte_size_type computeDataSize(size_type elements) {                                              \
       byte_size_type _soa_impl_ret = 0;                                                                                \
-      _ITERATE_ON_ALL(_ACCUMULATE_SOA_ELEMENT, ~, __VA_ARGS__)                                                         \
+      _ITERATE_ON_ALL(_ACCUMULATE_SOA_ELEMENT, ~, ENUM_IF_VALID(_ITERATE_ON_ALL(GENERATE_BLOCK_0, ~, __VA_ARGS__)))                                                         \
+      _ITERATE_ON_ALL(_ACCUMULATE_SOA_ELEMENT, ~, ENUM_IF_VALID(_ITERATE_ON_ALL(GENERATE_BLOCK_1, ~, __VA_ARGS__)))                                                         \
       return _soa_impl_ret;                                                                                            \
     }                                                                                                                  \
                                                                                                                        \
@@ -609,23 +644,33 @@
         return CLASS(_soa_impl_addr, parent_.elements_);                                                               \
       }                                                                                                                \
                                                                                                                        \
-      _ITERATE_ON_ALL(_DEFINE_METADATA_MEMBERS, ~, __VA_ARGS__)                                                        \
+      _ITERATE_ON_ALL(_DEFINE_METADATA_MEMBERS, ~, ENUM_IF_VALID(_ITERATE_ON_ALL(GENERATE_BLOCK_0, ~, __VA_ARGS__)))                                                        \
+      _ITERATE_ON_ALL(_DEFINE_METADATA_MEMBERS, ~, ENUM_IF_VALID(_ITERATE_ON_ALL(GENERATE_BLOCK_1, ~, __VA_ARGS__)))                                                        \
                                                                                                                        \
       struct value_element {                                                                                           \
         SOA_HOST_DEVICE SOA_INLINE value_element                                                                       \
           BOOST_PP_IF(                                                                                                 \
-            BOOST_PP_SEQ_SIZE(_ITERATE_ON_ALL(_VALUE_ELEMENT_CTOR_ARGS, ~, __VA_ARGS__) ),                             \
-            (_ITERATE_ON_ALL_COMMA(_VALUE_ELEMENT_CTOR_ARGS, ~, __VA_ARGS__)):,                                        \
+            BOOST_PP_SEQ_SIZE(_ITERATE_ON_ALL(_VALUE_ELEMENT_CTOR_ARGS, ~, ENUM_IF_VALID(_ITERATE_ON_ALL(GENERATE_BLOCK_0, ~, __VA_ARGS__))) ),                             \
+            (_ITERATE_ON_ALL_COMMA(_VALUE_ELEMENT_CTOR_ARGS, ~, ENUM_IF_VALID(_ITERATE_ON_ALL(GENERATE_BLOCK_0, ~, __VA_ARGS__)))):,                                        \
             ())                                                                                                        \
+          BOOST_PP_IF(                                                                                                 \
+            BOOST_PP_SEQ_SIZE(_ITERATE_ON_ALL(_VALUE_ELEMENT_CTOR_ARGS, ~, ENUM_IF_VALID(_ITERATE_ON_ALL(GENERATE_BLOCK_1, ~, __VA_ARGS__)))),                              \
+            BOOST_PP_SEQ_TO_TUPLE(_ITERATE_ON_ALL(_VALUE_ELEMENT_CTOR_ARGS, ~, ENUM_IF_VALID(_ITERATE_ON_ALL(GENERATE_BLOCK_1, ~, __VA_ARGS__)))),                          \
+            ())                                                                                                         \
           BOOST_PP_TUPLE_ENUM(BOOST_PP_IF(                                                                             \
-            BOOST_PP_SEQ_SIZE(_ITERATE_ON_ALL(_VALUE_ELEMENT_CTOR_ARGS, ~, __VA_ARGS__)),                              \
-            BOOST_PP_SEQ_TO_TUPLE(_ITERATE_ON_ALL(_VALUE_ELEMENT_INITIALIZERS, ~, __VA_ARGS__)),                       \
+            BOOST_PP_SEQ_SIZE(_ITERATE_ON_ALL(_VALUE_ELEMENT_CTOR_ARGS, ~, ENUM_IF_VALID(_ITERATE_ON_ALL(GENERATE_BLOCK_0, ~, __VA_ARGS__)))),                              \
+            BOOST_PP_SEQ_TO_TUPLE(_ITERATE_ON_ALL(_VALUE_ELEMENT_INITIALIZERS, ~, ENUM_IF_VALID(_ITERATE_ON_ALL(GENERATE_BLOCK_0, ~, __VA_ARGS__)))),                       \
             ()                                                                                                         \
-          )                                                                                                            \
+          ))                                                                                                            \
+          BOOST_PP_TUPLE_ENUM(BOOST_PP_IF(                                                                             \
+            BOOST_PP_SEQ_SIZE(_ITERATE_ON_ALL(_VALUE_ELEMENT_CTOR_ARGS, ~, ENUM_IF_VALID(_ITERATE_ON_ALL(GENERATE_BLOCK_1, ~, __VA_ARGS__)))),                              \
+            BOOST_PP_SEQ_TO_TUPLE(_ITERATE_ON_ALL(_VALUE_ELEMENT_INITIALIZERS, ~, ENUM_IF_VALID(_ITERATE_ON_ALL(GENERATE_BLOCK_1, ~, __VA_ARGS__)))),                       \
+            ())                                                                                                         \
         )                                                                                                              \
         {}                                                                                                             \
                                                                                                                        \
-        _ITERATE_ON_ALL(_DEFINE_VALUE_ELEMENT_MEMBERS, ~, __VA_ARGS__)                                                 \
+        _ITERATE_ON_ALL(_DEFINE_VALUE_ELEMENT_MEMBERS, ~, ENUM_IF_VALID(_ITERATE_ON_ALL(GENERATE_BLOCK_0, ~, __VA_ARGS__)))                                                 \
+        _ITERATE_ON_ALL(_DEFINE_VALUE_ELEMENT_MEMBERS, ~, ENUM_IF_VALID(_ITERATE_ON_ALL(GENERATE_BLOCK_1, ~, __VA_ARGS__)))                                                 \
       };                                                                                                               \
                                                                                                                        \
       Metadata& operator=(const Metadata&) = delete;                                                                   \
@@ -647,7 +692,7 @@
                     SOA_VIEW_LAYOUT_LIST(                                                                              \
                         SOA_VIEW_LAYOUT(BOOST_PP_CAT(CLASS, _parametrized) , BOOST_PP_CAT(instance_, CLASS))),         \
                     SOA_VIEW_VALUE_LIST(_ITERATE_ON_ALL_COMMA(                                                         \
-                    _VIEW_FIELD_FROM_LAYOUT, BOOST_PP_CAT(instance_, CLASS), __VA_ARGS__)), __VA_ARGS__)               \
+                    _VIEW_FIELD_FROM_LAYOUT, BOOST_PP_CAT(instance_, CLASS), ENUM_IF_VALID(_ITERATE_ON_ALL(GENERATE_BLOCK_0, ~, __VA_ARGS__)))), ENUM_IF_VALID(_ITERATE_ON_ALL(GENERATE_BLOCK_0, ~, __VA_ARGS__)))               \
                                                                                                                        \
     template <bool RESTRICT_QUALIFY, bool RANGE_CHECKING>                                                              \
     using ConstViewTemplate = ConstViewTemplateFreeParams<ALIGNMENT, ALIGNMENT_ENFORCEMENT, RESTRICT_QUALIFY,          \
@@ -660,8 +705,8 @@
                     SOA_VIEW_LAYOUT_LIST(                                                                              \
                         SOA_VIEW_LAYOUT(BOOST_PP_CAT(CLASS, _parametrized), BOOST_PP_CAT(instance_, CLASS))),          \
                     SOA_VIEW_VALUE_LIST(_ITERATE_ON_ALL_COMMA(                                                         \
-                    _VIEW_FIELD_FROM_LAYOUT, BOOST_PP_CAT(instance_, CLASS), __VA_ARGS__)),                            \
-                    __VA_ARGS__)                                                                                       \
+                    _VIEW_FIELD_FROM_LAYOUT, BOOST_PP_CAT(instance_, CLASS), ENUM_IF_VALID(_ITERATE_ON_ALL(GENERATE_BLOCK_0, ~, __VA_ARGS__)))),                            \
+                    ENUM_IF_VALID(_ITERATE_ON_ALL(GENERATE_BLOCK_0, ~, __VA_ARGS__)))                                                                                       \
                                                                                                                        \
     template <bool RESTRICT_QUALIFY, bool RANGE_CHECKING>                                                              \
     using ViewTemplate = ViewTemplateFreeParams<ALIGNMENT, ALIGNMENT_ENFORCEMENT, RESTRICT_QUALIFY, RANGE_CHECKING>;   \
@@ -673,7 +718,8 @@
         : mem_(nullptr),                                                                                               \
           elements_(0),                                                                                                \
           byteSize_(0),                                                                                                \
-          _ITERATE_ON_ALL_COMMA(_DECLARE_MEMBER_TRIVIAL_CONSTRUCTION, ~, __VA_ARGS__) {}                               \
+          _ITERATE_ON_ALL_COMMA(_DECLARE_MEMBER_TRIVIAL_CONSTRUCTION, ~, ENUM_IF_VALID(_ITERATE_ON_ALL(GENERATE_BLOCK_0, ~, __VA_ARGS__))),                               \
+          _ITERATE_ON_ALL_COMMA(_DECLARE_MEMBER_TRIVIAL_CONSTRUCTION, ~, ENUM_IF_VALID(_ITERATE_ON_ALL(GENERATE_BLOCK_1, ~, __VA_ARGS__))) {}                               \
                                                                                                                        \
     /* Constructor relying on user provided storage (implementation shared with ROOT streamer) */                      \
     SOA_HOST_ONLY CLASS(std::byte* mem, size_type elements) : mem_(mem), elements_(elements), byteSize_(0) {           \
@@ -685,13 +731,15 @@
         : mem_(_soa_impl_other.mem_),                                                                                  \
           elements_(_soa_impl_other.elements_),                                                                        \
           byteSize_(_soa_impl_other.byteSize_),                                                                        \
-          _ITERATE_ON_ALL_COMMA(_DECLARE_MEMBER_COPY_CONSTRUCTION, ~, __VA_ARGS__) {}                                  \
+          _ITERATE_ON_ALL_COMMA(_DECLARE_MEMBER_COPY_CONSTRUCTION, ~, ENUM_IF_VALID(_ITERATE_ON_ALL(GENERATE_BLOCK_0, ~, __VA_ARGS__))),                                  \
+          _ITERATE_ON_ALL_COMMA(_DECLARE_MEMBER_COPY_CONSTRUCTION, ~, ENUM_IF_VALID(_ITERATE_ON_ALL(GENERATE_BLOCK_1, ~, __VA_ARGS__))) {}                                  \
                                                                                                                        \
     SOA_HOST_ONLY CLASS& operator=(CLASS const& _soa_impl_other) {                                                     \
         mem_ = _soa_impl_other.mem_;                                                                                   \
         elements_ = _soa_impl_other.elements_;                                                                         \
         byteSize_ = _soa_impl_other.byteSize_;                                                                         \
-        _ITERATE_ON_ALL(_DECLARE_MEMBER_ASSIGNMENT, ~, __VA_ARGS__)                                                    \
+        _ITERATE_ON_ALL(_DECLARE_MEMBER_ASSIGNMENT, ~, ENUM_IF_VALID(_ITERATE_ON_ALL(GENERATE_BLOCK_0, ~, __VA_ARGS__)))                                                    \
+        _ITERATE_ON_ALL(_DECLARE_MEMBER_ASSIGNMENT, ~, ENUM_IF_VALID(_ITERATE_ON_ALL(GENERATE_BLOCK_1, ~, __VA_ARGS__)))                                                    \
         return *this;                                                                                                  \
     }                                                                                                                  \
                                                                                                                        \
@@ -699,19 +747,22 @@
       if (elements_ < view.metadata().size())                                                                          \
         throw std::runtime_error(                                                                                      \
             "In "#CLASS "::deepCopy method: number of elements mismatch ");                                            \
-      _ITERATE_ON_ALL(_COPY_VIEW_COLUMNS, ~, __VA_ARGS__)                                                              \
+      _ITERATE_ON_ALL(_COPY_VIEW_COLUMNS, ~, ENUM_IF_VALID(_ITERATE_ON_ALL(GENERATE_BLOCK_0, ~, __VA_ARGS__)))                                                              \
+      _ITERATE_ON_ALL(_COPY_VIEW_COLUMNS, ~, ENUM_IF_VALID(_ITERATE_ON_ALL(GENERATE_BLOCK_1, ~, __VA_ARGS__)))                                                              \
     }                                                                                                                  \
                                                                                                                        \
     /* ROOT read streamer */                                                                                           \
     template <typename T>                                                                                              \
     void ROOTReadStreamer(T & onfile) {                                                                                \
-      _ITERATE_ON_ALL(_STREAMER_READ_SOA_DATA_MEMBER, ~, __VA_ARGS__)                                                  \
+      _ITERATE_ON_ALL(_STREAMER_READ_SOA_DATA_MEMBER, ~, ENUM_IF_VALID(_ITERATE_ON_ALL(GENERATE_BLOCK_0, ~, __VA_ARGS__)))                                                  \
+      _ITERATE_ON_ALL(_STREAMER_READ_SOA_DATA_MEMBER, ~, ENUM_IF_VALID(_ITERATE_ON_ALL(GENERATE_BLOCK_1, ~, __VA_ARGS__)))                                                  \
     }                                                                                                                  \
                                                                                                                        \
     /* ROOT allocation cleanup */                                                                                      \
     void ROOTStreamerCleaner() {                                                                                       \
       /* This function should only be called from the PortableCollection ROOT streamer */                              \
-      _ITERATE_ON_ALL(_ROOT_FREE_SOA_COLUMN_OR_SCALAR, ~, __VA_ARGS__)                                                 \
+      _ITERATE_ON_ALL(_ROOT_FREE_SOA_COLUMN_OR_SCALAR, ~, ENUM_IF_VALID(_ITERATE_ON_ALL(GENERATE_BLOCK_0, ~, __VA_ARGS__)))                                                 \
+      _ITERATE_ON_ALL(_ROOT_FREE_SOA_COLUMN_OR_SCALAR, ~, ENUM_IF_VALID(_ITERATE_ON_ALL(GENERATE_BLOCK_1, ~, __VA_ARGS__)))                                                 \
     }                                                                                                                  \
                                                                                                                        \
     /* Dump the SoA internal structure */                                                                              \
@@ -725,7 +776,9 @@
         if (reinterpret_cast<intptr_t>(mem_) % alignment)                                                              \
           throw std::runtime_error("In " #CLASS "::" #CLASS ": misaligned buffer");                                    \
       auto _soa_impl_curMem = mem_;                                                                                    \
-      _ITERATE_ON_ALL(_ASSIGN_SOA_COLUMN_OR_SCALAR, ~, __VA_ARGS__)                                                    \
+      _ITERATE_ON_ALL(_ASSIGN_SOA_COLUMN_OR_SCALAR, ~, ENUM_IF_VALID(_ITERATE_ON_ALL(GENERATE_BLOCK_0, ~, __VA_ARGS__)))                                                    \
+      _ITERATE_ON_ALL(_ASSIGN_SOA_COLUMN_OR_SCALAR, ~, ENUM_IF_VALID(_ITERATE_ON_ALL(GENERATE_BLOCK_1, ~, __VA_ARGS__)))                                                    \
+                                                                                                                       \
       /* Sanity check: we should have reached the computed size, only on host code */                                  \
       byteSize_ = computeDataSize(elements_);                                                                          \
       if (mem_ + byteSize_ != _soa_impl_curMem)                                                                        \
@@ -737,8 +790,11 @@
       size_type _soa_methods_count = 0;                                                                                \
       size_type _soa_const_methods_count = 0;                                                                          \
                                                                                                                        \
-      _ITERATE_ON_ALL(_COUNT_SOA_METHODS, _soa_methods_count, __VA_ARGS__)                                             \
-      _ITERATE_ON_ALL(_COUNT_SOA_CONST_METHODS, _soa_const_methods_count, __VA_ARGS__)                                 \
+      _ITERATE_ON_ALL(_COUNT_SOA_METHODS, _soa_methods_count, ENUM_IF_VALID(_ITERATE_ON_ALL(GENERATE_BLOCK_0, ~, __VA_ARGS__)))                                             \
+      _ITERATE_ON_ALL(_COUNT_SOA_METHODS, _soa_methods_count, ENUM_IF_VALID(_ITERATE_ON_ALL(GENERATE_BLOCK_1, ~, __VA_ARGS__)))                                             \
+                                                                                                                       \
+      _ITERATE_ON_ALL(_COUNT_SOA_CONST_METHODS, _soa_const_methods_count, ENUM_IF_VALID(_ITERATE_ON_ALL(GENERATE_BLOCK_0, ~, __VA_ARGS__)))                                 \
+      _ITERATE_ON_ALL(_COUNT_SOA_CONST_METHODS, _soa_const_methods_count, ENUM_IF_VALID(_ITERATE_ON_ALL(GENERATE_BLOCK_1, ~, __VA_ARGS__)))                                 \
                                                                                                                        \
       return {_soa_methods_count, _soa_const_methods_count};                                                           \
     }                                                                                                                  \
@@ -755,7 +811,9 @@
     size_type elements_;                                                                                               \
     size_type const scalar_ = 1;                                                                                       \
     byte_size_type byteSize_ EDM_REFLEX_TRANSIENT;                                                                     \
-    _ITERATE_ON_ALL(_DECLARE_SOA_DATA_MEMBER, ~, __VA_ARGS__)                                                          \
+    _ITERATE_ON_ALL(_DECLARE_SOA_DATA_MEMBER, ~, ENUM_IF_VALID(_ITERATE_ON_ALL(GENERATE_BLOCK_0, ~, __VA_ARGS__)))                                                          \
+    _ITERATE_ON_ALL(_DECLARE_SOA_DATA_MEMBER, ~, ENUM_IF_VALID(_ITERATE_ON_ALL(GENERATE_BLOCK_1, ~, __VA_ARGS__)))                                                          \
+                                                                                                                       \
     /* Making the code conditional is problematic in macros as the commas will interfere with parameter lisings     */ \
     /* So instead we make the code unconditional with paceholder names which are protected by a private protection. */ \
     /* This will be handled later as we handle the integration of the view as a subclass of the layout.             */ \
