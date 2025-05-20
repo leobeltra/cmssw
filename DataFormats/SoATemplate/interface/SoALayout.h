@@ -132,7 +132,7 @@
         return parent_.metadata().BOOST_PP_CAT(parametersOf_, NAME)().addr_;                                           \
       }                                                                                                                \
       using BOOST_PP_CAT(ParametersTypeOf_, NAME) =                                                                    \
-        typename cms::soa::SoAParameters_Alignment<ALIGNMENT>::template SoAParameters_ColumnType<cms::soa::SoAColumnType::scalar>::template DataType<CPP_TYPE>;                       \
+        cms::soa::SoAParameters_ColumnType<cms::soa::SoAColumnType::scalar>::DataType<CPP_TYPE>;                       \
       SOA_HOST_DEVICE SOA_INLINE                                                                                       \
       BOOST_PP_CAT(ParametersTypeOf_, NAME) BOOST_PP_CAT(parametersOf_, NAME)() const {                                \
         return  BOOST_PP_CAT(ParametersTypeOf_, NAME) (parent_.BOOST_PP_CAT(NAME, _), parent_.metadata().size());      \
@@ -143,7 +143,7 @@
       },                                                                                                               \
       /* Column */                                                                                                     \
       using BOOST_PP_CAT(ParametersTypeOf_, NAME) =                                                                    \
-         typename cms::soa::SoAParameters_Alignment<ALIGNMENT>::template SoAParameters_ColumnType<cms::soa::SoAColumnType::column>::template DataType<CPP_TYPE>;                      \
+         cms::soa::SoAParameters_ColumnType<cms::soa::SoAColumnType::column>::DataType<CPP_TYPE>;                      \
       SOA_HOST_DEVICE SOA_INLINE                                                                                       \
       BOOST_PP_CAT(ParametersTypeOf_, NAME) BOOST_PP_CAT(parametersOf_, NAME)() const {                                \
         return  BOOST_PP_CAT(ParametersTypeOf_, NAME) (parent_.BOOST_PP_CAT(NAME, _), parent_.metadata().size());      \
@@ -164,7 +164,7 @@
       constexpr static cms::soa::SoAColumnType BOOST_PP_CAT(ColumnTypeOf_, NAME) = cms::soa::SoAColumnType::column;,   \
       /* Eigen column */                                                                                               \
       using BOOST_PP_CAT(ParametersTypeOf_, NAME) =                                                                    \
-          typename cms::soa::SoAParameters_Alignment<ALIGNMENT>::template SoAParameters_ColumnType<cms::soa::SoAColumnType::eigen>::template DataType<CPP_TYPE>;                      \
+          cms::soa::SoAParameters_ColumnType<cms::soa::SoAColumnType::eigen>::DataType<CPP_TYPE>;                      \
       SOA_HOST_DEVICE SOA_INLINE                                                                                       \
       BOOST_PP_CAT(ParametersTypeOf_, NAME) BOOST_PP_CAT(parametersOf_, NAME)() const {                                \
         return BOOST_PP_CAT(ParametersTypeOf_, NAME) (                                                                 \
@@ -540,7 +540,7 @@
     /* Column */                                                                                      \
     (std::span<std::add_const_t<CPP_TYPE>>)                                                                             \
     ,                                                                                                 \
-    (std::span<std::add_const_t<CPP_TYPE::Scalar>>)                                                                     \
+    (std::span<std::add_const_t<CPP_TYPE>>)                                                                     \
   )
 
 #define _DECLARE_CONST_DESCRIPTOR_SPANS(R, DATA, TYPE_NAME) BOOST_PP_EXPAND(_DECLARE_CONST_DESCRIPTOR_SPANS_IMPL TYPE_NAME)
@@ -553,7 +553,7 @@
     /* Column */                                                                                      \
     (std::span<CPP_TYPE>)                                                                             \
     ,                                                                                                 \
-    (std::span<CPP_TYPE::Scalar>)                                                                     \
+    (std::span<CPP_TYPE>)                                                                     \
   )
 
 #define _DECLARE_DESCRIPTOR_SPANS(R, DATA, TYPE_NAME) BOOST_PP_EXPAND(_DECLARE_DESCRIPTOR_SPANS_IMPL TYPE_NAME)
@@ -568,7 +568,7 @@
     (std::span(view.metadata().BOOST_PP_CAT(addressOf_, NAME)(),                            \
                     cms::soa::alignSize(view.metadata().size() * sizeof(CPP_TYPE), alignment) / sizeof(CPP_TYPE))) \
     ,                                                                                                 \
-    (std::span(view.metadata().BOOST_PP_CAT(addressOf_, NAME)(),                      \
+    (std::span<CPP_TYPE>(view[0].NAME(),                      \
                     cms::soa::alignSize(view.metadata().size() * sizeof(CPP_TYPE::Scalar), alignment) *                    \
                     CPP_TYPE::RowsAtCompileTime * CPP_TYPE::ColsAtCompileTime / sizeof(CPP_TYPE::Scalar))) \
   )
@@ -635,10 +635,10 @@
         alignmentEnforcement == cms::soa::AlignmentEnforcement::enforced ? alignment : 0;                              \
     /* Those typedefs avoid having commas in macros (which is problematic) */                                          \
     template <cms::soa::SoAColumnType COLUMN_TYPE, class C>                                                            \
-    using SoAValueWithConf = cms::soa::SoAValue<COLUMN_TYPE, C, alignment>;                                 \
+    using SoAValueWithConf = cms::soa::SoAValue<COLUMN_TYPE, C, conditionalAlignment>;                                 \
                                                                                                                        \
     template <cms::soa::SoAColumnType COLUMN_TYPE, class C>                                                            \
-    using SoAConstValueWithConf = cms::soa::SoAConstValue<COLUMN_TYPE, C, alignment>;                       \
+    using SoAConstValueWithConf = cms::soa::SoAConstValue<COLUMN_TYPE, C, conditionalAlignment>;                       \
                                                                                                                        \
     template <CMS_SOA_BYTE_SIZE_TYPE VIEW_ALIGNMENT = cms::soa::CacheLineSize::defaultSize,                            \
             bool VIEW_ALIGNMENT_ENFORCEMENT = cms::soa::AlignmentEnforcement::relaxed,                                 \

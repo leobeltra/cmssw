@@ -116,8 +116,8 @@ public:
         for (int j = 0; j < ConstDescriptor::eigenIndexes[0].second; j++) {
           std::cout << "Copying eigen column of desc_ " << j << " of size " << std::get<I>(desc_.buff).size() / ConstDescriptor::eigenIndexes[0].second << std::endl;
           std::cout << "Copying eigen column of src " << j << " of size " << std::get<I>(src.buff).size() / ConstDescriptor::eigenIndexes[0].second << std::endl;
-          alpaka::memcpy(queue, alpaka::createView(alpaka::getDev(queue), std::get<I>(desc_.buff).data() + j * std::get<I>(desc_.buff).size() / ConstDescriptor::eigenIndexes[0].second, std::get<I>(desc_.buff).size() / ConstDescriptor::eigenIndexes[0].second),
-          alpaka::createView(alpaka::getDev(queue), std::get<I>(src.buff).data() + j * std::get<I>(src.buff).size() / ConstDescriptor::eigenIndexes[0].second, std::get<I>(src.buff).size() / ConstDescriptor::eigenIndexes[0].second));
+          alpaka::memcpy(queue, alpaka::createView(alpaka::getDev(queue), std::get<I>(desc_.buff).data() + j * std::get<I>(desc_.buff).size() / ConstDescriptor::eigenIndexes[0].second, /* std::get<I>(desc_.buff).size() / ConstDescriptor::eigenIndexes[0].second) */ 32),
+          alpaka::createView(alpaka::getDev(queue), std::get<I>(src.buff).data() + j * 32, /* std::get<I>(src.buff).size() / ConstDescriptor::eigenIndexes[0].second)*/ 32));
         }
         }
       else {  

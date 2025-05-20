@@ -94,8 +94,8 @@ public:
     if constexpr (I < ConstDescriptor::num_cols) {
       if constexpr (portablecollection::matches_index<ConstDescriptor::eigenColsCount>(ConstDescriptor::eigenIndexes, I)) {
         for (int j = 0; j < ConstDescriptor::eigenIndexes[0].second; j++) {
-            alpaka::memcpy(queue, alpaka::createView(alpaka::getDev(queue), std::get<I>(desc_.buff).data() + j * std::get<I>(desc_.buff).size() / ConstDescriptor::eigenIndexes[0].second, std::get<I>(desc_.buff).size() / ConstDescriptor::eigenIndexes[0].second),
-                                  alpaka::createView(alpaka::getDev(queue), std::get<I>(src.buff).data() + j * std::get<I>(src.buff).size() / ConstDescriptor::eigenIndexes[0].second, std::get<I>(desc_.buff).size() / ConstDescriptor::eigenIndexes[0].second));
+            alpaka::memcpy(queue, alpaka::createView(alpaka::getDev(queue), std::get<I>(desc_.buff).data() + j * std::get<I>(desc_.buff).size() / ConstDescriptor::eigenIndexes[0].second, /* std::get<I>(desc_.buff).size() / ConstDescriptor::eigenIndexes[0].second*/ 32),
+                                  alpaka::createView(alpaka::getDev(queue), std::get<I>(src.buff).data() + j * std::get<I>(src.buff).size() / ConstDescriptor::eigenIndexes[0].second, /* std::get<I>(desc_.buff).size() / ConstDescriptor::eigenIndexes[0].second*/ 32));
           }
         }
       else {  
