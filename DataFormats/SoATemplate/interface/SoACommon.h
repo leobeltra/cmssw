@@ -435,6 +435,18 @@ namespace cms::soa {
   };
 #endif
 
+  template <SoAColumnType COLUMN_TYPE>
+  struct SoAValue_ColumnType {
+    template <typename T>
+    struct DataType {
+      template <byte_size_type ALIGNMENT>
+      struct Alignment {
+        template <bool RESTRICT_QUALIFY>
+        using Value = SoAValue<COLUMN_TYPE, T, ALIGNMENT, RESTRICT_QUALIFY>;
+      };
+    };
+  };
+
   // Helper template managing a const value at index idx within a column.
   template <SoAColumnType COLUMN_TYPE,
             typename T,
@@ -540,6 +552,18 @@ namespace cms::soa {
                   "Eigen/Core should be pre-included before the SoA headers to enable support for Eigen columns.");
   };
 #endif
+
+template <SoAColumnType COLUMN_TYPE>
+struct SoAConstValue_ColumnType {
+  template <typename T>
+  struct DataType {
+    template <byte_size_type ALIGNMENT>
+    struct Alignment {
+      template <bool RESTRICT_QUALIFY>
+      using ConstValue = SoAConstValue<COLUMN_TYPE, T, ALIGNMENT, RESTRICT_QUALIFY>;
+    };
+  };
+};
 
   // Helper template to avoid commas inside macros
 #ifdef EIGEN_WORLD_VERSION

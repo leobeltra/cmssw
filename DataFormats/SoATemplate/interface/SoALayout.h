@@ -9,7 +9,7 @@
 #include "FWCore/Reflection/interface/reflex.h"
 
 #include "SoACommon.h"
-#include "SoAView.h"
+// #include "SoAView.h"
 
 /* dump SoA fields information; these should expand to, for columns:
  * Example:
@@ -55,6 +55,40 @@
  * Final offset = 3904 computeDataSize(...): 3904
  *
  */
+
+namespace cms::soa {
+
+  /* Traits for the different column type scenarios */
+  /* Value traits passes the class as is in the case of column type and return
+   * an empty class with functions returning non-scalar as accessors. */
+  template <class C, SoAColumnType COLUMN_TYPE>
+  struct ConstValueTraits : public C {
+    using C::C;
+  };
+
+  template <class C>
+  struct ConstValueTraits<C, SoAColumnType::scalar> {
+    // Just take to SoAValue type to generate the right constructor.
+    SOA_HOST_DEVICE SOA_INLINE ConstValueTraits(size_type, const typename C::valueType*) {}
+    SOA_HOST_DEVICE SOA_INLINE ConstValueTraits(size_type, const typename C::Params&) {}
+    SOA_HOST_DEVICE SOA_INLINE ConstValueTraits(size_type, const typename C::ConstParams&) {}
+    // Any attempt to do anything with the "scalar" value a const element will fail.
+  };
+
+  template <typename C>
+  struct ColumnTypeOf;
+
+  template <SoAColumnType CT, typename T, byte_size_type ALIGNMENT, bool RESTRICT>
+  struct ColumnTypeOf<SoAConstValue<CT, T, ALIGNMENT, RESTRICT>> {
+    static constexpr SoAColumnType value = CT;
+  };
+
+  template <typename C>
+  using ConstValueTraitsFromC = cms::soa::ConstValueTraits<C, ColumnTypeOf<C>::value>;
+}  // namespace cms::soa
+
+
+// -------- MACROS FOR GENERATING SOA LAYOUTS ----------
 
 // clang-format off
 #define _COUNT_SOA_METHODS_IMPL(VALUE_TYPE, CPP_TYPE, NAME, ARGS, DATA)                                                \
@@ -433,6 +467,523 @@
               BOOST_PP_EMPTY(),                                                             \
               BOOST_PP_EXPAND(_COPY_VIEW_COLUMNS_IMPL TYPE_NAME))
 
+// -------- MACROS FOR GENERATING SOA VIEWS ----------
+
+/**
+ * Member types aliasing for referencing by name
+ */
+// clang-format off
+#define _DECLARE_VIEW_MEMBER_TYPE_ALIAS_IMPL(VALUE_TYPE, CPP_TYPE, NAME, ARGS, CAST)                             \
+  using BOOST_PP_CAT(TypeOf_, NAME) =                                                                            \
+      typename TypeOf_Layout::Metadata::BOOST_PP_CAT(TypeOf_, NAME);                     \
+  using BOOST_PP_CAT(ParametersTypeOf_, NAME) =                                                                  \
+      typename TypeOf_Layout::Metadata::BOOST_PP_CAT(ParametersTypeOf_, NAME);           \
+  constexpr static cms::soa::SoAColumnType BOOST_PP_CAT(ColumnTypeOf_, NAME) =                                   \
+      TypeOf_Layout::Metadata::BOOST_PP_CAT(ColumnTypeOf_, NAME);                        \
+  using BOOST_PP_CAT(ConstAccessorOf_, NAME) =                                                                   \
+    typename cms::soa::SoAAccessors<typename BOOST_PP_CAT(Metadata::TypeOf_, NAME)>::                            \
+        template ColumnType<BOOST_PP_CAT(ColumnTypeOf_, NAME)>::template AccessType<                             \
+            cms::soa::SoAAccessType::constAccess>::template Alignment<conditionalAlignment>::                          \
+                template RestrictQualifier<restrictQualify> ;                                                          \
+  using BOOST_PP_CAT(MutableAccessorOf_, NAME) =                                                                 \
+    typename cms::soa::SoAAccessors<typename BOOST_PP_CAT(Metadata::TypeOf_, NAME)>::                            \
+        template ColumnType<BOOST_PP_CAT(ColumnTypeOf_, NAME)>::template AccessType<                             \
+            cms::soa::SoAAccessType::mutableAccess>::template Alignment<conditionalAlignment>::                        \
+                template RestrictQualifier<restrictQualify> ;                                                          \
+  SOA_HOST_DEVICE SOA_INLINE                                                                                           \
+  const auto BOOST_PP_CAT(parametersOf_, NAME)() const {                                                         \
+    return CAST(parent_.BOOST_PP_CAT(NAME, Parameters_));                                                        \
+  };
+// clang-format on
+
+// DATA should be a function used to convert
+//   parent_.LOCAL_NAME ## Parameters_
+// to
+//   ParametersTypeOf_ ## LOCAL_NAME                (for a View)
+// or
+//   ParametersTypeOf_ ## LOCAL_NAME :: ConstType   (for a ConstView)
+// or empty, if no conversion is necessary.
+#define _DECLARE_VIEW_MEMBER_TYPE_ALIAS(R, DATA, TYPE_NAME) \
+  BOOST_PP_IF(BOOST_PP_GREATER(BOOST_PP_TUPLE_ELEM(0, TYPE_NAME), _VALUE_LAST_COLUMN_TYPE),                            \
+              BOOST_PP_EMPTY(),                                                                                        \
+              BOOST_PP_EXPAND(_DECLARE_VIEW_MEMBER_TYPE_ALIAS_IMPL BOOST_PP_TUPLE_PUSH_BACK(TYPE_NAME, DATA)))
+
+/**
+ * Member type const pointers for referencing by name
+ */
+// clang-format off
+#define _DECLARE_VIEW_MEMBER_CONST_POINTERS_IMPL(VALUE_TYPE, CPP_TYPE, NAME, ARGS)                               \
+  SOA_HOST_DEVICE SOA_INLINE auto const* BOOST_PP_CAT(addressOf_, NAME)() const {                                \
+    return BOOST_PP_CAT(parametersOf_, NAME)().addr_;                                                            \
+  };
+// clang-format on
+
+#define _DECLARE_VIEW_MEMBER_CONST_POINTERS(R, DATA, TYPE_NAME) \
+  BOOST_PP_IF(BOOST_PP_GREATER(BOOST_PP_TUPLE_ELEM(0, TYPE_NAME), _VALUE_LAST_COLUMN_TYPE),                            \
+              BOOST_PP_EMPTY(),                                                                                        \
+              BOOST_PP_EXPAND(_DECLARE_VIEW_MEMBER_CONST_POINTERS_IMPL TYPE_NAME))
+
+/**
+ * Assign the value of the records to the column parameters.
+ */
+#define _STRUCT_ELEMENT_INITIALIZERS_IMPL(VALUE_TYPE, CPP_TYPE, NAME, ARGS) \
+  (BOOST_PP_CAT(NAME, _){parent_.metadata().BOOST_PP_CAT(parametersOf_, NAME)()})
+
+#define _STRUCT_ELEMENT_INITIALIZERS(R, DATA, TYPE_NAME) \
+  BOOST_PP_IF(BOOST_PP_GREATER(BOOST_PP_TUPLE_ELEM(0, TYPE_NAME), _VALUE_LAST_COLUMN_TYPE),                            \
+              BOOST_PP_EMPTY(),                                                                                        \
+              BOOST_PP_EXPAND(_STRUCT_ELEMENT_INITIALIZERS_IMPL TYPE_NAME))
+
+/**
+ * Generator of accessors for (const) view Metarecords subclass.
+ */
+#define _CONST_ACCESSORS_STRUCT_MEMBERS_IMPL(VALUE_TYPE, CPP_TYPE, NAME, ARGS)                    \
+  const typename Metadata::BOOST_PP_CAT(ParametersTypeOf_, NAME)::ConstType& NAME() const { \
+    return BOOST_PP_CAT(NAME, _);                                                                 \
+  }
+
+#define _CONST_ACCESSORS_STRUCT_MEMBERS(R, DATA, TYPE_NAME) \
+  BOOST_PP_IF(BOOST_PP_GREATER(BOOST_PP_TUPLE_ELEM(0, TYPE_NAME), _VALUE_LAST_COLUMN_TYPE),                            \
+              BOOST_PP_EMPTY(),                                                                                        \
+              BOOST_PP_EXPAND(_CONST_ACCESSORS_STRUCT_MEMBERS_IMPL TYPE_NAME))
+
+/**
+ * Generator of members for (const) view Metarecords subclass.
+ */
+#define _DECLARE_STRUCT_CONST_DATA_MEMBER_IMPL(VALUE_TYPE, CPP_TYPE, NAME, ARGS) \
+  typename Metadata::BOOST_PP_CAT(ParametersTypeOf_, NAME)::ConstType BOOST_PP_CAT(NAME, _);
+
+#define _DECLARE_STRUCT_CONST_DATA_MEMBER(R, DATA, TYPE_NAME) \
+  BOOST_PP_IF(BOOST_PP_GREATER(BOOST_PP_TUPLE_ELEM(0, TYPE_NAME), _VALUE_LAST_COLUMN_TYPE),                            \
+              BOOST_PP_EMPTY(),                                                                                        \
+              BOOST_PP_EXPAND(_DECLARE_STRUCT_CONST_DATA_MEMBER_IMPL TYPE_NAME))
+
+/**
+ * Generator of member initialization from constructor.
+ * We use a lambda with auto return type to handle multiple possible return types.
+ */
+// clang-format off
+#define _DECLARE_VIEW_MEMBER_INITIALIZERS_IMPL(VALUE_TYPE, CPP_TYPE, NAME, ARGS)                                                   \
+  (BOOST_PP_CAT(NAME, Parameters_)([&]() -> auto {                                                                     \
+    auto params = layout.metadata().BOOST_PP_CAT(parametersOf_, NAME)();                                             \
+    if constexpr (alignmentEnforcement == AlignmentEnforcement::enforced)                                              \
+      if (reinterpret_cast<intptr_t>(params.addr_) % alignment)                                                        \
+        throw std::runtime_error("In constructor by layout: misaligned column: " #NAME);                               \
+    return params;                                                                                                     \
+  }()))
+// clang-format on
+
+#define _DECLARE_VIEW_MEMBER_INITIALIZERS(R, DATA, TYPE_NAME) \
+  BOOST_PP_IF(BOOST_PP_GREATER(BOOST_PP_TUPLE_ELEM(0, TYPE_NAME), _VALUE_LAST_COLUMN_TYPE),                            \
+              BOOST_PP_EMPTY(),                                                                                        \
+              BOOST_PP_EXPAND(_DECLARE_VIEW_MEMBER_INITIALIZERS_IMPL TYPE_NAME))
+
+/**
+ * Generator of parameters for constructor by column.
+ */
+#define _DECLARE_VIEW_CONSTRUCTION_BYCOLUMN_PARAMETERS_IMPL(VALUE_TYPE, CPP_TYPE, NAME, ARGS, DATA) \
+  (DATA typename BOOST_PP_CAT(Metadata::ParametersTypeOf_, NAME)::TupleOrPointerType NAME)
+
+#define _DECLARE_VIEW_CONSTRUCTION_BYCOLUMN_PARAMETERS(R, DATA, TYPE_NAME) \
+  BOOST_PP_IF(BOOST_PP_GREATER(BOOST_PP_TUPLE_ELEM(0, TYPE_NAME), _VALUE_LAST_COLUMN_TYPE),                            \
+              BOOST_PP_EMPTY(),                                                                                        \
+              BOOST_PP_EXPAND(_DECLARE_VIEW_CONSTRUCTION_BYCOLUMN_PARAMETERS_IMPL BOOST_PP_TUPLE_PUSH_BACK(TYPE_NAME, DATA)))
+
+/**
+ * Generator of member initialization from constructor.
+ * We use a lambda with auto return type to handle multiple possible return types.
+ */
+// clang-format off
+#define _DECLARE_VIEW_MEMBER_INITIALIZERS_BYCOLUMN_IMPL(VALUE_TYPE, CPP_TYPE, NAME, ARGS)                                          \
+  (                                                                                                                    \
+    BOOST_PP_CAT(NAME, Parameters_)([&]() -> auto {                                                                    \
+      if constexpr (alignmentEnforcement == AlignmentEnforcement::enforced)                                            \
+        if (Metadata:: BOOST_PP_CAT(ParametersTypeOf_, NAME)::checkAlignment(NAME, alignment))                         \
+          throw std::runtime_error("In constructor by column: misaligned column: " #NAME);                             \
+      return NAME;                                                                                                     \
+    }())                                                                                                               \
+  )
+// clang-format on
+
+#define _DECLARE_VIEW_MEMBER_INITIALIZERS_BYCOLUMN(R, DATA, TYPE_NAME) \
+  BOOST_PP_IF(BOOST_PP_GREATER(BOOST_PP_TUPLE_ELEM(0, TYPE_NAME), _VALUE_LAST_COLUMN_TYPE),                            \
+              BOOST_PP_EMPTY(),                                                                                        \
+              BOOST_PP_EXPAND(_DECLARE_VIEW_MEMBER_INITIALIZERS_BYCOLUMN_IMPL TYPE_NAME))
+
+/**
+ * Generator of parameters for (const) view Metarecords subclass.
+ */
+#define _DECLARE_CONST_VIEW_CONSTRUCTOR_COLUMNS_IMPL(VALUE_TYPE, CPP_TYPE, NAME, ARGS) \
+  (typename Metadata::BOOST_PP_CAT(ParametersTypeOf_, NAME)::ConstType NAME)
+
+#define _DECLARE_CONST_VIEW_CONSTRUCTOR_COLUMNS(R, DATA, TYPE_NAME) \
+  BOOST_PP_IF(BOOST_PP_GREATER(BOOST_PP_TUPLE_ELEM(0, TYPE_NAME), _VALUE_LAST_COLUMN_TYPE),                            \
+              BOOST_PP_EMPTY(),                                                                                        \
+              BOOST_PP_EXPAND(_DECLARE_CONST_VIEW_CONSTRUCTOR_COLUMNS_IMPL TYPE_NAME))
+
+// clang-format off
+#define _INITIALIZE_CONST_VIEW_PARAMETERS_AND_SIZE_IMPL(VALUE_TYPE, CPP_TYPE, NAME, ARGS)                        \
+        if (not readyToSet) {                                                                                          \
+          elements_ = NAME.size_;                                                                                \
+          readyToSet = true;                                                                                           \
+        }                                                                                                              \
+        auto BOOST_PP_CAT(NAME, _tmp) = [&]() -> auto {                                                          \
+          if (elements_ != NAME.size_)                                                                           \
+            throw std::runtime_error(                                                                                  \
+              "In constructor by column pointers: number of elements not equal for every column: "                     \
+              BOOST_PP_STRINGIZE(NAME));                                                                         \
+          if constexpr (alignmentEnforcement == AlignmentEnforcement::enforced)                                        \
+            if (Metadata:: BOOST_PP_CAT(ParametersTypeOf_, NAME)::checkAlignment(NAME, alignment))         \
+              throw std::runtime_error("In constructor by column: misaligned column: " #NAME);                   \
+          return NAME;                                                                                           \
+            }();                                                                                                       \
+        BOOST_PP_CAT(NAME, Parameters_) = BOOST_PP_CAT(NAME, _tmp); \
+// clang-format on
+
+#define _INITIALIZE_CONST_VIEW_PARAMETERS_AND_SIZE(R, DATA, TYPE_NAME) \
+  BOOST_PP_IF(BOOST_PP_GREATER(BOOST_PP_TUPLE_ELEM(0, TYPE_NAME), _VALUE_LAST_COLUMN_TYPE),                            \
+              BOOST_PP_EMPTY(),                                                                                        \
+              BOOST_PP_EXPAND(_INITIALIZE_CONST_VIEW_PARAMETERS_AND_SIZE_IMPL TYPE_NAME))
+
+/**
+ * Generator of view member list.
+ */
+#define _DECLARE_VIEW_OTHER_MEMBER_LIST_IMPL(VALUE_TYPE, CPP_TYPE, NAME, ARGS) \
+  (const_cast_SoAParametersImpl(other.BOOST_PP_CAT(NAME, Parameters_)).tupleOrPointer())
+
+#define _DECLARE_VIEW_OTHER_MEMBER_LIST(R, DATA, TYPE_NAME) \
+  BOOST_PP_IF(BOOST_PP_GREATER(BOOST_PP_TUPLE_ELEM(0, TYPE_NAME), _VALUE_LAST_COLUMN_TYPE),                            \
+              BOOST_PP_EMPTY(),                                                                                        \
+              BOOST_PP_EXPAND(_DECLARE_VIEW_OTHER_MEMBER_LIST_IMPL TYPE_NAME))
+
+/**
+ * Generator of parameters for (const) element subclass (expanded comma separated).
+ */
+#define _DECLARE_CONST_VIEW_ELEMENT_VALUE_ARG_IMPL(VALUE_TYPE, CPP_TYPE, NAME, ARGS, DATA) \
+  (DATA typename BOOST_PP_CAT(Metadata::ParametersTypeOf_, NAME)::ConstType NAME)
+
+#define _DECLARE_CONST_VIEW_ELEMENT_VALUE_ARG(R, DATA, TYPE_NAME) \
+  BOOST_PP_IF(BOOST_PP_GREATER(BOOST_PP_TUPLE_ELEM(0, TYPE_NAME), _VALUE_LAST_COLUMN_TYPE),                            \
+              BOOST_PP_EMPTY(),                                                                                        \
+              BOOST_PP_EXPAND(_DECLARE_CONST_VIEW_ELEMENT_VALUE_ARG_IMPL BOOST_PP_TUPLE_PUSH_BACK(TYPE_NAME, DATA)))
+
+/**
+ * Generator of member initialization for constructor of element subclass
+ */
+#define _DECLARE_VIEW_CONST_ELEM_MEMBER_INIT_IMPL(VALUE_TYPE, CPP_TYPE, NAME, ARGS, DATA) \
+  (BOOST_PP_CAT(NAME, _)(DATA, NAME))
+
+/* declare AoS-like element value args for contructor; these should expand,for columns only */
+#define _DECLARE_VIEW_CONST_ELEM_MEMBER_INIT(R, DATA, TYPE_NAME) \
+  BOOST_PP_IF(BOOST_PP_GREATER(BOOST_PP_TUPLE_ELEM(0, TYPE_NAME), _VALUE_LAST_COLUMN_TYPE),                            \
+              BOOST_PP_EMPTY(),                                                                                        \
+              BOOST_PP_EXPAND(_DECLARE_VIEW_CONST_ELEM_MEMBER_INIT_IMPL BOOST_PP_TUPLE_PUSH_BACK(TYPE_NAME, DATA)))
+
+/**
+ * Declaration of the members accessors of the const element subclass
+ */
+// clang-format off
+#define _DECLARE_VIEW_CONST_ELEMENT_ACCESSOR_IMPL(VALUE_TYPE, CPP_TYPE, NAME, ARGS)                              \
+  SOA_HOST_DEVICE SOA_INLINE                                                                                           \
+      const typename cms::soa::SoAConstValue_ColumnType<BOOST_PP_CAT(Metadata::ColumnTypeOf_, NAME)>::template                     \
+              DataType<typename BOOST_PP_CAT(Metadata::TypeOf_, NAME)>::template Alignment<conditionalAlignment>::template                       \
+                  ConstValue<restrictQualify>::RefToConst                                                                                 \
+      NAME() const {                                                                                             \
+    return BOOST_PP_CAT(NAME, _)();                                                                              \
+  }
+// clang-format on
+
+#define _DECLARE_VIEW_CONST_ELEMENT_ACCESSOR(R, DATA, TYPE_NAME) \
+  BOOST_PP_IF(BOOST_PP_GREATER(BOOST_PP_TUPLE_ELEM(0, TYPE_NAME), _VALUE_LAST_COLUMN_TYPE),                            \
+              BOOST_PP_EMPTY(),                                                                                        \
+              _DECLARE_VIEW_CONST_ELEMENT_ACCESSOR_IMPL TYPE_NAME)
+
+/**
+ * Declaration of the private members of the const element subclass
+ */
+// clang-format off
+#define _DECLARE_VIEW_CONST_ELEMENT_VALUE_MEMBER_IMPL(VALUE_TYPE, CPP_TYPE, NAME, ARGS)                          \
+  const cms::soa::ConstValueTraitsFromC<typename cms::soa::SoAConstValue_ColumnType<                             \
+      BOOST_PP_CAT(Metadata::ColumnTypeOf_, NAME)>::template                  \
+          DataType<typename BOOST_PP_CAT(Metadata::TypeOf_, NAME)>::template Alignment<conditionalAlignment>::template        \
+              ConstValue<restrictQualify>>                              \
+      BOOST_PP_CAT(NAME, _);
+// clang-format on
+
+#define _DECLARE_VIEW_CONST_ELEMENT_VALUE_MEMBER(R, DATA, TYPE_NAME) \
+  BOOST_PP_IF(BOOST_PP_GREATER(BOOST_PP_TUPLE_ELEM(0, TYPE_NAME), _VALUE_LAST_COLUMN_TYPE),                            \
+              BOOST_PP_EMPTY(),                                                                                        \
+              BOOST_PP_EXPAND(_DECLARE_VIEW_CONST_ELEMENT_VALUE_MEMBER_IMPL TYPE_NAME))
+
+/**
+ * Parameters passed to const element subclass constructor in operator[]
+ */
+#define _DECLARE_VIEW_CONST_ELEMENT_CONSTR_CALL_IMPL(VALUE_TYPE, CPP_TYPE, NAME, ARGS) \
+  (BOOST_PP_CAT(NAME, Parameters_))
+
+#define _DECLARE_VIEW_CONST_ELEMENT_CONSTR_CALL(R, DATA, TYPE_NAME) \
+  BOOST_PP_IF(BOOST_PP_GREATER(BOOST_PP_TUPLE_ELEM(0, TYPE_NAME), _VALUE_LAST_COLUMN_TYPE),                            \
+              BOOST_PP_EMPTY(),                                                                                        \
+              BOOST_PP_EXPAND(_DECLARE_VIEW_CONST_ELEMENT_CONSTR_CALL_IMPL TYPE_NAME))
+
+/**
+ * Direct access to column pointer (const) and indexed access.
+ */
+// clang-format off
+#define _DECLARE_VIEW_SOA_CONST_ACCESSOR_IMPL(VALUE_TYPE, CPP_TYPE, NAME, ARGS)                                  \
+  /* Column or scalar */                                                                                               \
+  SOA_HOST_DEVICE SOA_INLINE                                                                                           \
+  typename cms::soa::SoAAccessors<typename BOOST_PP_CAT(Metadata::TypeOf_, NAME)>::                              \
+        template ColumnType<BOOST_PP_CAT(Metadata::ColumnTypeOf_, NAME)>::template AccessType<                   \
+            cms::soa::SoAAccessType::constAccess>::template Alignment<conditionalAlignment>::                          \
+                template RestrictQualifier<restrictQualify>::NoParamReturnType                                         \
+  NAME() const {                                                                                                 \
+    return typename cms::soa::SoAAccessors<typename BOOST_PP_CAT(Metadata::TypeOf_, NAME)>::                     \
+        template ColumnType<BOOST_PP_CAT(Metadata::ColumnTypeOf_, NAME)>::template AccessType<                   \
+            cms::soa::SoAAccessType::constAccess>::template Alignment<conditionalAlignment>::                          \
+                template RestrictQualifier<restrictQualify>(BOOST_PP_CAT(NAME, Parameters_))();                  \
+  }                                                                                                                    \
+  SOA_HOST_DEVICE SOA_INLINE                                                                                           \
+  typename cms::soa::SoAAccessors<typename BOOST_PP_CAT(Metadata::TypeOf_, NAME)>::                              \
+        template ColumnType<BOOST_PP_CAT(Metadata::ColumnTypeOf_, NAME)>::template AccessType<                   \
+            cms::soa::SoAAccessType::constAccess>::template Alignment<conditionalAlignment>::                          \
+                template RestrictQualifier<restrictQualify>::ParamReturnType                                           \
+  NAME(size_type _soa_impl_index) const {                                                                        \
+    if constexpr (rangeChecking == cms::soa::RangeChecking::enabled) {                                                 \
+      if (_soa_impl_index >= elements_ or _soa_impl_index < 0)                                                         \
+        SOA_THROW_OUT_OF_RANGE("Out of range index in const " #NAME "(size_type index)")                         \
+    }                                                                                                                  \
+    return typename cms::soa::SoAAccessors<typename BOOST_PP_CAT(Metadata::TypeOf_, NAME)>::                     \
+        template ColumnType<BOOST_PP_CAT(Metadata::ColumnTypeOf_, NAME)>::template AccessType<                   \
+            cms::soa::SoAAccessType::constAccess>::template Alignment<conditionalAlignment>::                          \
+                template RestrictQualifier<restrictQualify>(BOOST_PP_CAT(NAME, Parameters_))(_soa_impl_index);   \
+  }
+// clang-format on
+
+#define _DECLARE_VIEW_SOA_CONST_ACCESSOR(R, DATA, TYPE_NAME) \
+  BOOST_PP_IF(BOOST_PP_GREATER(BOOST_PP_TUPLE_ELEM(0, TYPE_NAME), _VALUE_LAST_COLUMN_TYPE),                            \
+              BOOST_PP_EMPTY(),                                                                                        \
+              BOOST_PP_EXPAND(_DECLARE_VIEW_SOA_CONST_ACCESSOR_IMPL TYPE_NAME))
+
+/**
+ * Const SoA class member declaration (column pointers and parameters).
+ */
+#define _DECLARE_CONST_VIEW_SOA_MEMBER_IMPL(VALUE_TYPE, CPP_TYPE, NAME, ARGS, DATA) \
+  typename BOOST_PP_CAT(Metadata::ParametersTypeOf_, NAME)::ConstType BOOST_PP_CAT(NAME, Parameters_);
+
+#define _DECLARE_CONST_VIEW_SOA_MEMBER(R, DATA, TYPE_NAME) \
+  BOOST_PP_IF(BOOST_PP_GREATER(BOOST_PP_TUPLE_ELEM(0, TYPE_NAME), _VALUE_LAST_COLUMN_TYPE),                            \
+              BOOST_PP_EMPTY(),                                                                                        \
+              BOOST_PP_EXPAND(_DECLARE_CONST_VIEW_SOA_MEMBER_IMPL BOOST_PP_TUPLE_PUSH_BACK(TYPE_NAME, DATA))  )
+
+/**
+ * Member type pointers for referencing by name
+ */
+// clang-format off
+#define _DECLARE_VIEW_MEMBER_POINTERS_IMPL(VALUE_TYPE, CPP_TYPE, NAME, ARGS)                                     \
+  SOA_HOST_DEVICE SOA_INLINE auto* BOOST_PP_CAT(addressOf_, NAME)() {                                            \
+    return BOOST_PP_CAT(parametersOf_, NAME)().addr_;                                                            \
+  };
+// clang-format on
+
+#define _DECLARE_VIEW_MEMBER_POINTERS(R, DATA, TYPE_NAME) \
+  BOOST_PP_IF(BOOST_PP_GREATER(BOOST_PP_TUPLE_ELEM(0, TYPE_NAME), _VALUE_LAST_COLUMN_TYPE),                            \
+              BOOST_PP_EMPTY(),                                                                                        \
+              BOOST_PP_EXPAND(_DECLARE_VIEW_MEMBER_POINTERS_IMPL TYPE_NAME))
+
+/**
+ * Generator of accessors for (const) view Metarecords subclass.
+ */
+#define _ACCESSORS_STRUCT_MEMBERS_IMPL(VALUE_TYPE, CPP_TYPE, NAME, ARGS)                \
+  const typename Metadata::BOOST_PP_CAT(ParametersTypeOf_, NAME) & NAME() const { \
+    return BOOST_PP_CAT(NAME, _);                                                       \
+  }
+
+#define _ACCESSORS_STRUCT_MEMBERS(R, DATA, TYPE_NAME) \
+  BOOST_PP_IF(BOOST_PP_GREATER(BOOST_PP_TUPLE_ELEM(0, TYPE_NAME), _VALUE_LAST_COLUMN_TYPE),                            \
+              BOOST_PP_EMPTY(),                                                                                        \
+              BOOST_PP_EXPAND(_ACCESSORS_STRUCT_MEMBERS_IMPL TYPE_NAME))
+
+/**
+ * Generator of members for view Metarecords subclass.
+ */
+#define _DECLARE_STRUCT_DATA_MEMBER_IMPL(VALUE_TYPE, CPP_TYPE, NAME, ARGS) \
+  typename Metadata::BOOST_PP_CAT(ParametersTypeOf_, NAME) BOOST_PP_CAT(NAME, _);
+
+#define _DECLARE_STRUCT_DATA_MEMBER(R, DATA, TYPE_NAME) \
+  BOOST_PP_IF(BOOST_PP_GREATER(BOOST_PP_TUPLE_ELEM(0, TYPE_NAME), _VALUE_LAST_COLUMN_TYPE),                            \
+              BOOST_PP_EMPTY(),                                                                                        \
+              BOOST_PP_EXPAND(_DECLARE_STRUCT_DATA_MEMBER_IMPL TYPE_NAME))
+
+/**
+ * Generator of view member list.
+ */
+#define _DECLARE_VIEW_MEMBER_LIST_IMPL(VALUE_TYPE, CPP_TYPE, NAME, ARGS) (NAME)
+
+#define _DECLARE_VIEW_MEMBER_LIST(R, DATA, TYPE_NAME) \
+  BOOST_PP_IF(BOOST_PP_GREATER(BOOST_PP_TUPLE_ELEM(0, TYPE_NAME), _VALUE_LAST_COLUMN_TYPE),                            \
+              BOOST_PP_EMPTY(),                                                                                        \
+              BOOST_PP_EXPAND(_DECLARE_VIEW_MEMBER_LIST_IMPL TYPE_NAME))
+
+/**
+ * Generator of parameters for view Metarecords subclass.
+ */
+#define _DECLARE_VIEW_CONSTRUCTOR_COLUMNS_IMPL(VALUE_TYPE, CPP_TYPE, NAME, ARGS) \
+  (typename Metadata::BOOST_PP_CAT(ParametersTypeOf_, NAME) NAME)
+
+#define _DECLARE_VIEW_CONSTRUCTOR_COLUMNS(R, DATA, TYPE_NAME) \
+  BOOST_PP_IF(BOOST_PP_GREATER(BOOST_PP_TUPLE_ELEM(0, TYPE_NAME), _VALUE_LAST_COLUMN_TYPE),                            \
+              BOOST_PP_EMPTY(),                                                                                        \
+              BOOST_PP_EXPAND(_DECLARE_VIEW_CONSTRUCTOR_COLUMNS_IMPL TYPE_NAME))
+
+// clang-format off
+#define _INITIALIZE_VIEW_PARAMETERS_AND_SIZE_IMPL(VALUE_TYPE, CPP_TYPE, NAME, ARGS)                              \
+        if (not readyToSet) {                                                                                          \
+          base_type::elements_ = NAME.size_;                                                                     \
+          readyToSet = true;                                                                                           \
+        }                                                                                                              \
+        auto BOOST_PP_CAT(NAME, _tmp) = [&]() -> auto {                                                          \
+          if (base_type::elements_ != NAME.size_)                                                                \
+            throw std::runtime_error(                                                                                  \
+              "In constructor by column pointers: number of elements not equal for every column: "                     \
+              BOOST_PP_STRINGIZE(NAME));                                                                         \
+          if constexpr (alignmentEnforcement == AlignmentEnforcement::enforced)                                        \
+            if (Metadata:: BOOST_PP_CAT(ParametersTypeOf_, NAME)::checkAlignment(NAME, alignment))         \
+              throw std::runtime_error("In constructor by column: misaligned column: " #NAME);                   \
+          return NAME;                                                                                           \
+            }();                                                                                                       \
+        base_type::BOOST_PP_CAT(NAME, Parameters_) = BOOST_PP_CAT(NAME, _tmp); \
+  // clang-format on
+
+#define _INITIALIZE_VIEW_PARAMETERS_AND_SIZE(R, DATA, TYPE_NAME) \
+  BOOST_PP_IF(BOOST_PP_GREATER(BOOST_PP_TUPLE_ELEM(0, TYPE_NAME), _VALUE_LAST_COLUMN_TYPE),                            \
+              BOOST_PP_EMPTY(),                                                                                        \
+              BOOST_PP_EXPAND(_INITIALIZE_VIEW_PARAMETERS_AND_SIZE_IMPL TYPE_NAME))
+
+/**
+ * Generator of parameters for (non-const) element subclass (expanded comma separated).
+ */
+#define _DECLARE_VIEW_ELEMENT_VALUE_ARG_IMPL(VALUE_TYPE, CPP_TYPE, NAME, ARGS) \
+  (typename BOOST_PP_CAT(Metadata::ParametersTypeOf_, NAME) NAME)
+
+#define _DECLARE_VIEW_ELEMENT_VALUE_ARG(R, DATA, TYPE_NAME) \
+  BOOST_PP_IF(BOOST_PP_GREATER(BOOST_PP_TUPLE_ELEM(0, TYPE_NAME), _VALUE_LAST_COLUMN_TYPE),                            \
+              BOOST_PP_EMPTY(),                                                                                        \
+              BOOST_PP_EXPAND(_DECLARE_VIEW_ELEMENT_VALUE_ARG_IMPL TYPE_NAME))
+
+/**
+ * Generator of element members initializer.
+ */
+#define _DECLARE_VIEW_ELEM_MEMBER_INIT_IMPL(VALUE_TYPE, CPP_TYPE, NAME, ARGS, DATA) (NAME(DATA, NAME))
+
+#define _DECLARE_VIEW_ELEM_MEMBER_INIT(R, DATA, TYPE_NAME) \
+  BOOST_PP_IF(BOOST_PP_GREATER(BOOST_PP_TUPLE_ELEM(0, TYPE_NAME), _VALUE_LAST_COLUMN_TYPE),                            \
+              BOOST_PP_EMPTY(),                                                                                        \
+              BOOST_PP_EXPAND(_DECLARE_VIEW_ELEM_MEMBER_INIT_IMPL BOOST_PP_TUPLE_PUSH_BACK(TYPE_NAME, DATA)))
+
+/**
+ * Generator of the member-by-member copy operator of the element subclass.
+ */
+#define _DECLARE_VIEW_ELEMENT_VALUE_COPY_IMPL(VALUE_TYPE, CPP_TYPE, NAME, ARGS)                 \
+  if constexpr (Metadata::BOOST_PP_CAT(ColumnTypeOf_, NAME) != cms::soa::SoAColumnType::scalar) \
+    NAME() = _soa_impl_other.NAME();
+
+#define _DECLARE_VIEW_ELEMENT_VALUE_COPY(R, DATA, TYPE_NAME) \
+  BOOST_PP_IF(BOOST_PP_GREATER(BOOST_PP_TUPLE_ELEM(0, TYPE_NAME), _VALUE_LAST_COLUMN_TYPE),                            \
+              BOOST_PP_EMPTY(),                                                                                        \
+              BOOST_PP_EXPAND(_DECLARE_VIEW_ELEMENT_VALUE_COPY_IMPL TYPE_NAME))
+
+/**
+ * Assign the value of the view from the values in the value_element.
+ */
+// clang-format off
+#define _TRIVIAL_VIEW_ASSIGN_VALUE_ELEMENT_IMPL(VALUE_TYPE, CPP_TYPE, NAME, ARGS)                                      \
+  _SWITCH_ON_TYPE(VALUE_TYPE,                                                                                          \
+      /* Scalar (empty) */                                                                                             \
+      ,                                                                                                                \
+      /* Column */                                                                                                     \
+      NAME() = _soa_impl_value.NAME;                                                                                   \
+      ,                                                                                                                \
+      /* Eigen column */                                                                                               \
+      NAME() = _soa_impl_value.NAME;                                                                                   \
+)
+// clang-format on
+
+#define _TRIVIAL_VIEW_ASSIGN_VALUE_ELEMENT(R, DATA, TYPE_NAME) \
+  BOOST_PP_IF(BOOST_PP_GREATER(BOOST_PP_TUPLE_ELEM(0, TYPE_NAME), _VALUE_LAST_COLUMN_TYPE),                            \
+              BOOST_PP_EMPTY(),                                                                                        \
+              BOOST_PP_EXPAND(_TRIVIAL_VIEW_ASSIGN_VALUE_ELEMENT_IMPL TYPE_NAME))
+
+/**
+ * Declaration of the private members of the const element subclass
+ */
+// clang-format off
+#define _DECLARE_VIEW_ELEMENT_VALUE_MEMBER_IMPL(VALUE_TYPE, CPP_TYPE, NAME, ARGS)                               \
+  typename cms::soa::SoAValue_ColumnType<BOOST_PP_CAT(Metadata::ColumnTypeOf_, NAME)>::template                  \
+              DataType<typename BOOST_PP_CAT(Metadata::TypeOf_, NAME)>::template Alignment<conditionalAlignment>::       \
+                  template Value<restrictQualify>                                                                \
+      NAME;
+// clang-format on
+
+#define _DECLARE_VIEW_ELEMENT_VALUE_MEMBER(R, DATA, TYPE_NAME) \
+  BOOST_PP_IF(BOOST_PP_GREATER(BOOST_PP_TUPLE_ELEM(0, TYPE_NAME), _VALUE_LAST_COLUMN_TYPE),                            \
+              BOOST_PP_EMPTY(),                                                                                        \
+              BOOST_PP_EXPAND(_DECLARE_VIEW_ELEMENT_VALUE_MEMBER_IMPL TYPE_NAME))
+
+/**
+ * Parameters passed to element subclass constructor in operator[]
+ *
+ * The use of const_cast (inside const_cast_SoAParametersImpl) is safe because the constructor of a View binds only to
+ * non-const arguments.
+ */
+#define _DECLARE_VIEW_ELEMENT_CONSTR_CALL_IMPL(VALUE_TYPE, CPP_TYPE, NAME, ARGS) \
+  (const_cast_SoAParametersImpl(base_type::BOOST_PP_CAT(NAME, Parameters_)))
+
+#define _DECLARE_VIEW_ELEMENT_CONSTR_CALL(R, DATA, TYPE_NAME) \
+  BOOST_PP_IF(BOOST_PP_GREATER(BOOST_PP_TUPLE_ELEM(0, TYPE_NAME), _VALUE_LAST_COLUMN_TYPE),                            \
+              BOOST_PP_EMPTY(),                                                                                        \
+              BOOST_PP_EXPAND(_DECLARE_VIEW_ELEMENT_CONSTR_CALL_IMPL TYPE_NAME))
+/**
+ * Direct access to column pointer and indexed access
+ */
+// clang-format off
+#define _DECLARE_VIEW_SOA_ACCESSOR_IMPL(VALUE_TYPE, CPP_TYPE, NAME, ARGS)                                        \
+  /* Column or scalar */                                                                                               \
+  SOA_HOST_DEVICE SOA_INLINE                                                                                           \
+  typename cms::soa::SoAAccessors<typename BOOST_PP_CAT(Metadata::TypeOf_, NAME)>::                              \
+        template ColumnType<BOOST_PP_CAT(Metadata::ColumnTypeOf_, NAME)>::template AccessType<                   \
+            cms::soa::SoAAccessType::mutableAccess>::template Alignment<conditionalAlignment>::                        \
+                 template RestrictQualifier<restrictQualify>::NoParamReturnType                                        \
+  NAME() {                                                                                                       \
+    return typename cms::soa::SoAAccessors<typename BOOST_PP_CAT(Metadata::TypeOf_, NAME)>::                     \
+        template ColumnType<BOOST_PP_CAT(Metadata::ColumnTypeOf_, NAME)>::template AccessType<                   \
+            cms::soa::SoAAccessType::mutableAccess>::template Alignment<conditionalAlignment>::                        \
+                template RestrictQualifier<restrictQualify>(const_cast_SoAParametersImpl(                              \
+                    base_type:: BOOST_PP_CAT(NAME, Parameters_)))();                                             \
+  }                                                                                                                    \
+  SOA_HOST_DEVICE SOA_INLINE                                                                                           \
+  typename cms::soa::SoAAccessors<typename BOOST_PP_CAT(Metadata::TypeOf_, NAME)>::                              \
+        template ColumnType<BOOST_PP_CAT(Metadata::ColumnTypeOf_, NAME)>::template AccessType<                   \
+            cms::soa::SoAAccessType::mutableAccess>::template Alignment<conditionalAlignment>::                        \
+                 template RestrictQualifier<restrictQualify>::ParamReturnType                                          \
+  NAME(size_type _soa_impl_index) {                                                                              \
+    if constexpr (rangeChecking == cms::soa::RangeChecking::enabled) {                                                 \
+      if (_soa_impl_index >= base_type::elements_ or _soa_impl_index < 0)                                              \
+        SOA_THROW_OUT_OF_RANGE("Out of range index in mutable " #NAME "(size_type index)")                       \
+    }                                                                                                                  \
+    return typename cms::soa::SoAAccessors<typename BOOST_PP_CAT(Metadata::TypeOf_, NAME)>::                     \
+        template ColumnType<BOOST_PP_CAT(Metadata::ColumnTypeOf_, NAME)>::template AccessType<                   \
+            cms::soa::SoAAccessType::mutableAccess>::template Alignment<conditionalAlignment>::                        \
+                template RestrictQualifier<restrictQualify>(const_cast_SoAParametersImpl(                              \
+                    base_type:: BOOST_PP_CAT(NAME, Parameters_)))(_soa_impl_index);                              \
+  }
+// clang-format on
+
+#define _DECLARE_VIEW_SOA_ACCESSOR(R, DATA, TYPE_NAME) \
+  BOOST_PP_IF(BOOST_PP_GREATER(BOOST_PP_TUPLE_ELEM(0, TYPE_NAME), _VALUE_LAST_COLUMN_TYPE),                            \
+              BOOST_PP_EMPTY(),                                                                                        \
+              BOOST_PP_EXPAND(_DECLARE_VIEW_SOA_ACCESSOR_IMPL TYPE_NAME))
+
 #ifdef DEBUG
 #define _DO_RANGECHECK true
 #else
@@ -544,11 +1095,183 @@
     SOA_HOST_DEVICE SOA_INLINE Metadata metadata() { return Metadata(*this); }                                         \
                                                                                                                        \
     /* Generate the ConstView template */                                                                              \
-    _GENERATE_SOA_TRIVIAL_CONST_VIEW(CLASS,                                                                            \
-                    SOA_VIEW_LAYOUT_LIST(                                                                              \
-                        SOA_VIEW_LAYOUT(BOOST_PP_CAT(CLASS, _parametrized) , BOOST_PP_CAT(instance_, CLASS))),         \
-                    SOA_VIEW_VALUE_LIST(_ITERATE_ON_ALL_COMMA(                                                         \
-                    _VIEW_FIELD_FROM_LAYOUT, BOOST_PP_CAT(instance_, CLASS), __VA_ARGS__)), __VA_ARGS__)               \
+    /* _GENERATE_SOA_TRIVIAL_CONST_VIEW(CLASS,  */                                                                       \
+                /*    SOA_VIEW_LAYOUT_LIST(       */                                                                       \
+                /*        SOA_VIEW_LAYOUT(BOOST_PP_CAT(CLASS, _parametrized) , BOOST_PP_CAT(instance_, CLASS))), */        \
+                /*    SOA_VIEW___VA_ARGS__(_ITERATE_ON_ALL_COMMA(                                                 */        \
+                /*    _VIEW_FIELD_FROM_LAYOUT, BOOST_PP_CAT(instance_, CLASS), __VA_ARGS__)), __VA_ARGS__)       */        \
+    template <CMS_SOA_BYTE_SIZE_TYPE VIEW_ALIGNMENT,                                                                   \
+              bool VIEW_ALIGNMENT_ENFORCEMENT,                                                                         \
+              bool RESTRICT_QUALIFY,                                                                                   \
+              bool RANGE_CHECKING>                                                                                     \
+    struct ConstViewTemplateFreeParams {                                                                             \
+      /* these could be moved to an external type trait to free up the symbol names */                               \
+      using self_type = ConstViewTemplateFreeParams;                                                                           \
+      using BOOST_PP_CAT(CLASS, _parametrized) = CLASS<VIEW_ALIGNMENT, VIEW_ALIGNMENT_ENFORCEMENT>;                       \
+      using size_type = cms::soa::size_type;                                                                             \
+      using byte_size_type = cms::soa::byte_size_type;                                                                   \
+      using AlignmentEnforcement = cms::soa::AlignmentEnforcement;                                                       \
+                                                                                                                          \
+      template <CMS_SOA_BYTE_SIZE_TYPE, bool, bool, bool>                                                                \
+      friend struct ViewTemplateFreeParams;                                                                          \
+                                                                                                                          \
+      template <CMS_SOA_BYTE_SIZE_TYPE, bool, bool, bool>                                                                \
+      friend struct ConstViewTemplateFreeParams;                                                                     \
+                                                                                                                      \
+      /* For CUDA applications, we align to the 128 bytes of the cache lines.                                            \
+        * See https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#global-memory-3-0 this is still valid      \
+        * up to compute capability 8.X.                                                                                   \
+        */                                                                                                                \
+      constexpr static byte_size_type defaultAlignment = cms::soa::CacheLineSize::defaultSize;                           \
+      constexpr static byte_size_type alignment = VIEW_ALIGNMENT;                                                        \
+      constexpr static bool alignmentEnforcement = VIEW_ALIGNMENT_ENFORCEMENT;                                           \
+      constexpr static byte_size_type conditionalAlignment =                                                             \
+          alignmentEnforcement == AlignmentEnforcement::enforced ? alignment : 0;                                        \
+      constexpr static bool restrictQualify = RESTRICT_QUALIFY;                                                          \
+      constexpr static bool rangeChecking = RANGE_CHECKING;                                                              \
+      /* Those typedefs avoid having commas in macros (which is problematic) */                                          \
+      template <cms::soa::SoAColumnType COLUMN_TYPE, class C>                                                            \
+      using SoAValueWithConf = cms::soa::SoAValue<COLUMN_TYPE, C, conditionalAlignment, restrictQualify>;                \
+                                                                                                                        \
+      template <cms::soa::SoAColumnType COLUMN_TYPE, class C>                                                            \
+      using SoAConstValueWithConf = cms::soa::SoAConstValue<COLUMN_TYPE, C, conditionalAlignment, restrictQualify>;      \
+                                                                                                                        \
+      /**                                                                                                                \
+       * Helper/friend class allowing SoA introspection.                                                                 \
+       */                                                                                                                \
+      struct Metadata {                                                                                                  \
+        friend ConstViewTemplateFreeParams;                                                                              \
+        SOA_HOST_DEVICE SOA_INLINE size_type size() const { return parent_.elements_; }                                  \
+        /* Alias layout or view types to name-derived identifyer to allow simpler definitions */                         \
+        using TypeOf_Layout = BOOST_PP_CAT(CLASS, _parametrized);                                                       \
+                                                                                                                          \
+        /* Alias member types to name-derived identifyer to allow simpler definitions */                                 \
+        _ITERATE_ON_ALL(_DECLARE_VIEW_MEMBER_TYPE_ALIAS, BOOST_PP_EMPTY(), __VA_ARGS__)                                   \
+        _ITERATE_ON_ALL(_DECLARE_VIEW_MEMBER_CONST_POINTERS, ~, __VA_ARGS__)                                              \
+                                                                                                                          \
+        /* Forbid copying to avoid const correctness evasion */                                                          \
+        Metadata& operator=(const Metadata&) = delete;                                                                   \
+        Metadata(const Metadata&) = delete;                                                                              \
+                                                                                                                          \
+      private:                                                                                                           \
+        SOA_HOST_DEVICE SOA_INLINE Metadata(const ConstViewTemplateFreeParams& _soa_impl_parent) : parent_(_soa_impl_parent) {}           \
+        const ConstViewTemplateFreeParams& parent_;                                                                                       \
+      };                                                                                                                 \
+                                                                                                                          \
+      friend Metadata;                                                                                                   \
+                                                                                                                          \
+      /**                                                                                                                \
+      * Helper/friend class allowing access to size from columns.                                                       \
+      */                                                                                                                \
+      struct Metarecords {                                                                                               \
+        friend ConstViewTemplateFreeParams;                                                                                               \
+        Metarecords(const ConstViewTemplateFreeParams& _soa_impl_parent) :                                                                \
+                    parent_(_soa_impl_parent),                                                                          \
+                    _ITERATE_ON_ALL_COMMA(_STRUCT_ELEMENT_INITIALIZERS, ~, __VA_ARGS__) {}                                \
+        _ITERATE_ON_ALL(_CONST_ACCESSORS_STRUCT_MEMBERS, ~, __VA_ARGS__)                                                  \
+        private:                                                                                                         \
+          const ConstViewTemplateFreeParams& parent_;                                                                                     \
+          _ITERATE_ON_ALL(_DECLARE_STRUCT_CONST_DATA_MEMBER, ~, __VA_ARGS__)                                              \
+      };                                                                                                                 \
+      SOA_HOST_DEVICE SOA_INLINE const Metadata metadata() const { return Metadata(*this); }                             \
+      SOA_HOST_DEVICE SOA_INLINE const Metarecords records() const { return Metarecords(*this); }                        \
+                                                                                                                      \
+      /* Trivial constuctor */                                                                                           \
+      ConstViewTemplateFreeParams() = default;                                                                                            \
+                                                                                                                      \
+      /* Constructor relying on user provided layouts or views */                                                        \
+      SOA_HOST_ONLY ConstViewTemplateFreeParams(const Metadata::TypeOf_Layout& layout)        \
+      : elements_([&]() -> size_type {                                                                               \
+          bool set = false;                                                                                          \
+          size_type ret = 0;                                                                                         \
+          if (set) {                                                                                                 \
+            if (ret != layout.metadata().size())                                                                     \
+              throw std::runtime_error("In constructor by layout: different sizes from layouts.");                   \
+          } else {                                                                                                   \
+            ret = layout.metadata().size();                                                                          \
+            set = true;                                                                                              \
+          }                                                                                                          \
+          return ret;                                                                                                \
+        }()),                                                                                                        \
+        _ITERATE_ON_ALL_COMMA(_DECLARE_VIEW_MEMBER_INITIALIZERS, ~, __VA_ARGS__) {}                                   \
+                                                                                                                      \
+      /* Constructor relying on individually provided column addresses */                                                \
+      SOA_HOST_ONLY ConstViewTemplateFreeParams(size_type _soa_impl_elements,                                                             \
+          _ITERATE_ON_ALL_COMMA(_DECLARE_VIEW_CONSTRUCTION_BYCOLUMN_PARAMETERS, const, __VA_ARGS__))      \
+          : elements_(_soa_impl_elements),                                                                               \
+            _ITERATE_ON_ALL_COMMA(_DECLARE_VIEW_MEMBER_INITIALIZERS_BYCOLUMN, ~, __VA_ARGS__) {}                          \
+                                                                                                                  \
+      /* Constructor relying on individually provided column structs */                                                  \
+      SOA_HOST_ONLY ConstViewTemplateFreeParams(_ITERATE_ON_ALL_COMMA(                                                                    \
+                _DECLARE_CONST_VIEW_CONSTRUCTOR_COLUMNS, BOOST_PP_EMPTY(), __VA_ARGS__)) {                 \
+        bool readyToSet = false;                                                                                         \
+        _ITERATE_ON_ALL(_INITIALIZE_CONST_VIEW_PARAMETERS_AND_SIZE, BOOST_PP_EMPTY(), __VA_ARGS__)                        \
+      }                                                                                                                  \
+                                                                                                    \
+      /* Copiable */                                                                                                     \
+      ConstViewTemplateFreeParams(ConstViewTemplateFreeParams const&) = default;                                     \
+      ConstViewTemplateFreeParams& operator=(ConstViewTemplateFreeParams const&) = default;                          \
+                                                                                                                        \
+      /* Copy constructor for other parameters */                                                                        \
+      template <CMS_SOA_BYTE_SIZE_TYPE OTHER_VIEW_ALIGNMENT,                                                             \
+                bool OTHER_VIEW_ALIGNMENT_ENFORCEMENT,                                                                   \
+                bool OTHER_RESTRICT_QUALIFY,                                                                             \
+                bool OTHER_RANGE_CHECKING>                                                                               \
+      ConstViewTemplateFreeParams(ConstViewTemplateFreeParams<OTHER_VIEW_ALIGNMENT, OTHER_VIEW_ALIGNMENT_ENFORCEMENT, OTHER_RESTRICT_QUALIFY,              \
+          OTHER_RANGE_CHECKING> const& other): ConstViewTemplateFreeParams{other.elements_,                                         \
+            _ITERATE_ON_ALL_COMMA(_DECLARE_VIEW_OTHER_MEMBER_LIST, BOOST_PP_EMPTY(), __VA_ARGS__)                   \
+          } {}                                                                                                     \
+      /* Copy operator for other parameters */                                                                           \
+      template <CMS_SOA_BYTE_SIZE_TYPE OTHER_VIEW_ALIGNMENT,                                                             \
+          bool OTHER_VIEW_ALIGNMENT_ENFORCEMENT,                                                                   \
+          bool OTHER_RESTRICT_QUALIFY,                                                                             \
+          bool OTHER_RANGE_CHECKING>                                                                               \
+      ConstViewTemplateFreeParams& operator=(ConstViewTemplateFreeParams<OTHER_VIEW_ALIGNMENT, OTHER_VIEW_ALIGNMENT_ENFORCEMENT, OTHER_RESTRICT_QUALIFY,   \
+          OTHER_RANGE_CHECKING> const& other) { *this = other; }                                                   \
+                                                                                                                  \
+      /* Movable */                                                                                                      \
+      ConstViewTemplateFreeParams(ConstViewTemplateFreeParams &&) = default;                                            \
+      ConstViewTemplateFreeParams& operator=(ConstViewTemplateFreeParams &&) = default;                                 \
+                                                                                                                  \
+      /* Trivial destuctor */                                                                                            \
+      ~ConstViewTemplateFreeParams() = default;                                                                                           \
+                                                                                                                  \
+      /* AoS-like accessor (const) */                                                                                    \
+      struct const_element {                                                                                             \
+        SOA_HOST_DEVICE SOA_INLINE                                                                                       \
+        const_element(size_type _soa_impl_index, /* Declare parameters */                                                \
+                      _ITERATE_ON_ALL_COMMA(_DECLARE_CONST_VIEW_ELEMENT_VALUE_ARG, const, __VA_ARGS__))                   \
+                      : _ITERATE_ON_ALL_COMMA(_DECLARE_VIEW_CONST_ELEM_MEMBER_INIT, _soa_impl_index, __VA_ARGS__) {}                \
+        _ITERATE_ON_ALL(_DECLARE_VIEW_CONST_ELEMENT_ACCESSOR, ~, __VA_ARGS__)                                             \
+                                                                                                                          \
+        ENUM_IF_VALID(_ITERATE_ON_ALL(GENERATE_CONST_METHODS, ~, __VA_ARGS__))                                           \
+                                                                                                                      \
+        private:                                                                                                           \
+        _ITERATE_ON_ALL(_DECLARE_VIEW_CONST_ELEMENT_VALUE_MEMBER, ~, __VA_ARGS__)                                         \
+      };                                                                                                                 \
+                                                                                                                           \
+        SOA_HOST_DEVICE SOA_INLINE                                                                                         \
+        const_element operator[](size_type _soa_impl_index) const {                                                        \
+          if constexpr (rangeChecking == cms::soa::RangeChecking::enabled) {                                               \
+            if (_soa_impl_index >= elements_ or _soa_impl_index < 0)                                                       \
+              SOA_THROW_OUT_OF_RANGE("Out of range index in ConstViewTemplateFreeParams ::operator[]")                                  \
+          }                                                                                                                \
+          return const_element{                                                                                            \
+            _soa_impl_index, _ITERATE_ON_ALL_COMMA(_DECLARE_VIEW_CONST_ELEMENT_CONSTR_CALL, ~, __VA_ARGS__)                 \
+          };                                                                                                               \
+        }                                                                                                                  \
+                                                                                                                           \
+        /* const accessors */                                                                                              \
+        _ITERATE_ON_ALL(_DECLARE_VIEW_SOA_CONST_ACCESSOR, ~, __VA_ARGS__)                                                   \
+                                                                                                                    \
+        /* dump the SoA internal structure */                                                                              \
+        template <typename T>                                                                                              \
+        SOA_HOST_ONLY friend void dump();                                                                                  \
+                                                                                                                            \
+        private:                                                                                                             \
+          size_type elements_ = 0;                                                                                           \
+          _ITERATE_ON_ALL(_DECLARE_CONST_VIEW_SOA_MEMBER, const, __VA_ARGS__)                                                 \
+      };                                                                                                             \
                                                                                                                        \
     template <bool RESTRICT_QUALIFY, bool RANGE_CHECKING>                                                              \
     using ConstViewTemplate = ConstViewTemplateFreeParams<ALIGNMENT, ALIGNMENT_ENFORCEMENT, RESTRICT_QUALIFY,          \
@@ -557,16 +1280,199 @@
     using ConstView = ConstViewTemplate<cms::soa::RestrictQualify::Default, cms::soa::RangeChecking::Default>;         \
                                                                                                                        \
     /* Generate the mutable View template */                                                                           \
-    _GENERATE_SOA_TRIVIAL_VIEW(CLASS,                                                                                  \
-                    SOA_VIEW_LAYOUT_LIST(                                                                              \
-                        SOA_VIEW_LAYOUT(BOOST_PP_CAT(CLASS, _parametrized), BOOST_PP_CAT(instance_, CLASS))),          \
-                    SOA_VIEW_VALUE_LIST(_ITERATE_ON_ALL_COMMA(                                                         \
-                    _VIEW_FIELD_FROM_LAYOUT, BOOST_PP_CAT(instance_, CLASS), __VA_ARGS__)),                            \
-                    __VA_ARGS__)                                                                                       \
+    /* _GENERATE_SOA_TRIVIAL_VIEW(CLASS, */                                                                                 \
+    /*                SOA_VIEW_LAYOUT_LIST(        */                                                                      \
+    /*                    SOA_VIEW_LAYOUT(BOOST_PP_CAT(CLASS, _parametrized), BOOST_PP_CAT(instance_, CLASS))),  */        \
+    /*                SOA_VIEW_VALUE_LIST(_ITERATE_ON_ALL_COMMA(                                         */              \
+    /*                _VIEW_FIELD_FROM_LAYOUT, BOOST_PP_CAT(instance_, CLASS), __VA_ARGS__)),             */               \
+    /*                __VA_ARGS__)                                                                */                       \
+                                                                                                                    \
+    template <CMS_SOA_BYTE_SIZE_TYPE VIEW_ALIGNMENT,                                                                     \
+              bool VIEW_ALIGNMENT_ENFORCEMENT,                                                                           \
+              bool RESTRICT_QUALIFY,                                                                                     \
+              bool RANGE_CHECKING>                                                                                       \
+      struct ViewTemplateFreeParams : public ConstViewTemplateFreeParams<VIEW_ALIGNMENT, VIEW_ALIGNMENT_ENFORCEMENT, RESTRICT_QUALIFY, RANGE_CHECKING> {      \
+      /* Declare the parametrized layouts as the default */                                                              \
+      /*BOOST_PP_SEQ_CAT(_ITERATE_ON_ALL(_DECLARE_VIEW_LAYOUT_PARAMETRIZED_TEMPLATE, ~, LAYOUTS_LIST))   */              \
+      /* these could be moved to an external type trait to free up the symbol names */                                   \
+      using self_type = ViewTemplateFreeParams;                                                                                            \
+      using base_type = ConstViewTemplateFreeParams<VIEW_ALIGNMENT, VIEW_ALIGNMENT_ENFORCEMENT, RESTRICT_QUALIFY, RANGE_CHECKING>;      \
+      using BOOST_PP_CAT(CLASS, _parametrized) = CLASS<VIEW_ALIGNMENT, VIEW_ALIGNMENT_ENFORCEMENT>;                      \
+      using size_type = cms::soa::size_type;                                                                             \
+      using byte_size_type = cms::soa::byte_size_type;                                                                   \
+      using AlignmentEnforcement = cms::soa::AlignmentEnforcement;                                                       \
+                                                                                                                         \
+      /* For CUDA applications, we align to the 128 bytes of the cache lines.                                            \
+       * See https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#global-memory-3-0 this is still valid      \
+       * up to compute capability 8.X.                                                                                   \
+       */                                                                                                                \
+      constexpr static byte_size_type defaultAlignment = cms::soa::CacheLineSize::defaultSize;                           \
+      constexpr static byte_size_type alignment = VIEW_ALIGNMENT;                                                        \
+      constexpr static bool alignmentEnforcement = VIEW_ALIGNMENT_ENFORCEMENT;                                           \
+      constexpr static byte_size_type conditionalAlignment =                                                             \
+          alignmentEnforcement == AlignmentEnforcement::enforced ? alignment : 0;                                        \
+      constexpr static bool restrictQualify = RESTRICT_QUALIFY;                                                          \
+      constexpr static bool rangeChecking = RANGE_CHECKING;                                                              \
+      /* Those typedefs avoid having commas in macros (which is problematic) */                                          \
+      template <cms::soa::SoAColumnType COLUMN_TYPE, class C>                                                            \
+      using SoAValueWithConf = cms::soa::SoAValue<COLUMN_TYPE, C, conditionalAlignment, restrictQualify>;                \
+                                                                                                                         \
+      template <cms::soa::SoAColumnType COLUMN_TYPE, class C>                                                            \
+      using SoAConstValueWithConf = cms::soa::SoAConstValue<COLUMN_TYPE, C, conditionalAlignment, restrictQualify>;      \
+                                                                                                                         \
+      template <CMS_SOA_BYTE_SIZE_TYPE, bool, bool, bool>                                                                \
+      friend struct ViewTemplateFreeParams;                                                                                                \
+                                                                                                                         \
+      /**                                                                                                                \
+       * Helper/friend class allowing SoA introspection.                                                                 \
+       */                                                                                                                \
+      struct Metadata {                                                                                                  \
+        friend ViewTemplateFreeParams;                                                                                                     \
+        SOA_HOST_DEVICE SOA_INLINE size_type size() const { return parent_.elements_; }                                  \
+        /* Alias layout or view types to name-derived identifyer to allow simpler definitions */                         \
+        using TypeOf_Layout = BOOST_PP_CAT(CLASS, _parametrized);                                                       \
+                                                                                                                         \
+        /* Alias member types to name-derived identifyer to allow simpler definitions */                                 \
+        _ITERATE_ON_ALL(_DECLARE_VIEW_MEMBER_TYPE_ALIAS, const_cast_SoAParametersImpl, __VA_ARGS__)                       \
+        _ITERATE_ON_ALL(_DECLARE_VIEW_MEMBER_POINTERS, ~, __VA_ARGS__)                                                    \
+        _ITERATE_ON_ALL(_DECLARE_VIEW_MEMBER_CONST_POINTERS, ~, __VA_ARGS__)                                              \
+                                                                                                                         \
+        /* Forbid copying to avoid const correctness evasion */                                                          \
+        Metadata& operator=(const Metadata&) = delete;                                                                   \
+        Metadata(const Metadata&) = delete;                                                                              \
+                                                                                                                         \
+      private:                                                                                                           \
+        SOA_HOST_DEVICE SOA_INLINE Metadata(const ViewTemplateFreeParams& _soa_impl_parent) : parent_(_soa_impl_parent) {}                 \
+        const ViewTemplateFreeParams& parent_;                                                                                             \
+      };                                                                                                                 \
+                                                                                                                        \
+      friend Metadata;                                                                                                   \
+                                                                                                                        \
+      /**                                                                                                                \
+       * Helper/friend class allowing access to size from columns.                                                       \
+       */                                                                                                                \
+      struct Metarecords {                                                                                               \
+        friend ViewTemplateFreeParams;                                                                                                     \
+        Metarecords(const ViewTemplateFreeParams& _soa_impl_parent) :                                                                      \
+                    parent_(_soa_impl_parent),                                                                           \
+                    _ITERATE_ON_ALL_COMMA(_STRUCT_ELEMENT_INITIALIZERS, ~, __VA_ARGS__) {}                                \
+        _ITERATE_ON_ALL(_ACCESSORS_STRUCT_MEMBERS, ~, __VA_ARGS__)                                                        \
+        private:                                                                                                         \
+          const ViewTemplateFreeParams& parent_;                                                                                           \
+          _ITERATE_ON_ALL(_DECLARE_STRUCT_DATA_MEMBER, ~, __VA_ARGS__)                                                    \
+      };                                                                                                                 \
+                                                                                                                        \
+      SOA_HOST_DEVICE SOA_INLINE const Metadata metadata() const { return Metadata(*this); }                             \
+      SOA_HOST_DEVICE SOA_INLINE Metadata metadata() { return Metadata(*this); }                                         \
+      SOA_HOST_DEVICE SOA_INLINE const Metarecords records() const { return Metarecords(*this); }                        \
+      SOA_HOST_DEVICE SOA_INLINE Metarecords records() { return Metarecords(*this); }                                    \
+                                                                                                                        \
+      /* Trivial constuctor */                                                                                           \
+      ViewTemplateFreeParams() = default;                                                                                \
+                                                                                                                        \
+      /* Constructor relying on user provided layouts or views */                                                        \
+      SOA_HOST_ONLY ViewTemplateFreeParams(const Metadata::TypeOf_Layout& layout)                                  \
+        : base_type{layout} {}                                                                                    \
                                                                                                                        \
+      /* Constructor relying on individually provided column addresses */                                                \
+      SOA_HOST_ONLY ViewTemplateFreeParams(size_type _soa_impl_elements,                                                                   \
+                        _ITERATE_ON_ALL_COMMA(_DECLARE_VIEW_CONSTRUCTION_BYCOLUMN_PARAMETERS,                          \
+                                              BOOST_PP_EMPTY(),                                                        \
+                                              __VA_ARGS__))                                                             \
+        : base_type{_soa_impl_elements,                                                                                \
+                    _ITERATE_ON_ALL_COMMA(_DECLARE_VIEW_MEMBER_LIST, BOOST_PP_EMPTY(), __VA_ARGS__)                     \
+          } {}                                                                                                         \
+                                                                                                                       \
+      /* Constructor relying on individually provided column structs */                                                  \
+      SOA_HOST_ONLY ViewTemplateFreeParams(_ITERATE_ON_ALL_COMMA(_DECLARE_VIEW_CONSTRUCTOR_COLUMNS, BOOST_PP_EMPTY(), __VA_ARGS__)) {       \
+        bool readyToSet = false;                                                                                         \
+        _ITERATE_ON_ALL(_INITIALIZE_VIEW_PARAMETERS_AND_SIZE, BOOST_PP_EMPTY(), __VA_ARGS__)                              \
+      }                                                                                                                  \
+                                                                                                                       \
+      /* Copiable */                                                                                                     \
+      ViewTemplateFreeParams(ViewTemplateFreeParams const&) = default;                                                                                       \
+      ViewTemplateFreeParams& operator=(ViewTemplateFreeParams const&) = default;                                                                            \
+                                                                                                                          \
+      /* Copy constructor for other parameters */                                                                        \
+      template <CMS_SOA_BYTE_SIZE_TYPE OTHER_VIEW_ALIGNMENT,                                                             \
+                bool OTHER_VIEW_ALIGNMENT_ENFORCEMENT,                                                                   \
+                bool OTHER_RESTRICT_QUALIFY,                                                                             \
+                bool OTHER_RANGE_CHECKING>                                                                               \
+      ViewTemplateFreeParams(ViewTemplateFreeParams<OTHER_VIEW_ALIGNMENT, OTHER_VIEW_ALIGNMENT_ENFORCEMENT, OTHER_RESTRICT_QUALIFY,                          \
+                OTHER_RANGE_CHECKING> const& other): base_type{other.elements_,                                          \
+                  _ITERATE_ON_ALL_COMMA(_DECLARE_VIEW_OTHER_MEMBER_LIST, BOOST_PP_EMPTY(), __VA_ARGS__)                   \
+                } {}                                                                                                     \
+      /* Copy operator for other parameters */                                                                           \
+      template <CMS_SOA_BYTE_SIZE_TYPE OTHER_VIEW_ALIGNMENT,                                                             \
+                bool OTHER_VIEW_ALIGNMENT_ENFORCEMENT,                                                                   \
+                bool OTHER_RESTRICT_QUALIFY,                                                                             \
+                bool OTHER_RANGE_CHECKING>                                                                               \
+      ViewTemplateFreeParams& operator=(ViewTemplateFreeParams<OTHER_VIEW_ALIGNMENT, OTHER_VIEW_ALIGNMENT_ENFORCEMENT, OTHER_RESTRICT_QUALIFY,               \
+                OTHER_RANGE_CHECKING> const& other) { static_cast<base_type>(*this) = static_cast<base_type>(other); }   \
+                                                                                                                        \
+      /* Movable */                                                                                                      \
+      ViewTemplateFreeParams(ViewTemplateFreeParams &&) = default;                                                                                           \
+      ViewTemplateFreeParams& operator=(ViewTemplateFreeParams &&) = default;                                                                                \
+                                                                                                                        \
+      /* Trivial destuctor */                                                                                            \
+      ~ViewTemplateFreeParams() = default;                                                                                                 \
+                                                                                                                        \
+      /* AoS-like accessor (const) */                                                                                    \
+      using const_element = typename base_type::const_element;                                                           \
+                                                                                                                        \
+      using base_type::operator[];                                                                                       \
+                                                                                                                         \
+      /* AoS-like accessor (mutable) */                                                                                  \
+      struct element {                                                                                                   \
+        SOA_HOST_DEVICE SOA_INLINE                                                                                       \
+        element(size_type _soa_impl_index, /* Declare parameters */                                                      \
+                _ITERATE_ON_ALL_COMMA(_DECLARE_VIEW_ELEMENT_VALUE_ARG, ~, __VA_ARGS__))                    \
+            : _ITERATE_ON_ALL_COMMA(_DECLARE_VIEW_ELEM_MEMBER_INIT, _soa_impl_index, __VA_ARGS__) {}                      \
+        SOA_HOST_DEVICE SOA_INLINE                                                                                       \
+        element& operator=(const element& _soa_impl_other) {                                                             \
+          _ITERATE_ON_ALL(_DECLARE_VIEW_ELEMENT_VALUE_COPY, ~, __VA_ARGS__)                                               \
+          return *this;                                                                                                  \
+        }                                                                                                                \
+        SOA_HOST_DEVICE SOA_INLINE                                                                                       \
+        element& operator=(const const_element& _soa_impl_other) {                                                       \
+          _ITERATE_ON_ALL(_DECLARE_VIEW_ELEMENT_VALUE_COPY, ~, __VA_ARGS__)                                               \
+          return *this;                                                                                                  \
+        }                                                                                                               \
+        /* Extra operator=() for mutable element to emulate the aggregate initialisation syntax */                          \
+        SOA_HOST_DEVICE SOA_INLINE constexpr element & operator=(const typename                                             \
+            BOOST_PP_CAT(CLASS, _parametrized)::Metadata::value_element _soa_impl_value) {                                  \
+          _ITERATE_ON_ALL(_TRIVIAL_VIEW_ASSIGN_VALUE_ELEMENT, ~, __VA_ARGS__)                                               \
+          return *this;                                                                                                     \
+        }                                                                                                                   \
+                                                                                                                            \
+        ENUM_IF_VALID(_ITERATE_ON_ALL(GENERATE_METHODS, ~, __VA_ARGS__))                                                    \
+        ENUM_IF_VALID(_ITERATE_ON_ALL(GENERATE_CONST_METHODS, ~, __VA_ARGS__))                                              \
+                                                                                                                        \
+        _ITERATE_ON_ALL(_DECLARE_VIEW_ELEMENT_VALUE_MEMBER, ~, __VA_ARGS__)                                               \
+      };                                                                                                                 \
+                                                                                                                         \
+      SOA_HOST_DEVICE SOA_INLINE                                                                                         \
+      element operator[](size_type _soa_impl_index) {                                                                    \
+        if constexpr (rangeChecking == cms::soa::RangeChecking::enabled) {                                               \
+          if (_soa_impl_index >= base_type::elements_ or _soa_impl_index < 0)                                            \
+            SOA_THROW_OUT_OF_RANGE("Out of range index in ViewTemplateFreeParams ::operator[]")                                        \
+        }                                                                                                                \
+        return element{_soa_impl_index, _ITERATE_ON_ALL_COMMA(_DECLARE_VIEW_ELEMENT_CONSTR_CALL, ~, __VA_ARGS__)};        \
+      }                                                                                                                  \
+                                                                                                                         \
+      /* inherit const accessors from ConstView */                                                                       \
+                                                                                                                         \
+      /* non-const accessors */                                                                                          \
+      _ITERATE_ON_ALL(_DECLARE_VIEW_SOA_ACCESSOR, ~, __VA_ARGS__)                                                         \
+                                                                                                                         \
+      /* dump the SoA internal structure */                                                                              \
+      template <typename T>                                                                                              \
+      SOA_HOST_ONLY friend void dump();                                                                                  \
+    };                                                                                                                \
+                                                                                                                        \
     template <bool RESTRICT_QUALIFY, bool RANGE_CHECKING>                                                              \
     using ViewTemplate = ViewTemplateFreeParams<ALIGNMENT, ALIGNMENT_ENFORCEMENT, RESTRICT_QUALIFY, RANGE_CHECKING>;   \
-                                                                                                                       \
+                                                                                                                        \
     using View = ViewTemplate<cms::soa::RestrictQualify::Default, cms::soa::RangeChecking::Default>;                   \
                                                                                                                        \
     /* Trivial constuctor */                                                                                           \
