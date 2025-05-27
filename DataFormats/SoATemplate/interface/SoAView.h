@@ -746,6 +746,7 @@ namespace cms::soa {
     };                                                                                                                 \
                                                                                                                        \
     friend Metadata;                                                                                                   \
+    // Here I added Metarecords										               \
     SOA_HOST_DEVICE SOA_INLINE const Metadata metadata() const { return Metadata(*this); }                             \
                                                                                                                        \
     /* Trivial constuctor */                                                                                           \
