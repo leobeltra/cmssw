@@ -146,6 +146,7 @@ public:
     auto& mview = product.view();
     auto const& cmview = product.view();
 
+    // DANGEROUS POINT
     if (expectSize_ >= 0 and expectSize_ != view.metadata().size()) {
       throw cms::Exception("Assert") << "Expected input collection size " << expectSize_ << ", got "
                                      << view.metadata().size();
