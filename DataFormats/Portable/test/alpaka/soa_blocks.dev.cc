@@ -293,9 +293,10 @@ int main(int argc, char** argv) {
     Queue queue(device);
 
     // number of elements
-    const std::size_t pos_elems = 1000000;
-    const std::size_t vel_elems = 1000000;
-    const std::size_t pca_elems = 1000000;
+    const std::size_t size = parse_or_default(argc > 1 ? argv[1] : nullptr, 1000000);
+    const int pos_elems = size;
+    const int vel_elems = size;
+    const int pca_elems = size;
 
     const std::array<cms::soa::size_type, 3> sizes{{pos_elems, vel_elems, pca_elems}};
 
@@ -313,13 +314,13 @@ int main(int argc, char** argv) {
 
     // fill up
     // 1) Block size: argv[1] if valid, else 64
-    const std::size_t blockSize = parse_or_default(argc > 1 ? argv[1] : nullptr, 64);
+    const std::size_t blockSize = parse_or_default(argc > 2 ? argv[2] : nullptr, 64);
 
     // 2) Default blocks: cover all elements for the chosen block size
     const std::size_t defaultBlocks = cms::alpakatools::divide_up_by(pos_elems, blockSize);
 
     // 3) Number of blocks: argv[2] if valid (>0), else defaultBlocks
-    std::size_t numberOfBlocks = parse_or_default(argc > 2 ? argv[2] : nullptr, defaultBlocks);
+    std::size_t numberOfBlocks = parse_or_default(argc > 3 ? argv[3] : nullptr, defaultBlocks);
 
     // (Optional) guard: never let it be 0
     if (numberOfBlocks == 0) numberOfBlocks = defaultBlocks;
