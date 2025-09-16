@@ -24,7 +24,7 @@
  * Declare accessors for the View of each block
  */
 #define _DECLARE_ACCESSORS_VIEW_BLOCKS_IMPL(VALUE_TYPE, NAME, LAYOUT_NAME)                \
-  LAYOUT_NAME<ALIGNMENT>::View NAME() {                                                   \
+  SOA_HOST_DEVICE SOA_INLINE LAYOUT_NAME<ALIGNMENT>::View NAME() {                                                   \
     return LAYOUT_NAME<ALIGNMENT>::const_cast_View(base_type::BOOST_PP_CAT(NAME, View_)); \
   }
 
@@ -74,7 +74,7 @@
  * Declare accessors for the ConstView of each block
  */
 #define _DECLARE_ACCESSORS_CONST_VIEW_BLOCKS_IMPL(VALUE_TYPE, NAME, LAYOUT_NAME) \
-  const LAYOUT_NAME<ALIGNMENT>::ConstView NAME() const { return BOOST_PP_CAT(NAME, View_); }
+  SOA_HOST_DEVICE SOA_INLINE const LAYOUT_NAME<ALIGNMENT>::ConstView NAME() const { return BOOST_PP_CAT(NAME, View_); }
 
 #define _DECLARE_ACCESSORS_CONST_VIEW_BLOCKS(R, DATA, NAME)                      \
   BOOST_PP_IF(BOOST_PP_GREATER(BOOST_PP_TUPLE_ELEM(0, NAME), _VALUE_TYPE_BLOCK), \
@@ -307,7 +307,7 @@
     struct Metadata {                                                                                                  \
       friend CLASS;                                                                                                    \
       SOA_HOST_DEVICE SOA_INLINE std::array<size_type, blocksNumber> size() const { return parent_.sizes_; }           \
-      SOA_HOST_DEVICE SOA_INLINE byte_size_type byteSize() const { return CLASS::computeDataSize(parent_.size_); }     \
+      SOA_HOST_DEVICE SOA_INLINE byte_size_type byteSize() const { return CLASS::computeDataSize(parent_.sizes_); }    \
       SOA_HOST_DEVICE SOA_INLINE byte_size_type alignment() const { return CLASS::alignment; }                         \
       SOA_HOST_DEVICE SOA_INLINE CLASS cloneToNewAddress(std::byte* _soa_impl_addr) const {                            \
         return CLASS(_soa_impl_addr, parent_.sizes_);                                                                  \

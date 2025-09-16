@@ -36,16 +36,13 @@ provided: `ViewTemplate`, `ViewViewTemplateFreeParams` and respectively `ConstVi
 `ConstViewTemplateFreeParams`. The parametrization of those templates is explained in the [Template
 parameters section](#template-parameters).
 
-<<<<<<< HEAD
 The view can be generated in a constant and non-constant flavors. All view flavors provide with the same
 interface where scalar elements are accessed with an `operator()`: `soa.scalar()` while columns (Eigen or not) are
 accessed via a array of structure (AoS) -like syntax: `soa[index].x()`. The "struct" object returned by `operator[]`
 can be used as a shortcut: `auto si = soa[index]; si.z() = si.x() + si.y();`
 
 A view can be instanciated by being passed the corresponding layout or passing from the [Metarecords subclass](#metarecords-subclass). 
-=======
 It is also possible to build a generic `View` or `ConstView` passing from the [Metarecords subclass](#metarecords-subclass). 
->>>>>>> cfa76781b65 (Added SoABlocks feature)
 This view can point to data belonging to different SoAs and thus not contiguous in memory.
 
 ## Descriptor

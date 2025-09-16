@@ -1343,6 +1343,8 @@ _SWITCH_ON_TYPE(VALUE_TYPE,                                                     
         : ConstViewTemplateFreeParams{other.elements_,                                                                 \
             _ITERATE_ON_ALL_COMMA(_DECLARE_VIEW_OTHER_MEMBER_LIST, BOOST_PP_EMPTY(), __VA_ARGS__)                      \
           } {}                                                                                                         \
+                                                                                                                       \
+      SOA_HOST_DEVICE                                                                                                  \
       ConstViewTemplateFreeParams(size_type elems,                                                                     \
         _ITERATE_ON_ALL_COMMA(_DECLARE_CONSTRUCTOR_CONST_COLUMNS, ~, __VA_ARGS__)) :                                   \
         elements_{elems}, _ITERATE_ON_ALL_COMMA(_INITIALIZE_CONST_COLUMNS, ~, __VA_ARGS__) { }                         \
@@ -1496,7 +1498,7 @@ _SWITCH_ON_TYPE(VALUE_TYPE,                                                     
         _ITERATE_ON_ALL(_INITIALIZE_VIEW_PARAMETERS_AND_SIZE, ~, __VA_ARGS__)                                          \
       }                                                                                                                \
                                                                                                                        \
-      SOA_HOST_ONLY ViewTemplateFreeParams(size_type elems,                                                            \
+      SOA_HOST_DEVICE ViewTemplateFreeParams(size_type elems,                                                            \
         _ITERATE_ON_ALL_COMMA(_DECLARE_CONSTRUCTOR_COLUMNS, ~, __VA_ARGS__)) :                                         \
         base_type{elems, _ITERATE_ON_ALL_COMMA(_INITIALIZE_COLUMNS, ~, __VA_ARGS__)} { }                               \
       /* Copiable */                                                                                                   \
@@ -1640,7 +1642,7 @@ _SWITCH_ON_TYPE(VALUE_TYPE,                                                     
     }                                                                                                                  \
                                                                                                                        \
     /* Helper function to convert a ConstView in a View, useful to implement View Blocks accessors */                  \
-    SOA_HOST_ONLY SOA_INLINE static View const_cast_View(ConstView const& view)  {                                     \
+    SOA_HOST_DEVICE SOA_INLINE static View const_cast_View(ConstView const& view)  {                                     \
       return View{view.metadata().size(), _ITERATE_ON_ALL_COMMA(_DECLARE_CONST_CAST_COLUMNS, ~, __VA_ARGS__)};         \
     }                                                                                                                  \
                                                                                                                        \
