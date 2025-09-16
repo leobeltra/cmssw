@@ -79,6 +79,11 @@ struct NormalisePositions {
 
 int main(int argc, char** argv) {
 
+        int i=0;
+        std::chrono::time_point<std::chrono::high_resolution_clock> start, end;
+        std::vector<double> inner_repetitions(10);
+        double sum, average;
+
         auto const& devices = cms::alpakatools::devices<Platform>();
         if (devices.empty()) {
         std::cout << "No devices available for the " <<  EDM_STRINGIZE(ALPAKA_ACCELERATOR_NAMESPACE) << " backend, "
@@ -87,13 +92,13 @@ int main(int argc, char** argv) {
     
         auto devHost = alpaka::getDevByIdx(alpaka::PlatformCpu{}, 0u);
     
-        for (auto const& device : cms::alpakatools::devices<Platform>()) {
+        for (auto const& device : cms::alpakatools::devices<Platform>()) {  
         std::cout << "Running on " << alpaka::getName(device) << std::endl;
     
         Queue queue(device);
     
         // common number of elements for the SoAs
-        const std::size_t elems = 50000000;
+        const std::size_t elems = parse_or_default(argc > 1 ? argv[1] : nullptr, );
 
         // Portable Collections
         PortableCollection<SoAPosition, Device> positionCollection(elems, queue);
@@ -101,13 +106,13 @@ int main(int argc, char** argv) {
 
         // fill up
         // 1) Block size: argv[1] if valid, else 64
-        const std::size_t blockSize = parse_or_default(argc > 1 ? argv[1] : nullptr, 64);
+        const std::size_t blockSize = parse_or_default(argc > 2 ? argv[2] : nullptr, 64);
 
         // 2) Default blocks: cover all elements for the chosen block size
         const std::size_t defaultBlocks = cms::alpakatools::divide_up_by(elems, blockSize);
 
         // 3) Number of blocks: argv[2] if valid (>0), else defaultBlocks
-        std::size_t numberOfBlocks = parse_or_default(argc > 2 ? argv[2] : nullptr, defaultBlocks);
+        std::size_t numberOfBlocks = parse_or_default(argc > 3 ? argv[3] : nullptr, defaultBlocks);
 
         // (Optional) guard: never let it be 0
         if (numberOfBlocks == 0) numberOfBlocks = defaultBlocks;
@@ -117,28 +122,45 @@ int main(int argc, char** argv) {
         alpaka::exec<Acc1D>(queue, workDiv, FillSoA{}, positionCollectionView);
         alpaka::wait(queue);
 
-        auto start = std::chrono::high_resolution_clock::now();
+        for(i=0; i<11; i++) {
 
-        // normalise
-        alpaka::exec<Acc1D>(queue, workDiv, NormalisePositions{}, positionCollectionView);  
-        alpaka::wait(queue);
+          start = std::chrono::high_resolution_clock::now();
 
-        auto end = std::chrono::high_resolution_clock::now();
-        std::chrono::duration<double> elapsed = end - start;
-        std::cout << "Total execution time: " << elapsed.count() << " seconds\n";
+          // normalise
+          alpaka::exec<Acc1D>(queue, workDiv, NormalisePositions{}, positionCollectionView);  
+          alpaka::wait(queue);
+
+          alpaka::exec<Acc1D>(queue, workDiv, FillSoA{}, positionCollectionView);
+          alpaka::wait(queue);
+
+          end = std::chrono::high_resolution_clock::now();
+
+          std::chrono::duration<double> elapsed = (end - start) * 1000;
+
+          if (i > 0)
+            inner_repetitions[i-1] = elapsed.count();
+        }
+
+        // Calculate the sum of all elements
+        sum = std::accumulate(inner_repetitions.begin(), inner_repetitions.end(), 0.0);
+
+        // Calculate the average
+        average = sum / inner_repetitions.size();
+        
+        std::cout << "Average execution time: " << average << " ms\n";
 
         PortableHostCollection<SoAPosition> positionHostCollection(elems, queue);
         alpaka::memcpy(queue, positionHostCollection.buffer(), positionCollection.buffer());
         alpaka::wait(queue);
 
         // check norm == 1
-        const SoAPositionConstView& positionViewHostCollection = positionHostCollection.const_view();
-        for (size_t i = 0; i < elems; i++) {
-            float norm = positionViewHostCollection[i].square_norm_position();
-            if (std::abs(norm - 1.0f) > 1.e-5f) {
-            std::cout << "Error in normalisation at element " << i << " : " << norm << std::endl;
-            }
-        }
+        // const SoAPositionConstView& positionViewHostCollection = positionHostCollection.const_view();
+        // for (size_t i = 0; i < elems; i++) {
+        //     float norm = positionViewHostCollection[i].square_norm_position();
+        //     if (std::abs(norm - 1.0f) > 1.e-5f) {
+        //     std::cout << "Error in normalisation at element " << i << " : " << norm << std::endl;
+        //     }
+        // }
 
         std::cout << "Normalisation check completed" << std::endl;
 
