@@ -13,8 +13,8 @@ CMSSW_BASE="/data/user/mmichail/hackathon_19/CMSSW_15_1_0_pre5"
 SRC_DIR="$CMSSW_BASE/src/DataFormats/Portable"
 RUN_DIR="$CMSSW_BASE/test/el8_amd64_gcc12"
 OUT_DIR="$SRC_DIR/test/results"
-OUT_CSV="$OUT_DIR/results_cpu.csv"
-#OUT_CSV="$OUT_DIR/results_cpu.csv"
+# OUT_CSV="$OUT_DIR/results_test_gpu.csv"
+OUT_CSV="$OUT_DIR/results_test_cpu.csv"
 
 mkdir -p "$OUT_DIR"
 
@@ -26,16 +26,16 @@ cd "$CMSSW_BASE" && eval "$(scram runtime -sh)"
 
 # Run experiments
 cd "$RUN_DIR" || exit 1
-# [[ -x ./Device_methodsCudaAsync ]] || { echo "ERROR: Device_methodsCudaAsync not found"; exit 1; }
-[[ -x ./Device_methodsSerialSync ]] || { echo "ERROR: Device_methodsSerialSync not found"; exit 1; }
+# [[ -x ./Device_test_methodsCudaAsync ]] || { echo "ERROR: Device_test_methodsCudaAsync not found"; exit 1; }
+[[ -x ./Device_test_methodsSerialSync ]] || { echo "ERROR: Device_test_methodsSerialSync not found"; exit 1; }
 
 echo "element_size,mean,std" > "$OUT_CSV"
 
 for size in "${SIZE_LIST[@]}"; do
   tmp="$(mktemp)"
   for i in {0..10}; do
-    # out="$(./Device_methodsCudaAsync "$size" 2>&1)"
-    out="$(./Device_methodsSerialSync "$size" 2>&1)"
+    # out="$(./Device_test_methodsCudaAsync "$size" 2>&1)"
+    out="$(./Device_test_methodsSerialSync "$size" 2>&1)"
     val="$(grep -m1 -E 'Average execution time:' <<<"$out" | awk '{print $(NF-1)}')"
     [[ -n "${val:-}" ]] && echo "$val" >> "$tmp"
   done

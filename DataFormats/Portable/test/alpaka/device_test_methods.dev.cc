@@ -30,31 +30,6 @@ GENERATE_SOA_LAYOUT(SoAPositionTemplate,
                     SOA_COLUMN(float, y),
                     SOA_COLUMN(float, z),
 
-                    SOA_ELEMENT_METHODS(
-
-                        SOA_HOST_DEVICE SOA_INLINE void normalise() {
-                          float norm_position = square_norm_position();
-                          if (norm_position > 0.0f) {
-                            x() /= norm_position;
-                            y() /= norm_position;
-                            z() /= norm_position;
-                          }}
-
-                        template <typename OtherView>
-                        SOA_HOST_DEVICE SOA_INLINE void add(OtherView& otherSoA) {
-                            x() = x() + otherSoA.x(0);
-                            y() = y() + otherSoA.y(0);
-                            z() = z() + otherSoA.z(0);
-                          }
-
-                    ),
-
-                    SOA_CONST_ELEMENT_METHODS(
-
-                        SOA_HOST_DEVICE SOA_INLINE float square_norm_position() const { return sqrt(x() * x() + y() * y() + z() * z()); };
-
-                    ),
-
                     SOA_SCALAR(int, detectorType))
 
 using SoAPosition = SoAPositionTemplate<>;
@@ -74,14 +49,24 @@ struct FillSoA {
         positionView[local_idx].z() = (static_cast<float>(local_idx) + 1.f) * 3.0f;
       }
     }
-  };
+};
+
+template <typename PositionView>
+SOA_HOST_DEVICE SOA_INLINE float square_norm_position(PositionView& positionView, int local_idx) {
+  return sqrt(positionView[local_idx].x() * positionView[local_idx].x() + positionView[local_idx].y() * positionView[local_idx].y() + positionView[local_idx].z() * positionView[local_idx].z());
+}
 
 // Kernel for normalising the positions
 struct NormalisePositions {
     template <typename TAcc, typename PositionView>
     ALPAKA_FN_ACC void operator()(TAcc const& acc, PositionView& positionView) const {
       for (auto local_idx : cms::alpakatools::uniform_elements(acc, positionView.metadata().size())) {
-        positionView[local_idx].normalise();
+        float norm_position = square_norm_position(positionView, local_idx);
+        if (norm_position > 0.0f) {
+          positionView[local_idx].x() /= norm_position;
+          positionView[local_idx].y() /= norm_position;
+          positionView[local_idx].z() /= norm_position;
+        }
       }
     }
   };  
@@ -93,7 +78,9 @@ struct Addition {
     ALPAKA_FN_ACC void operator()(TAcc const& acc, PositionView& positionView) const {
       for (auto local_idx : cms::alpakatools::uniform_elements(acc, positionView.metadata().size())) {
         if (local_idx != 0) {
-          positionView[local_idx].add(positionView);
+          positionView[local_idx].x() += positionView[0].x();
+          positionView[local_idx].y() += positionView[0].y();
+          positionView[local_idx].z() += positionView[0].z();
         }
       }
     }
@@ -121,7 +108,7 @@ int main(int argc, char** argv) {
         Queue queue(device);
     
         // common number of elements for the SoAs
-        const std::size_t elems = parse_or_default(argc > 1 ? argv[1] : nullptr, 0);
+        const std::size_t elems = parse_or_default(argc > 1 ? argv[1] : nullptr, 1000);
 
         // Portable Collections
         PortableCollection<SoAPosition, Device> positionCollection(elems, queue);
@@ -201,6 +188,13 @@ int main(int argc, char** argv) {
         PortableHostCollection<SoAPosition> positionHostCollection(elems, queue);
         alpaka::memcpy(queue, positionHostCollection.buffer(), positionCollection.buffer());
         alpaka::wait(queue);
+
+        // const SoAPositionConstView& positionViewHostCollection = positionHostCollection.const_view();
+        // for (size_t i = 0; i < elems; i++) {
+        //   std::cout << "New value for element " << i << " : " << positionViewHostCollection[i].x() << std::endl;
+        //   std::cout << "New value for element " << i << " : " << positionViewHostCollection[i].y() << std::endl;
+        //   std::cout << "New value for element " << i << " : " << positionViewHostCollection[i].z() << std::endl;
+        // }
 
         // check norm == 1
         // const SoAPositionConstView& positionViewHostCollection = positionHostCollection.const_view();
