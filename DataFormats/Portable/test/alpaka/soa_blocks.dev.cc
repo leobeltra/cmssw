@@ -83,7 +83,7 @@ struct FillSoAs {
       velocityView.charge() = -1;
     }
        
-    for (auto local_idx : cms::alpakatools::uniform_elements(acc, positionView.metadata().size())) {
+    for (auto local_idx : cms::alpakatools::uniform_elements(acc, pcaView.metadata().size())) {
       positionView[local_idx].x() = static_cast<float>(local_idx);
       positionView[local_idx].y() = static_cast<float>(local_idx) * 2.0f;
       positionView[local_idx].z() = static_cast<float>(local_idx) * 3.0f;
@@ -112,7 +112,7 @@ struct FillSoABlocks {
       view.velocity().charge() = -1;
     }  
 
-    for (auto local_idx : cms::alpakatools::uniform_elements(acc, view.position().metadata().size())) {
+    for (auto local_idx : cms::alpakatools::uniform_elements(acc, view.pca().metadata().size())) {
       view.position()[local_idx].x() = static_cast<float>(local_idx);
       view.position()[local_idx].y() = static_cast<float>(local_idx) * 2.0f;
       view.position()[local_idx].z() = static_cast<float>(local_idx) * 3.0f;
@@ -147,21 +147,19 @@ struct ComputeBenchmarkSoAs {
     constexpr int iters = 100;
     constexpr float dt = 1e-3f;
 
-    // Example of once-per-grid metadata writes (same as your fill kernel)
     if (cms::alpakatools::once_per_grid(acc)) {
       positionView.detectorType() = 1;
       velocityView.charge()       = -1;
     }
 
-    // Iterate over the elements assigned to this thread
     for (auto local_idx :
-         cms::alpakatools::uniform_elements(acc, positionView.metadata().size())) {
-      // Load positions once (keep memory traffic low)
+         cms::alpakatools::uniform_elements(acc, pcaView.metadata().size())) {
+
       float px = positionView[local_idx].x();
       float py = positionView[local_idx].y();
       float pz = positionView[local_idx].z();
 
-      // Seed "velocities" and "accelerations" from the position (arbitrary but deterministic)
+      // Seed "velocities" and "accelerations" from the position
       float vx = px * 0.5f;
       float vy = py * 0.5f;
       float vz = pz * 0.5f;
@@ -170,25 +168,23 @@ struct ComputeBenchmarkSoAs {
       float ay = 0.002f + 1e-6f * py;
       float az = 0.003f + 1e-6f * pz;
 
-      // Heavy compute loop: FMAs + trig + sqrt with dependencies
-      // to keep values in registers and avoid being optimized out.
       for (int k = 0; k < iters; ++k) {
-        // integrate-ish
+        // a * t + v and write on v
         vx = fma(acc, ax, dt, vx);
         vy = fma(acc, ay, dt, vy);
         vz = fma(acc, az, dt, vz);
 
-        // stress SFUs
+        // some math
         float s = sin(acc, vx) + cos(acc, vy);
         float r = sqrt(acc, vz * vz + 1.0f);
 
-        // mix to keep data-dependent flow
+        // s * 1e-3f + a
         ax = fma(acc, s, 1e-3f, ax);
         ay = fma(acc, r, 1e-3f, ay);
         az = fma(acc, s + r, 1e-3f, az);
       }
 
-      // Write results back so work isn't dead-code-eliminated
+      // Write results
       velocityView[local_idx].vx() = vx;
       velocityView[local_idx].vy() = vy;
       velocityView[local_idx].vz() = vz;
@@ -203,7 +199,7 @@ struct ComputeBenchmarkSoAs {
   }
 };
 
-// Kernel for compute microbenchmarking on SoAs
+// Kernel for compute microbenchmarking on SoABlocks
 struct ComputeBenchmarkSoABlocks {
   template <typename TAcc, typename SoABlocksView>
   ALPAKA_FN_ACC void operator()(TAcc const& acc,
@@ -217,21 +213,19 @@ struct ComputeBenchmarkSoABlocks {
     constexpr int iters = 100;
     constexpr float dt = 1e-3f;
 
-    // Example of once-per-grid metadata writes (same as your fill kernel)
     if (cms::alpakatools::once_per_grid(acc)) {
       view.position().detectorType() = 1;
       view.velocity().charge()       = -1;
     }
 
-    // Iterate over the elements assigned to this thread
     for (auto local_idx :
-         cms::alpakatools::uniform_elements(acc, view.position().metadata().size())) {
-      // Load positions once (keep memory traffic low)
+         cms::alpakatools::uniform_elements(acc, view.pca().metadata().size())) {
+ 
       float px = view.position()[local_idx].x();
       float py = view.position()[local_idx].y();
       float pz = view.position()[local_idx].z();
 
-      // Seed "velocities" and "accelerations" from the position (arbitrary but deterministic)
+      // Seed "velocities" and "accelerations" from the position
       float vx = px * 0.5f;
       float vy = py * 0.5f;
       float vz = pz * 0.5f;
@@ -240,25 +234,23 @@ struct ComputeBenchmarkSoABlocks {
       float ay = 0.002f + 1e-6f * py;
       float az = 0.003f + 1e-6f * pz;
 
-      // Heavy compute loop: FMAs + trig + sqrt with dependencies
-      // to keep values in registers and avoid being optimized out.
       for (int k = 0; k < iters; ++k) {
-        // integrate-ish
+        // a * t + v and write on v
         vx = fma(acc, ax, dt, vx);
         vy = fma(acc, ay, dt, vy);
         vz = fma(acc, az, dt, vz);
 
-        // stress SFUs
+        // some math
         float s = sin(acc, vx) + cos(acc, vy);
         float r = sqrt(acc, vz * vz + 1.0f);
 
-        // mix to keep data-dependent flow
+        // s * 1e-3f + a
         ax = fma(acc, s, 1e-3f, ax);
         ay = fma(acc, r, 1e-3f, ay);
         az = fma(acc, s + r, 1e-3f, az);
       }
 
-      // Write results back so work isn't dead-code-eliminated
+      // Write results
       view.velocity()[local_idx].vx() = vx;
       view.velocity()[local_idx].vy() = vy;
       view.velocity()[local_idx].vz() = vz;
@@ -295,8 +287,8 @@ int main(int argc, char** argv) {
     // number of elements
     const std::size_t size = parse_or_default(argc > 1 ? argv[1] : nullptr, 1000000);
     const int pos_elems = size;
-    const int vel_elems = size;
-    const int pca_elems = size;
+    const int vel_elems = size * 0.9;
+    const int pca_elems = size * 0.8;
 
     const std::array<cms::soa::size_type, 3> sizes{{pos_elems, vel_elems, pca_elems}};
 
@@ -313,13 +305,12 @@ int main(int argc, char** argv) {
     SoABlocksView& blocksCollectionView = blocksCollection.view();
 
     // fill up
-    // 1) Block size: argv[1] if valid, else 64
-    const std::size_t blockSize = parse_or_default(argc > 2 ? argv[2] : nullptr, 64);
+    // block size: argv[2] if valid, else 512
+    const std::size_t blockSize = parse_or_default(argc > 2 ? argv[2] : nullptr, 512);
 
-    // 2) Default blocks: cover all elements for the chosen block size
     const std::size_t defaultBlocks = cms::alpakatools::divide_up_by(pos_elems, blockSize);
 
-    // 3) Number of blocks: argv[2] if valid (>0), else defaultBlocks
+    // number of blocks: argv[3] if valid (>0), else defaultBlocks
     std::size_t numberOfBlocks = parse_or_default(argc > 3 ? argv[3] : nullptr, defaultBlocks);
 
     // (Optional) guard: never let it be 0
@@ -332,7 +323,28 @@ int main(int argc, char** argv) {
     alpaka::exec<Acc1D>(queue, workDiv, FillSoABlocks{}, blocksCollectionView);
     alpaka::wait(queue);
 
+    // warm-up runs (discard)
+    start = std::chrono::high_resolution_clock::now();
+    int warmup = 2;
+    for (int w = 0; w < warmup; ++w) {
+      alpaka::exec<Acc1D>(queue, workDiv, ComputeBenchmarkSoAs{}, positionCollectionView, velocityCollectionView, pcaCollectionView);
+      alpaka::wait(queue);
+      alpaka::exec<Acc1D>(queue, workDiv, ComputeBenchmarkSoABlocks{}, blocksCollectionView);
+      alpaka::wait(queue);
+    }
+    end = std::chrono::high_resolution_clock::now();
+
     // benchmark
+    start = std::chrono::high_resolution_clock::now();
+    alpaka::exec<Acc1D>(queue,
+                     workDiv,
+                     ComputeBenchmarkSoABlocks{},
+                     blocksCollectionView);
+    alpaka::wait(queue);
+    end = std::chrono::high_resolution_clock::now();
+    elapsed = end - start;
+    std::cout << "Total execution time for SoABlocks: " << elapsed.count() * 1000 << " ms\n";
+
     start = std::chrono::high_resolution_clock::now();
     alpaka::exec<Acc1D>(queue,
                      workDiv,
@@ -343,17 +355,7 @@ int main(int argc, char** argv) {
     alpaka::wait(queue);
     end = std::chrono::high_resolution_clock::now();
     elapsed = end - start;
-    std::cout << "Total execution time for SoAs: " << elapsed.count() << " seconds\n";
-
-    start = std::chrono::high_resolution_clock::now();
-    alpaka::exec<Acc1D>(queue,
-                     workDiv,
-                     ComputeBenchmarkSoABlocks{},
-                     blocksCollectionView);
-    alpaka::wait(queue);
-    end = std::chrono::high_resolution_clock::now();
-    elapsed = end - start;
-    std::cout << "Total execution time for SoABlocks: " << elapsed.count() << " seconds\n";
+    std::cout << "Total execution time for SoAs: " << elapsed.count() * 1000 << " ms\n";
 
   }
 
