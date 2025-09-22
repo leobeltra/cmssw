@@ -9,7 +9,7 @@ export CUDA_VISIBLE_DEVICES="$GPU"
 export HIP_VISIBLE_DEVICES="$GPU"
 
 # Problem sizes
-SIZE_LIST=(10 100 1000 10000 100000 1000000)
+SIZE_LIST=(10 100 1000 10000 100000 250000 750000 1000000)
 
 # How many runs per size:
 # We'll do TOTAL_RUNS = WARMUP + SAMPLES, and then discard the first (warm-up).
@@ -22,7 +22,7 @@ CMSSW_BASE="/data/user/lebeltra/hackathon_blocks/CMSSW_15_1_0_pre5"
 SRC_DIR="$CMSSW_BASE/src/DataFormats/Portable"
 RUN_DIR="$CMSSW_BASE/test/el8_amd64_gcc12"
 OUT_DIR="$SRC_DIR/test/results"
-OUT_CSV="$OUT_DIR/results_avg_std_cuda.csv"
+OUT_CSV="$OUT_DIR/results_avg_std_cpu.csv"
 
 mkdir -p "$OUT_DIR"
 
@@ -36,7 +36,7 @@ eval "$(scram runtime -sh)"
 # Go to run dir
 cd "$RUN_DIR" || { echo "Run dir not found: $RUN_DIR"; exit 1; }
 
-EXEC="./Device_blocksCudaAsync"
+EXEC="./Device_blocksSerialSync"
 [[ -x "$EXEC" ]] || { echo "ERROR: $EXEC not found or not executable"; exit 1; }
 
 # CSV header
