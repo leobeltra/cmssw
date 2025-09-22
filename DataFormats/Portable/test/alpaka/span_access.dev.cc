@@ -346,6 +346,13 @@ int main(int argc, char** argv) {
     // warm-up runs (discard)
     start = std::chrono::high_resolution_clock::now();
     int warmup = 2;
+
+    const std::size_t n = pcaCollectionView.metadata().size();
+    const std::size_t align = 128;                     // allineamento in byte
+    
+    const std::size_t stride_bytes = align_size(n * sizeof(double), align);
+    const int eigen_stride = static_cast<int>(stride_bytes / sizeof(double));
+
     for (int w = 0; w < warmup; ++w) {
       alpaka::exec<Acc1D>(queue, workDiv, ComputeBenchmarkPointers{}, 
                                             pcaCollectionView.metadata().size(),
@@ -358,7 +365,7 @@ int main(int argc, char** argv) {
                                             pcaCollectionView.eigenvector_1().data(),
                                             pcaCollectionView.eigenvector_2().data(),
                                             pcaCollectionView.eigenvector_3().data(),
-                                            align_size(pcaCollectionView.metadata().size(), 128),
+                                            eigen_stride,
                                             pcaCollectionView.candidateDirection().data());
       alpaka::wait(queue);
       alpaka::exec<Acc1D>(queue, workDiv, ComputeBenchmarkSpans{},
@@ -372,7 +379,7 @@ int main(int argc, char** argv) {
                                             pcaCollectionView.eigenvector_1(),
                                             pcaCollectionView.eigenvector_2(),
                                             pcaCollectionView.eigenvector_3(),
-                                            align_size(pcaCollectionView.metadata().size(), 128),
+                                            eigen_stride,
                                             pcaCollectionView.candidateDirection());
       alpaka::wait(queue);
     }
@@ -392,7 +399,7 @@ int main(int argc, char** argv) {
                                             pcaCollectionView.eigenvector_1().data(),
                                             pcaCollectionView.eigenvector_2().data(),
                                             pcaCollectionView.eigenvector_3().data(),
-                                            align_size(pcaCollectionView.metadata().size(), 128),
+                                            eigen_stride,
                                             pcaCollectionView.candidateDirection().data());
       alpaka::wait(queue);
     end = std::chrono::high_resolution_clock::now();
@@ -411,7 +418,7 @@ int main(int argc, char** argv) {
                                             pcaCollectionView.eigenvector_1(),
                                             pcaCollectionView.eigenvector_2(),
                                             pcaCollectionView.eigenvector_3(),
-                                            align_size(pcaCollectionView.metadata().size(), 128),
+                                            eigen_stride,
                                             pcaCollectionView.candidateDirection());
       alpaka::wait(queue);
     end = std::chrono::high_resolution_clock::now();

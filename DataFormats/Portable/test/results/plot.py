@@ -3,8 +3,8 @@ import csv
 import math
 import matplotlib.pyplot as plt
 
-CSV_PATH = "results_avg_std_cpu.csv"   # update path if needed
-OUT_PNG  = "performance_with_std_cpu.png"
+CSV_PATH = "results_avg_std_cuda.csv"   # update path if needed
+OUT_PNG  = "performance_with_std_cuda.png"
 
 sizes = []
 mean_pointers = []
@@ -28,11 +28,11 @@ plt.errorbar(sizes, mean_spans, yerr=std_spans, marker="s", linestyle="-", capsi
 
 plt.xscale("log")
 # If your y range spans >10x, uncomment the next line:
-plt.yscale("log")
+# plt.yscale("log")
 
 plt.xlabel("Problem size (elements)")
 plt.ylabel("Execution time (ms)")
-plt.title("Pointers vs Spans — CPU (20 runs, 2 warm-up)")
+plt.title("Pointers vs Spans — GPU (20 runs, 2 warm-up)")
 plt.grid(True, which="both", linestyle="--", linewidth=0.5)
 plt.legend()
 plt.tight_layout()
