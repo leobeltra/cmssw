@@ -22,7 +22,7 @@ CMSSW_BASE="/data/user/lebeltra/hackathon_blocks/CMSSW_15_1_0_pre5"
 SRC_DIR="$CMSSW_BASE/src/DataFormats/Portable"
 RUN_DIR="$CMSSW_BASE/test/el8_amd64_gcc12"
 OUT_DIR="$SRC_DIR/test/results"
-OUT_CSV="$OUT_DIR/results_avg_std_cpu.csv"
+OUT_CSV="$OUT_DIR/results_avg_std_cuda.csv"
 
 mkdir -p "$OUT_DIR"
 
@@ -36,7 +36,7 @@ eval "$(scram runtime -sh)"
 # Go to run dir
 cd "$RUN_DIR" || { echo "Run dir not found: $RUN_DIR"; exit 1; }
 
-EXEC="./Device_blocksSerialSync"
+EXEC="./Device_blocksCudaAsync"
 [[ -x "$EXEC" ]] || { echo "ERROR: $EXEC not found or not executable"; exit 1; }
 
 # CSV header
