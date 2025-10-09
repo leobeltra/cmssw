@@ -3,8 +3,8 @@ import csv
 import math
 import matplotlib.pyplot as plt
 
-CSV_PATH = "results_cpu.csv"   # update path if needed
-OUT_PNG  = "performance_with_cpu.png"
+CSV_PATH = "results_mem_cuda.csv"   # update path if needed
+OUT_PNG  = "performance_mem_with_cuda.png"
 
 sizes = []
 mean_soa = []
@@ -28,11 +28,11 @@ plt.errorbar(sizes, mean_aos, yerr=std_aos, marker="s", linestyle="-", capsize=3
 
 plt.xscale("log")
 # If your y range AoS >10x, uncomment the next line:
-plt.yscale("log")
+# plt.yscale("log")
 
 plt.xlabel("Problem size (elements)")
 plt.ylabel("Execution time (ms)")
-plt.title("SoA vs AoS — CPU (20 runs, 2 warm-up)")
+plt.title("SoA vs AoS — GPU (20 runs, 2 warm-up)")
 plt.grid(True, which="both", linestyle="--", linewidth=0.5)
 plt.legend()
 plt.tight_layout()
