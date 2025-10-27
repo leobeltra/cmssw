@@ -171,7 +171,7 @@ namespace ALPAKA_ACCELERATOR_NAMESPACE {
                                                       uint32_t* nCellTracks,
                                                       CAPairSoAView ct,
                                                       cms::alpakatools::AtomicPairCounter& apc,
-                                                      Quality* __restrict__ quality,
+                                                      ::reco::TrackSoAView& quality,
                                                       TmpTuple& tmpNtuplet,
                                                       const unsigned int minHitsPerNtuplet) const {
       // the building process for a track ends if:
@@ -267,7 +267,7 @@ namespace ALPAKA_ACCELERATOR_NAMESPACE {
 #ifdef CA_DEBUG
                 printf("\n");
 #endif
-                quality[it] = bad;  // initialize to bad
+                quality.quality()[it] = bad;  // initialize to bad
               }
             }
           }

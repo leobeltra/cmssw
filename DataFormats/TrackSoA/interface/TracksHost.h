@@ -5,7 +5,7 @@
 #include "DataFormats/TrackSoA/interface/TracksSoA.h"
 
 namespace reco {
-  using TracksHost = PortableHostMultiCollection<TrackSoA, TrackHitSoA>;
+  using TracksHost = PortableHostMultiCollection<TrackAoS, TrackHitAoS>;
 }
 
 #endif  // DataFormats_TrackSoA_interface_TracksHost_H

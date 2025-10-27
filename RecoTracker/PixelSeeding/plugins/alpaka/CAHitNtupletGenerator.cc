@@ -451,7 +451,7 @@ namespace ALPAKA_ACCELERATOR_NAMESPACE {
                           hits_d.offsetBPIX2(),
                           geometry_d.view().metadata().size(),
                           tracks.view(),
-                          tracks.view<TrackHitSoA>(),
+                          tracks.view<TrackHitAoS>(),
                           geometry_d.view<::reco::CALayersSoA>(),
                           geometry_d.view<::reco::CAGraphSoA>(),
                           queue);

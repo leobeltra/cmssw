@@ -1,0 +1,129 @@
+%MSG-i ThreadStreamSetup:  (NoModuleName) 24-Oct-2025 17:42:49 CEST pre-events
+setting # threads 16
+setting # streams 16
+%MSG
+%MSG-i AlpakaService:  (NoModuleName) 24-Oct-2025 17:42:50 CEST pre-events
+AlpakaServiceSerialSync succesfully initialised.
+Found 1 device:
+  - AMD EPYC 9754 128-Core Processor
+%MSG
+%MSG-i CUDAService:  (NoModuleName) 24-Oct-2025 17:42:51 CEST pre-events
+CUDA runtime version 12.9, driver version 12.9, NVIDIA driver version 575.51.03
+CUDA device 0: Tesla T4 (sm_75)
+%MSG
+%MSG-i AlpakaService:  (NoModuleName) 24-Oct-2025 17:42:53 CEST pre-events
+AlpakaServiceCudaAsync succesfully initialised.
+Found 1 device:
+  - Tesla T4
+%MSG
+24-Oct-2025 17:42:55 CEST  Initiating request to open file file:/data/lebeltra/AoS_benchmarks/input_root.root
+24-Oct-2025 17:43:23 CEST  Successfully opened file file:/data/lebeltra/AoS_benchmarks/input_root.root
+Begin processing the 1st record. Run 1, Event 8701, LumiSection 88 on stream 14 at 24-Oct-2025 17:44:02.502 CEST
+Begin processing the 2nd record. Run 1, Event 8702, LumiSection 88 on stream 2 at 24-Oct-2025 17:44:02.503 CEST
+Begin processing the 3rd record. Run 1, Event 8703, LumiSection 88 on stream 11 at 24-Oct-2025 17:44:02.503 CEST
+Begin processing the 4th record. Run 1, Event 8704, LumiSection 88 on stream 9 at 24-Oct-2025 17:44:02.503 CEST
+Begin processing the 5th record. Run 1, Event 8705, LumiSection 88 on stream 13 at 24-Oct-2025 17:44:02.504 CEST
+Begin processing the 6th record. Run 1, Event 8706, LumiSection 88 on stream 10 at 24-Oct-2025 17:44:02.504 CEST
+Begin processing the 7th record. Run 1, Event 8707, LumiSection 88 on stream 7 at 24-Oct-2025 17:44:02.504 CEST
+Begin processing the 8th record. Run 1, Event 8708, LumiSection 88 on stream 1 at 24-Oct-2025 17:44:02.504 CEST
+Begin processing the 9th record. Run 1, Event 8709, LumiSection 88 on stream 4 at 24-Oct-2025 17:44:02.504 CEST
+Begin processing the 10th record. Run 1, Event 8710, LumiSection 88 on stream 12 at 24-Oct-2025 17:44:02.504 CEST
+Begin processing the 11th record. Run 1, Event 8711, LumiSection 88 on stream 5 at 24-Oct-2025 17:44:02.505 CEST
+Begin processing the 12th record. Run 1, Event 8712, LumiSection 88 on stream 3 at 24-Oct-2025 17:44:02.505 CEST
+Begin processing the 13th record. Run 1, Event 8713, LumiSection 88 on stream 0 at 24-Oct-2025 17:44:02.505 CEST
+Begin processing the 14th record. Run 1, Event 8714, LumiSection 88 on stream 6 at 24-Oct-2025 17:44:02.505 CEST
+Begin processing the 15th record. Run 1, Event 8715, LumiSection 88 on stream 15 at 24-Oct-2025 17:44:02.505 CEST
+Begin processing the 16th record. Run 1, Event 8716, LumiSection 88 on stream 8 at 24-Oct-2025 17:44:02.505 CEST
+Begin processing the 17th record. Run 1, Event 8717, LumiSection 88 on stream 9 at 24-Oct-2025 17:44:02.939 CEST
+Begin processing the 18th record. Run 1, Event 8718, LumiSection 88 on stream 7 at 24-Oct-2025 17:44:03.227 CEST
+Begin processing the 19th record. Run 1, Event 8719, LumiSection 88 on stream 3 at 24-Oct-2025 17:44:03.632 CEST
+Begin processing the 20th record. Run 1, Event 8720, LumiSection 88 on stream 11 at 24-Oct-2025 17:44:03.632 CEST
+Begin processing the 21st record. Run 1, Event 8721, LumiSection 88 on stream 0 at 24-Oct-2025 17:44:03.712 CEST
+Begin processing the 22nd record. Run 1, Event 8722, LumiSection 88 on stream 7 at 24-Oct-2025 17:44:04.284 CEST
+Begin processing the 23rd record. Run 1, Event 8723, LumiSection 88 on stream 11 at 24-Oct-2025 17:44:04.459 CEST
+Begin processing the 24th record. Run 1, Event 8724, LumiSection 88 on stream 7 at 24-Oct-2025 17:44:05.418 CEST
+Begin processing the 25th record. Run 1, Event 8725, LumiSection 88 on stream 7 at 24-Oct-2025 17:44:05.428 CEST
+Begin processing the 26th record. Run 1, Event 8726, LumiSection 88 on stream 8 at 24-Oct-2025 17:44:06.016 CEST
+Begin processing the 27th record. Run 1, Event 8727, LumiSection 88 on stream 14 at 24-Oct-2025 17:44:07.115 CEST
+Begin processing the 28th record. Run 1, Event 8728, LumiSection 88 on stream 4 at 24-Oct-2025 17:44:07.317 CEST
+Begin processing the 29th record. Run 1, Event 8729, LumiSection 88 on stream 12 at 24-Oct-2025 17:44:08.236 CEST
+Begin processing the 30th record. Run 1, Event 8730, LumiSection 88 on stream 5 at 24-Oct-2025 17:44:08.343 CEST
+Begin processing the 31st record. Run 1, Event 8731, LumiSection 88 on stream 15 at 24-Oct-2025 17:44:08.344 CEST
+Begin processing the 32nd record. Run 1, Event 8732, LumiSection 88 on stream 6 at 24-Oct-2025 17:44:08.344 CEST
+Begin processing the 33rd record. Run 1, Event 8733, LumiSection 88 on stream 14 at 24-Oct-2025 17:44:08.350 CEST
+Begin processing the 34th record. Run 1, Event 8734, LumiSection 88 on stream 14 at 24-Oct-2025 17:44:08.360 CEST
+Begin processing the 35th record. Run 1, Event 8735, LumiSection 88 on stream 1 at 24-Oct-2025 17:44:08.581 CEST
+Begin processing the 36th record. Run 1, Event 8736, LumiSection 88 on stream 9 at 24-Oct-2025 17:44:09.824 CEST
+Begin processing the 37th record. Run 1, Event 8737, LumiSection 88 on stream 0 at 24-Oct-2025 17:44:09.824 CEST
+Begin processing the 38th record. Run 1, Event 8738, LumiSection 88 on stream 7 at 24-Oct-2025 17:44:10.183 CEST
+Begin processing the 39th record. Run 1, Event 8739, LumiSection 88 on stream 3 at 24-Oct-2025 17:44:10.183 CEST
+Begin processing the 40th record. Run 1, Event 8740, LumiSection 88 on stream 13 at 24-Oct-2025 17:44:10.183 CEST
+Begin processing the 41st record. Run 1, Event 8741, LumiSection 88 on stream 10 at 24-Oct-2025 17:44:10.192 CEST
+Begin processing the 42nd record. Run 1, Event 8742, LumiSection 88 on stream 12 at 24-Oct-2025 17:44:10.192 CEST
+Begin processing the 43rd record. Run 1, Event 8743, LumiSection 88 on stream 2 at 24-Oct-2025 17:44:10.192 CEST
+Begin processing the 44th record. Run 1, Event 8744, LumiSection 88 on stream 7 at 24-Oct-2025 17:44:10.389 CEST
+Begin processing the 45th record. Run 1, Event 8745, LumiSection 88 on stream 7 at 24-Oct-2025 17:44:10.399 CEST
+Begin processing the 46th record. Run 1, Event 8746, LumiSection 88 on stream 0 at 24-Oct-2025 17:44:10.900 CEST
+Begin processing the 47th record. Run 1, Event 8747, LumiSection 88 on stream 8 at 24-Oct-2025 17:44:11.339 CEST
+Begin processing the 48th record. Run 1, Event 8748, LumiSection 88 on stream 4 at 24-Oct-2025 17:44:11.457 CEST
+Begin processing the 49th record. Run 1, Event 8749, LumiSection 88 on stream 11 at 24-Oct-2025 17:44:11.753 CEST
+Begin processing the 50th record. Run 1, Event 8750, LumiSection 88 on stream 11 at 24-Oct-2025 17:44:11.766 CEST
+Begin processing the 51st record. Run 1, Event 8751, LumiSection 88 on stream 9 at 24-Oct-2025 17:44:12.082 CEST
+Begin processing the 52nd record. Run 1, Event 8752, LumiSection 88 on stream 9 at 24-Oct-2025 17:44:12.093 CEST
+Begin processing the 53rd record. Run 1, Event 8753, LumiSection 88 on stream 4 at 24-Oct-2025 17:44:12.100 CEST
+Begin processing the 54th record. Run 1, Event 8754, LumiSection 88 on stream 14 at 24-Oct-2025 17:44:12.412 CEST
+Begin processing the 55th record. Run 1, Event 8755, LumiSection 88 on stream 1 at 24-Oct-2025 17:44:13.671 CEST
+Begin processing the 56th record. Run 1, Event 8756, LumiSection 88 on stream 10 at 24-Oct-2025 17:44:13.873 CEST
+Begin processing the 57th record. Run 1, Event 8757, LumiSection 88 on stream 3 at 24-Oct-2025 17:44:14.323 CEST
+Begin processing the 58th record. Run 1, Event 8758, LumiSection 88 on stream 13 at 24-Oct-2025 17:44:14.631 CEST
+Begin processing the 59th record. Run 1, Event 8759, LumiSection 88 on stream 7 at 24-Oct-2025 17:44:14.857 CEST
+Begin processing the 60th record. Run 1, Event 8760, LumiSection 88 on stream 6 at 24-Oct-2025 17:44:14.879 CEST
+Begin processing the 61st record. Run 1, Event 8761, LumiSection 88 on stream 15 at 24-Oct-2025 17:44:14.886 CEST
+Begin processing the 62nd record. Run 1, Event 8762, LumiSection 88 on stream 6 at 24-Oct-2025 17:44:14.893 CEST
+Begin processing the 63rd record. Run 1, Event 8763, LumiSection 88 on stream 6 at 24-Oct-2025 17:44:14.905 CEST
+Begin processing the 64th record. Run 1, Event 8764, LumiSection 88 on stream 5 at 24-Oct-2025 17:44:15.021 CEST
+Begin processing the 65th record. Run 1, Event 8765, LumiSection 88 on stream 12 at 24-Oct-2025 17:44:16.271 CEST
+Begin processing the 66th record. Run 1, Event 8766, LumiSection 88 on stream 8 at 24-Oct-2025 17:44:16.902 CEST
+Begin processing the 67th record. Run 1, Event 8767, LumiSection 88 on stream 8 at 24-Oct-2025 17:44:16.913 CEST
+Begin processing the 68th record. Run 1, Event 8768, LumiSection 88 on stream 1 at 24-Oct-2025 17:44:17.029 CEST
+Begin processing the 69th record. Run 1, Event 8769, LumiSection 88 on stream 2 at 24-Oct-2025 17:44:17.138 CEST
+Begin processing the 70th record. Run 1, Event 8770, LumiSection 88 on stream 11 at 24-Oct-2025 17:44:17.778 CEST
+Begin processing the 71st record. Run 1, Event 8771, LumiSection 88 on stream 0 at 24-Oct-2025 17:44:18.604 CEST
+Begin processing the 72nd record. Run 1, Event 8772, LumiSection 88 on stream 14 at 24-Oct-2025 17:44:18.611 CEST
+Begin processing the 73rd record. Run 1, Event 8773, LumiSection 88 on stream 14 at 24-Oct-2025 17:44:18.621 CEST
+Begin processing the 74th record. Run 1, Event 8774, LumiSection 88 on stream 0 at 24-Oct-2025 17:44:18.795 CEST
+Begin processing the 75th record. Run 1, Event 8775, LumiSection 88 on stream 4 at 24-Oct-2025 17:44:18.795 CEST
+Begin processing the 76th record. Run 1, Event 8776, LumiSection 88 on stream 13 at 24-Oct-2025 17:44:18.969 CEST
+Begin processing the 77th record. Run 1, Event 8777, LumiSection 88 on stream 3 at 24-Oct-2025 17:44:19.713 CEST
+Begin processing the 78th record. Run 1, Event 8778, LumiSection 88 on stream 10 at 24-Oct-2025 17:44:20.193 CEST
+Begin processing the 79th record. Run 1, Event 8779, LumiSection 88 on stream 6 at 24-Oct-2025 17:44:20.509 CEST
+Begin processing the 80th record. Run 1, Event 8780, LumiSection 88 on stream 7 at 24-Oct-2025 17:44:20.782 CEST
+Begin processing the 81st record. Run 1, Event 8781, LumiSection 88 on stream 9 at 24-Oct-2025 17:44:20.877 CEST
+Begin processing the 82nd record. Run 1, Event 8782, LumiSection 88 on stream 15 at 24-Oct-2025 17:44:21.211 CEST
+Begin processing the 83rd record. Run 1, Event 8783, LumiSection 88 on stream 5 at 24-Oct-2025 17:44:21.301 CEST
+Begin processing the 84th record. Run 1, Event 8784, LumiSection 88 on stream 5 at 24-Oct-2025 17:44:21.312 CEST
+Begin processing the 85th record. Run 1, Event 8785, LumiSection 88 on stream 12 at 24-Oct-2025 17:44:21.609 CEST
+Begin processing the 86th record. Run 1, Event 8786, LumiSection 88 on stream 12 at 24-Oct-2025 17:44:21.621 CEST
+Begin processing the 87th record. Run 1, Event 8787, LumiSection 88 on stream 8 at 24-Oct-2025 17:44:22.724 CEST
+Begin processing the 88th record. Run 1, Event 8788, LumiSection 88 on stream 8 at 24-Oct-2025 17:44:22.737 CEST
+Begin processing the 89th record. Run 1, Event 8789, LumiSection 88 on stream 2 at 24-Oct-2025 17:44:22.974 CEST
+Begin processing the 90th record. Run 1, Event 8790, LumiSection 88 on stream 14 at 24-Oct-2025 17:44:23.209 CEST
+Begin processing the 91st record. Run 1, Event 8791, LumiSection 88 on stream 11 at 24-Oct-2025 17:44:23.942 CEST
+Begin processing the 92nd record. Run 1, Event 8792, LumiSection 88 on stream 6 at 24-Oct-2025 17:44:24.404 CEST
+Begin processing the 93rd record. Run 1, Event 8793, LumiSection 88 on stream 15 at 24-Oct-2025 17:44:24.711 CEST
+Begin processing the 94th record. Run 1, Event 8794, LumiSection 88 on stream 13 at 24-Oct-2025 17:44:24.805 CEST
+Begin processing the 95th record. Run 1, Event 8795, LumiSection 88 on stream 12 at 24-Oct-2025 17:44:24.978 CEST
+Begin processing the 96th record. Run 1, Event 8796, LumiSection 88 on stream 0 at 24-Oct-2025 17:44:25.880 CEST
+Begin processing the 97th record. Run 1, Event 8797, LumiSection 88 on stream 10 at 24-Oct-2025 17:44:25.992 CEST
+Begin processing the 98th record. Run 1, Event 8798, LumiSection 88 on stream 1 at 24-Oct-2025 17:44:26.099 CEST
+Begin processing the 99th record. Run 1, Event 8799, LumiSection 88 on stream 4 at 24-Oct-2025 17:44:27.051 CEST
+Begin processing the 100th record. Run 1, Event 8800, LumiSection 88 on stream 9 at 24-Oct-2025 17:44:27.227 CEST
+24-Oct-2025 17:44:32 CEST  Closed file file:/data/lebeltra/AoS_benchmarks/input_root.root
+%MSG-i ThroughputService:  AfterModEndJob 24-Oct-2025 17:44:32 CEST EndJob
+      25, 24-Oct-2025 17:44:09.874027 CEST
+      50, 24-Oct-2025 17:44:16.848109 CEST
+      75, 24-Oct-2025 17:44:23.885616 CEST
+     100, 24-Oct-2025 17:44:32.119986 CEST
+
+Average throughput: 3.3714 ± 0.322816 ev/s
+%MSG

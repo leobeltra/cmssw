@@ -1,0 +1,14 @@
+cmsDriver.py Phase2 -s L1P2GT,HLT:75e33_timing \
+--processName=HLTX \
+--conditions auto:phase2_realistic_T33 \
+--geometry ExtendedRun4D110 \
+--era Phase2C17I13M9 \
+--customise SLHCUpgradeSimulations/Configuration/aging.customise_aging_1000 \
+--eventcontent FEVTDEBUGHLT \
+--filein=file:/data/lebeltra/AoS_benchmarks/input_root.root \
+--mc \
+--inputCommands="keep *, drop *_hlt*_*_HLT, drop triggerTriggerFilterObjectWithRefs_l1t*_*_HLT" \
+-n -1 \
+--no_exec \
+--output={} \
+--python_filename hlt_config.py

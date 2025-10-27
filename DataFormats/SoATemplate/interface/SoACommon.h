@@ -831,6 +831,8 @@ namespace cms::soa {
 
     SOA_HOST_DEVICE SOA_INLINE size_type size() const { return proxy_.size(); }
 
+    SOA_HOST_DEVICE SOA_INLINE value_element* data() { return proxy_.data(); }
+
   private:
     // value_element* base = nullptr;
     // size_type length = 0;
@@ -847,6 +849,8 @@ namespace cms::soa {
     SOA_HOST_DEVICE SOA_INLINE auto operator[](size_type i) const -> decltype(auto) { return (proxy_[i].*Member); }
 
     SOA_HOST_DEVICE SOA_INLINE size_type size() const { return proxy_.size(); }
+
+    SOA_HOST_DEVICE SOA_INLINE const value_element* data() const { return proxy_.data(); }
 
   private:
     // const value_element* proxy_ = nullptr;

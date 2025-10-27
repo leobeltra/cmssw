@@ -33,12 +33,14 @@ namespace reco {
   GENERATE_SOA_LAYOUT(TrackHitsLayout, SOA_COLUMN(uint32_t, id), SOA_COLUMN(uint32_t, detId))
 
   using TrackSoA = TrackLayout<>;
-  using TrackSoAView = TrackSoA::View;
-  using TrackSoAConstView = TrackSoA::ConstView;
+  using TrackAoS = TrackSoA::AoSWrapper;
+  using TrackSoAView = TrackAoS::View;
+  using TrackSoAConstView = TrackAoS::ConstView;
 
   using TrackHitSoA = TrackHitsLayout<>;
-  using TrackHitSoAView = TrackHitSoA::View;
-  using TrackHitSoAConstView = TrackHitSoA::ConstView;
+  using TrackHitAoS = TrackHitSoA::AoSWrapper;
+  using TrackHitSoAView = TrackHitAoS::View;
+  using TrackHitSoAConstView = TrackHitAoS::ConstView;
 
   // All these below were constexpr. Now I get this:
   // note: non-literal type 'reco::TrackLayout<128, false>::ConstViewTemplateFreeParams<128, false, true, true>::const_element'

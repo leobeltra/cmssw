@@ -48,7 +48,7 @@ class PixelTrackProducerFromSoAAlpaka : public edm::global::EDProducer<> {
   using TrackSoAHost = reco::TracksHost;
   using HMSstorage = std::vector<uint32_t>;
   using IndToEdm = std::vector<uint32_t>;
-  using TrackHitSoA = reco::TrackHitSoA;
+  using TrackHitAoS = reco::TrackHitAoS;
 
 public:
   explicit PixelTrackProducerFromSoAAlpaka(const edm::ParameterSet &iConfig);
@@ -165,7 +165,7 @@ void PixelTrackProducerFromSoAAlpaka::produce(edm::StreamID streamID,
   auto const &tsoa = iEvent.get(tokenTrack_);
   auto const quality = tsoa.view().quality();
   auto const hitOffs = tsoa.view().hitOffsets();
-  auto const hitIdxs = tsoa.template view<TrackHitSoA>().id();
+  auto const hitIdxs = tsoa.template view<TrackHitAoS>().id();
   // auto const &hitIndices = tsoa.view().hitIndices();
   auto nTracks = tsoa.view().nTracks();
 
