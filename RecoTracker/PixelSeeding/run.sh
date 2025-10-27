@@ -17,6 +17,7 @@ cmsDriver.py Phase2 -s L1P2GT,HLT:75e33_timing \
 --customise SLHCUpgradeSimulations/Configuration/aging.customise_aging_1000 \
 --eventcontent FEVTDEBUGHLT \
 --filein=$ALL_FILES \
+--procModifiers alpaka \
 --mc \
 --inputCommands="keep *, drop *_hlt*_*_HLT, drop triggerTriggerFilterObjectWithRefs_l1t*_*_HLT" \
 -n -1 \
