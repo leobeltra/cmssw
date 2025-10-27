@@ -1399,7 +1399,7 @@ _SWITCH_ON_TYPE(VALUE_TYPE,                                                     
       */                                                                                                               \
       struct Metarecords {                                                                                             \
         friend ConstViewTemplateFreeParams;                                                                            \
-        Metarecords(const ConstViewTemplateFreeParams& _soa_impl_parent) :                                             \
+        SOA_HOST_DEVICE SOA_INLINE Metarecords(const ConstViewTemplateFreeParams& _soa_impl_parent) :                                             \
                     parent_(_soa_impl_parent), _ITERATE_ON_ALL_COMMA(_STRUCT_ELEMENT_INITIALIZERS, ~, __VA_ARGS__) {}  \
         _ITERATE_ON_ALL(_CONST_ACCESSORS_STRUCT_MEMBERS, ~, __VA_ARGS__)                                               \
         private:                                                                                                       \
@@ -1560,7 +1560,7 @@ _SWITCH_ON_TYPE(VALUE_TYPE,                                                     
        */                                                                                                              \
       struct Metarecords {                                                                                             \
         friend ViewTemplateFreeParams;                                                                                 \
-        Metarecords(const ViewTemplateFreeParams& _soa_impl_parent) :                                                  \
+        SOA_HOST_DEVICE SOA_INLINE Metarecords(const ViewTemplateFreeParams& _soa_impl_parent) :                                                  \
                     parent_(_soa_impl_parent), _ITERATE_ON_ALL_COMMA(_STRUCT_ELEMENT_INITIALIZERS, ~, __VA_ARGS__) {}  \
         _ITERATE_ON_ALL(_ACCESSORS_STRUCT_MEMBERS, ~, __VA_ARGS__)                                                     \
         private:                                                                                                       \
@@ -1581,7 +1581,7 @@ _SWITCH_ON_TYPE(VALUE_TYPE,                                                     
         : base_type{layout} {}                                                                                         \
                                                                                                                        \
       /* Constructor relying on individually provided column structs */                                                \
-      SOA_HOST_ONLY ViewTemplateFreeParams(                                                                            \
+      SOA_HOST_ONLY SOA_INLINE ViewTemplateFreeParams(                                                                            \
                     _ITERATE_ON_ALL_COMMA(_DECLARE_VIEW_CONSTRUCTOR_COLUMNS, ~, __VA_ARGS__)) {                        \
         bool readyToSet = false;                                                                                       \
         _ITERATE_ON_ALL(_INITIALIZE_VIEW_PARAMETERS_AND_SIZE, ~, __VA_ARGS__)                                          \
