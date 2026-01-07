@@ -133,6 +133,15 @@ public:
     _deepCopy<0>(desc_, desc, queue);
   }
 
+  // Copy block by block heterogeneously for device to host data transfer.
+  template <typename TQueue>
+    requires(alpaka::isQueue<TQueue> && portablecollection::hasBlocksNumber<Layout>)
+  void deepCopy(ConstView const& view, TQueue& queue) {
+    ConstDescriptor desc{view};
+    Descriptor desc_{view_};
+    __deepCopy<0>(desc_, desc, queue);
+  }  
+
 private:
   // Helper function implementing the recursive deep copy
   template <int I, typename TQueue>
@@ -144,6 +153,15 @@ private:
           alpaka::createView(alpaka::getDev(queue), std::get<I>(dest.buff).data(), std::get<I>(dest.buff).size()),
           alpaka::createView(alpaka::getDev(queue), std::get<I>(src.buff).data(), std::get<I>(src.buff).size()));
       _deepCopy<I + 1>(dest, src, queue);
+    }
+  }
+
+  // Helper function implementing the recursive deep copy for blocks
+  template <int I, typename TQueue>
+  void __deepCopy(Descriptor& dest, ConstDescriptor const& src, TQueue& queue) {
+    if constexpr (I < Layout::blocksNumber) {
+      _deepCopy<0>(std::get<I>(dest.buff), std::get<I>(src.buff), queue);
+      __deepCopy<I + 1>(dest, src, queue);
     }
   }
 

@@ -1740,10 +1740,14 @@ _SWITCH_ON_TYPE(VALUE_TYPE,                                                     
     using View = ViewTemplate<cms::soa::RestrictQualify::Default, cms::soa::RangeChecking::Default>;                   \
                                                                                                                        \
     /* Helper struct to loop over the columns without using name for non-mutable data */                               \
-    struct ConstDescriptor {                                                                                           \
-      ConstDescriptor() = default;                                                                                     \
+    template <CMS_SOA_BYTE_SIZE_TYPE VIEW_ALIGNMENT,                                                                   \
+              bool VIEW_ALIGNMENT_ENFORCEMENT,                                                                         \
+              bool RESTRICT_QUALIFY,                                                                                   \
+              bool RANGE_CHECKING>                                                                                     \
+    struct ConstDescriptorTemplateFreeParams {                                                                                           \
+      ConstDescriptorTemplateFreeParams() = default;                                                                                     \
                                                                                                                        \
-      explicit ConstDescriptor(ConstView const& view)                                                                  \
+      explicit ConstDescriptorTemplateFreeParams(ConstViewTemplateFreeParams<VIEW_ALIGNMENT, VIEW_ALIGNMENT_ENFORCEMENT, RESTRICT_QUALIFY, RANGE_CHECKING> const& view)                                                                  \
           : buff{ _ITERATE_ON_ALL_COMMA(_ASSIGN_SPAN_TO_COLUMNS, ~, __VA_ARGS__)} {}                                   \
                                                                                                                        \
       std::tuple<_ITERATE_ON_ALL_COMMA(_DECLARE_CONST_DESCRIPTOR_SPANS, ~, __VA_ARGS__)> buff;                         \
@@ -1753,11 +1757,20 @@ _SWITCH_ON_TYPE(VALUE_TYPE,                                                     
                                     _ITERATE_ON_ALL_COMMA(_DECLARE_CONST_DESCRIPTOR_SPANS, ~, __VA_ARGS__)>>::value;   \
     };                                                                                                                 \
                                                                                                                        \
-    /* Helper struct to loop over the columns without using name for mutable data */                                   \
-    struct Descriptor {                                                                                                \
-      Descriptor() = default;                                                                                          \
+    template <bool RESTRICT_QUALIFY, bool RANGE_CHECKING>                                                                         \
+    using ConstDescriptorTemplate = ConstDescriptorTemplateFreeParams<ALIGNMENT, ALIGNMENT_ENFORCEMENT, RESTRICT_QUALIFY, RANGE_CHECKING>; \
+                                                                                                                           \
+    using ConstDescriptor = ConstDescriptorTemplate<cms::soa::RestrictQualify::Default, cms::soa::RangeChecking::Default>; \
                                                                                                                        \
-      explicit Descriptor(View& view)                                                                                  \
+    /* Helper struct to loop over the columns without using name for mutable data */                                   \
+    template <CMS_SOA_BYTE_SIZE_TYPE VIEW_ALIGNMENT,                                                                   \
+          bool VIEW_ALIGNMENT_ENFORCEMENT,                                                                         \
+          bool RESTRICT_QUALIFY,                                                                                   \
+          bool RANGE_CHECKING>                                                                                     \
+    struct DescriptorTemplateFreeParams {                                                                                                \
+      DescriptorTemplateFreeParams() = default;                                                                                          \
+                                                                                                                       \
+      explicit DescriptorTemplateFreeParams(ViewTemplateFreeParams<VIEW_ALIGNMENT, VIEW_ALIGNMENT_ENFORCEMENT, RESTRICT_QUALIFY, RANGE_CHECKING>& view)                                                                                  \
           : buff{ _ITERATE_ON_ALL_COMMA(_ASSIGN_SPAN_TO_COLUMNS, ~, __VA_ARGS__)} {}                                   \
                                                                                                                        \
       std::tuple<_ITERATE_ON_ALL_COMMA(_DECLARE_DESCRIPTOR_SPANS, ~, __VA_ARGS__)> buff;                               \
@@ -1766,6 +1779,11 @@ _SWITCH_ON_TYPE(VALUE_TYPE,                                                     
       static constexpr size_type num_cols = std::tuple_size<std::tuple<                                                \
                                     _ITERATE_ON_ALL_COMMA(_DECLARE_DESCRIPTOR_SPANS, ~, __VA_ARGS__)>>::value;         \
     };                                                                                                                 \
+
+    template <bool RESTRICT_QUALIFY, bool RANGE_CHECKING>                                                              \
+    using DescriptorTemplate = DescriptorTemplateFreeParams<ALIGNMENT, ALIGNMENT_ENFORCEMENT, RESTRICT_QUALIFY, RANGE_CHECKING>;                   \
+                                                                                                                        \
+    using Descriptor = DescriptorTemplate<cms::soa::RestrictQualify::Default, cms::soa::RangeChecking::Default>;         \
                                                                                                                        \
     /* Trivial constuctor */                                                                                           \
     CLASS()                                                                                                            \
